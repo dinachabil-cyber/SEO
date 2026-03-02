@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page Builder{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Page Builder - {{ page.slug }}</h1>
+        
+        <h2>Add Section</h2>
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            
+            {# Dynamic fields based on section type #}
+            <div id="dynamic-fields"></div>
+            
+            <button type="submit" class="btn btn-primary">Add Section</button>
+        {{ form_end(form) }}
+        
+        <h2>Existing Sections</h2>
+        {% if sections is empty %}
+            <p>No sections yet.</p>
+        {% else %}
+            <ul class="sections-list">
+                {% for section in sections %}
+                    <li>
+                        <strong>{{ section.type }}</strong> (Position: {{ section.position }})
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="delete_section" value="{{ section.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <a href="{{ path('app_admin_site_dashboard', {'id': page.site.id}) }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.querySelector('select[name="page_section[type]"]');
+            const dynamicFields = document.getElementById('dynamic-fields');
+            
+            typeSelect.addEventListener('change', function() {
+                const type = this.value;
+                dynamicFields.innerHTML = '';
+                
+                switch(type) {
+                    case 'header':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>Logo Text</label>
+                                <input type="text" name="header_logo_text" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Menu (JSON)</label>
+                                <textarea name="header_menu" class="form-control" rows="3">[{ "label": "Home", "targetSlug": "home" }]</textarea>
+                            </div>
+                        `;
+                        break;
+                    case 'body':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>HTML Content</label>
+                                <textarea name="body_html" class="form-control" rows="5"><p>Content here</p></textarea>
+                            </div>
+                        `;
+                        break;
+                    case 'image':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>Image Source</label>
+                                <input type="text" name="image_src" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Image Alt</label>
+                                <input type="text" name="image_alt" class="form-control">
+                            </div>
+                        `;
+                        break;
+                    case 'cards':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>Cards (JSON)</label>
+                                <textarea name="cards_data" class="form-control" rows="5">[{"title": "Card 1", "text": "Description", "image": "/uploads/image.jpg", "buttonText": "View", "targetSlug": "page"}]</textarea>
+                            </div>
+                        `;
+                        break;
+                    case 'form':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>Form Title</label>
+                                <input type="text" name="form_title" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Form Fields (JSON)</label>
+                                <textarea name="form_fields" class="form-control" rows="5">[{"name": "name", "label": "Name", "type": "text", "required": true}]</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Submit Text</label>
+                                <input type="text" name="form_submit_text" class="form-control" value="Submit">
+                            </div>
+                        `;
+                        break;
+                    case 'footer':
+                        dynamicFields.innerHTML = `
+                            <div class="form-group">
+                                <label>Footer Text</label>
+                                <input type="text" name="footer_text" class="form-control" value="© 2026">
+                            </div>
+                            <div class="form-group">
+                                <label>Footer Links (JSON)</label>
+                                <textarea name="footer_links" class="form-control" rows="3">[{"label": "Contact", "targetSlug": "contact"}]</textarea>
+                            </div>
+                        `;
+                        break;
+                }
+            });
+        });
+    </script>
+{% endblock %}
