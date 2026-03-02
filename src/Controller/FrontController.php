@@ -21,10 +21,19 @@ final class FrontController extends AbstractController
             throw $this->createNotFoundException('No active site found');
         }
 
-        $page = $pageRepository->findOneBy(['slug' => $slug, 'site' => $site, 'isPublished' => true]);
+        // Debug info
+        $allPages = $pageRepository->findAll();
+        $sitePages = $pageRepository->createQueryBuilder('p')
+            ->andWhere('p.site = :site')
+            ->andWhere('p.isPublished = true')
+            ->setParameter('site', $site)
+            ->getQuery()
+            ->getResult();
+
+        $page = $pageRepository->findOneBySlugAndSite($slug, $site);
         
         if (!$page) {
-            throw $this->createNotFoundException('Page not found');
+            throw $this->createNotFoundException(sprintf('Page not found for slug "%s" and site "%s"', $slug, $site->getName()));
         }
 
         // Get sections ordered by position

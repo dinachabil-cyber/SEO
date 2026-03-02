@@ -20,32 +20,64 @@ final class Version20260302144400 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // Update Site entity
-        $this->addSql('ALTER TABLE site DROP page');
-        $this->addSql('ALTER TABLE site ADD domain VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE site ADD default_locale VARCHAR(5) DEFAULT \'fr\' NOT NULL');
-        $this->addSql('ALTER TABLE site ADD is_active TINYINT(1) DEFAULT 1 NOT NULL');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_694309E4115F0EE5 ON site (domain)');
+        if ($schema->getTable('site')->hasColumn('page')) {
+            $this->addSql('ALTER TABLE site DROP page');
+        }
+        if (!$schema->getTable('site')->hasColumn('domain')) {
+            $this->addSql('ALTER TABLE site ADD domain VARCHAR(255) NOT NULL');
+        }
+        if (!$schema->getTable('site')->hasColumn('default_locale')) {
+            $this->addSql('ALTER TABLE site ADD default_locale VARCHAR(5) DEFAULT \'fr\' NOT NULL');
+        }
+        if (!$schema->getTable('site')->hasColumn('is_active')) {
+            $this->addSql('ALTER TABLE site ADD is_active TINYINT(1) DEFAULT 1 NOT NULL');
+        }
+        if (!$schema->getTable('site')->hasIndex('UNIQ_694309E4115F0EE5')) {
+            $this->addSql('CREATE UNIQUE INDEX UNIQ_694309E4115F0EE5 ON site (domain)');
+        }
 
         // Update Page entity
-        $this->addSql('ALTER TABLE page DROP url, DROP title, DROP target_keywords, DROP internal_links');
-        $this->addSql('ALTER TABLE page ADD slug VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE page ADD meta_title VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE page ADD meta_description VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE page ADD h1 VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE page ADD is_published TINYINT(1) DEFAULT 1 NOT NULL');
-        $this->addSql('CREATE INDEX IDX_140AB6205DA37D0D ON page (slug)');
+        if ($schema->getTable('page')->hasColumn('url')) {
+            $this->addSql('ALTER TABLE page DROP url');
+        }
+        if ($schema->getTable('page')->hasColumn('title')) {
+            $this->addSql('ALTER TABLE page DROP title');
+        }
+        if ($schema->getTable('page')->hasColumn('target_keywords')) {
+            $this->addSql('ALTER TABLE page DROP target_keywords');
+        }
+        if ($schema->getTable('page')->hasColumn('internal_links')) {
+            $this->addSql('ALTER TABLE page DROP internal_links');
+        }
+        if (!$schema->getTable('page')->hasColumn('slug')) {
+            $this->addSql('ALTER TABLE page ADD slug VARCHAR(255) NOT NULL');
+        }
+        if (!$schema->getTable('page')->hasColumn('meta_title')) {
+            $this->addSql('ALTER TABLE page ADD meta_title VARCHAR(255) DEFAULT NULL');
+        }
+        if (!$schema->getTable('page')->hasColumn('h1')) {
+            $this->addSql('ALTER TABLE page ADD h1 VARCHAR(255) DEFAULT NULL');
+        }
+        if (!$schema->getTable('page')->hasColumn('is_published')) {
+            $this->addSql('ALTER TABLE page ADD is_published TINYINT(1) DEFAULT 1 NOT NULL');
+        }
+        if (!$schema->getTable('page')->hasIndex('IDX_140AB6205DA37D0D')) {
+            $this->addSql('CREATE INDEX IDX_140AB6205DA37D0D ON page (slug)');
+        }
 
         // Create PageSection entity
-        $this->addSql('CREATE TABLE page_section (
-            id INT AUTO_INCREMENT NOT NULL, 
-            page_id INT NOT NULL, 
-            type VARCHAR(20) NOT NULL, 
-            position INT NOT NULL, 
-            data JSON NOT NULL, 
-            INDEX IDX_98A2C6F4C4663E4 (page_id), 
-            PRIMARY KEY(id)
-        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE page_section ADD CONSTRAINT FK_98A2C6F4C4663E4 FOREIGN KEY (page_id) REFERENCES page (id)');
+        if (!$schema->hasTable('page_section')) {
+            $this->addSql('CREATE TABLE page_section (
+                id INT AUTO_INCREMENT NOT NULL, 
+                page_id INT NOT NULL, 
+                type VARCHAR(20) NOT NULL, 
+                position INT NOT NULL, 
+                data JSON NOT NULL, 
+                INDEX IDX_98A2C6F4C4663E4 (page_id), 
+                PRIMARY KEY(id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+            $this->addSql('ALTER TABLE page_section ADD CONSTRAINT FK_98A2C6F4C4663E4 FOREIGN KEY (page_id) REFERENCES page (id)');
+        }
     }
 
     public function down(Schema $schema): void

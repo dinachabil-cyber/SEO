@@ -2,36 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Page;
-use App\Entity\Site;
+use App\Entity\PageSection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Page>
+ * @extends ServiceEntityRepository<PageSection>
  */
-class PageRepository extends ServiceEntityRepository
+class PageSectionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Page::class);
-    }
-
-    public function findOneBySlugAndSite(string $slug, Site $site): ?Page
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.slug = :slug')
-            ->andWhere('p.site = :site')
-            ->andWhere('p.isPublished = true')
-            ->setParameter('slug', $slug)
-            ->setParameter('site', $site)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        parent::__construct($registry, PageSection::class);
     }
 
     //    /**
-    //     * @return Page[] Returns an array of Page objects
+    //     * @return PageSection[] Returns an array of PageSection objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -45,7 +31,7 @@ class PageRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Page
+    //    public function findOneBySomeField($value): ?PageSection
     //    {
     //        return $this->createQueryBuilder('p')
     //            ->andWhere('p.exampleField = :val')
