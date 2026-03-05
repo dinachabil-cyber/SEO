@@ -1,10 +1,11 @@
-<header class="site-navbar" style="{% if data.background is defined %}background-color: {{ data.background }};{% endif %}">
+<header class="site-navbar {% if data.style is defined and data.style.sticky %}sticky-top{% endif %} {% if data.style is defined and data.style.variant == 'dark' %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}" 
+        style="{% if data.style is defined and data.style.background %}background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="brand">
-                {% if data.logoText is defined %}
-                    {{ data.logoText }}
-                {% elseif data.brandText is defined %}
+                {% if data.logoUrl %}
+                    <img src="{{ data.logoUrl }}" alt="{{ data.brandText }}" class="logo">
+                {% elseif data.brandText %}
                     {{ data.brandText }}
                 {% else %}
                     {{ 'Brand' }}

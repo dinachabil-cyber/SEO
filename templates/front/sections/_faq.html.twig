@@ -6,11 +6,11 @@
             </div>
         {% endif %}
         
-        <div class="accordion" id="faqAccordion">
+        <div class="accordion {% if data.style is defined and data.style.accordionVariant %}accordion-{{ data.style.accordionVariant }}{% endif %}" id="faqAccordion">
             {% for item in data.items %}
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="true" aria-controls="faqCollapse{{ loop.index }}">
+                        <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="faqCollapse{{ loop.index }}">
                             {{ item.question }}
                         </button>
                     </h2>

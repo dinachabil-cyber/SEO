@@ -11,10 +11,12 @@
                     <h4>Quick Links</h4>
                     <ul>
                         {% set links = data.links|split('\n') %}
-                        {% for link in links if link %}
-                            {% set parts = link|split('|') %}
-                            {% if parts|length == 2 %}
-                                <li><a href="{{ parts[1] }}">{{ parts[0] }}</a></li>
+                        {% for link in links %}
+                            {% if link %}
+                                {% set parts = link|split('|') %}
+                                {% if parts|length == 2 %}
+                                    <li><a href="{{ parts[1] }}">{{ parts[0] }}</a></li>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </ul>

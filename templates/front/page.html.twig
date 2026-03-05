@@ -5,7 +5,7 @@
 {% block body %}
 <main class="main-content">
     {# Render each section #}
-    {% for section in page.sections %}
+    {% for section in sections %}
         {% set data = section.effectiveData %}
         
         {% if section.type == 'header' %}
@@ -29,4 +29,17 @@
         {% endif %}
     {% endfor %}
 </main>
+{% endblock %}
+
+{% block javascripts %}
+    {# Example of how to generate site-specific URLs in JavaScript #}
+    <script>
+        const siteDomain = '{{ site.domain }}';
+        const baseUrl = window.location.protocol + '//' + siteDomain;
+        
+        // Usage example: generate URL for another page
+        function generatePageUrl(slug) {
+            return baseUrl + '/' + slug;
+        }
+    </script>
 {% endblock %}

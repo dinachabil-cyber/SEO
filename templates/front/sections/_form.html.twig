@@ -10,31 +10,77 @@
             <div class="col-md-8 col-lg-6">
                 <div class="lead-form">
                     <form method="POST" action="{{ path('app_contact') }}">
-                        {% if 'name' in data.fields %}
-                            <div class="mb-3">
-                                <input type="text" class="form-control" placeholder="Your Name" required>
-                            </div>
+                        {{ csrf_token('contact_form') }}
+                        {% if data.fields is defined %}
+                            {% for field in data.fields %}
+                                {# Handle both object fields (new format) and string fields (old format) #}
+                                {% if field is not iterable %}
+                                    <div class="mb-3">
+                                        {% if field == 'name' %}
+                                            <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                                        {% elseif field == 'email' %}
+                                            <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                                        {% elseif field == 'phone' %}
+                                            <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
+                                        {% elseif field == 'message' %}
+                                            <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="mb-3 {% if data.style is defined and data.style.layout == '2col' and field.width == 'half' %}col-md-6{% else %}col-12{% endif %}">
+                                        {% if field.type == 'text' %}
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   name="{{ field.name }}" 
+                                                   placeholder="{{ field.placeholder }}" 
+                                                   {% if field.required %}required{% endif %}>
+                                        {% elseif field.type == 'email' %}
+                                            <input type="email" 
+                                                   class="form-control" 
+                                                   name="{{ field.name }}" 
+                                                   placeholder="{{ field.placeholder }}" 
+                                                   {% if field.required %}required{% endif %}>
+                                        {% elseif field.type == 'tel' %}
+                                            <input type="tel" 
+                                                   class="form-control" 
+                                                   name="{{ field.name }}" 
+                                                   placeholder="{{ field.placeholder }}" 
+                                                   {% if field.required %}required{% endif %}>
+                                        {% elseif field.type == 'textarea' %}
+                                            <textarea class="form-control" 
+                                                      name="{{ field.name }}" 
+                                                      rows="4" 
+                                                      placeholder="{{ field.placeholder }}" 
+                                                      {% if field.required %}required{% endif %}></textarea>
+                                        {% elseif field.type == 'select' %}
+                                            <select class="form-control" 
+                                                    name="{{ field.name }}" 
+                                                    {% if field.required %}required{% endif %}>
+                                                {% set options = field.options|split('\n') %}
+                                                {% for option in options %}
+                                                    {% if option %}
+                                                        <option value="{{ option }}">{{ option }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        {% elseif field.type == 'checkbox' %}
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input" 
+                                                       id="{{ field.name }}" 
+                                                       name="{{ field.name }}" 
+                                                       {% if field.required %}required{% endif %}>
+                                                <label class="form-check-label" for="{{ field.name }}">
+                                                    {{ field.label }}
+                                                </label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
                         
-                        {% if 'email' in data.fields %}
-                            <div class="mb-3">
-                                <input type="email" class="form-control" placeholder="Your Email" required>
-                            </div>
-                        {% endif %}
-                        
-                        {% if 'phone' in data.fields %}
-                            <div class="mb-3">
-                                <input type="tel" class="form-control" placeholder="Your Phone">
-                            </div>
-                        {% endif %}
-                        
-                        {% if 'message' in data.fields %}
-                            <div class="mb-3">
-                                <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
-                            </div>
-                        {% endif %}
-                        
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="submit" class="btn {% if data.style is defined and data.style.buttonStyle == 'accent' %}btn-accent{% else %}btn-primary{% endif %} w-100">
                             {{ data.submitText }}
                         </button>
                         

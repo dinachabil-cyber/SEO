@@ -1,23 +1,71 @@
-<section class="hero">
+{% set hasImage = data.imageUrl is defined and data.imageUrl %}
+{% set layout = data.style is defined and data.style.layout ? data.style.layout : 'left' %}
+{% set backgroundColor = data.style is defined and data.style.background ? data.style.background : '#007bff' %}
+
+<section class="hero {% if hasImage %}hero-with-image{% endif %}" 
+         style="{% if not hasImage %}background-color: {{ backgroundColor }};{% endif %}">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <h1 class="display-4 mb-4">{{ data.title }}</h1>
-                    {% if data.subtitle %}
-                        <p class="lead mb-4">{{ data.subtitle }}</p>
-                    {% endif %}
-                    {% if data.ctaText and data.ctaUrl %}
-                        <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
-                            {{ data.ctaText }}
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-            {% if data.imageUrl %}
+            {% if layout == 'left' %}
                 <div class="col-lg-6">
-                    <div class="hero-media">
-                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                    <div class="hero-content">
+                        <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                        {% if data.subtitle %}
+                            <p class="lead mb-4">{{ data.subtitle }}</p>
+                        {% endif %}
+                        {% if data.bullets %}
+                            <ul class="list-unstyled mb-4">
+                                {% set bullets = data.bullets|split('\n') %}
+                                {% for bullet in bullets %}
+                                    {% if bullet %}
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> {{ bullet }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if data.ctaText and data.ctaUrl %}
+                            <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                                {{ data.ctaText }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if hasImage %}
+                    <div class="col-lg-6">
+                        <div class="hero-media">
+                            <img src="{{ data.imageUrl }}" alt="{{ data.title }}" class="img-fluid rounded shadow-lg">
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if hasImage %}
+                    <div class="col-lg-6">
+                        <div class="hero-media">
+                            <img src="{{ data.imageUrl }}" alt="{{ data.title }}" class="img-fluid rounded shadow-lg">
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                        {% if data.subtitle %}
+                            <p class="lead mb-4">{{ data.subtitle }}</p>
+                        {% endif %}
+                        {% if data.bullets %}
+                            <ul class="list-unstyled mb-4">
+                                {% set bullets = data.bullets|split('\n') %}
+                                {% for bullet in bullets %}
+                                    {% if bullet %}
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> {{ bullet }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if data.ctaText and data.ctaUrl %}
+                            <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                                {{ data.ctaText }}
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}

@@ -6,19 +6,23 @@
             </div>
         {% endif %}
         
-        <div class="grid-3">
+        <div class="row {% if data.style is defined %}row-cols-1 row-cols-md-{{ data.style.columns }} g-4{% else %}row-cols-1 row-cols-md-3 g-4{% endif %}">
             {% for card in data.cards %}
-                <div class="x-card">
-                    {% if card.imageUrl %}
-                        <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 rounded">
-                    {% endif %}
-                    <h3 class="mb-2">{{ card.title }}</h3>
-                    <p class="mb-4 text-muted">{{ card.description }}</p>
-                    {% if card.linkUrl %}
-                        <a href="{{ card.linkUrl }}" class="btn btn-primary">
-                            Learn More
-                        </a>
-                    {% endif %}
+                <div class="col">
+                    <div class="card {% if data.style is defined and data.style.cardVariant == 'outline' %}border-primary{% elseif data.style is defined and data.style.cardVariant == 'glass' %}glass{% endif %} h-100">
+                        {% if card.imageUrl %}
+                            <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="card-img-top {% if data.style is defined and data.style.cardVariant == 'solid' %}rounded-top{% endif %}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">{{ card.title }}</h3>
+                            <p class="card-text text-muted mb-4">{{ card.description }}</p>
+                            {% if card.linkUrl %}
+                                <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style.accentColor == 'accent' %}btn-accent{% else %}btn-primary{% endif %}">
+                                    Learn More
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         </div>
