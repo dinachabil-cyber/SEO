@@ -1,0 +1,14 @@
+<section class="section bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="text-center">
+                    <img src="{{ data.imageUrl }}" alt="{{ data.alt }}" class="img-fluid mb-4">
+                    {% if data.caption %}
+                        <p class="text-muted">{{ data.caption }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page.metaTitle }}{% endblock %}
+
+{% block body %}
+<main class="main-content">
+    {# Render each section #}
+    {% for section in page.sections %}
+        {% set data = section.effectiveData %}
+        
+        {% if section.type == 'header' %}
+            {% include 'front/sections/_header.html.twig' with {data: data} %}
+        {% elseif section.type == 'hero' %}
+            {% include 'front/sections/_hero.html.twig' with {data: data} %}
+        {% elseif section.type == 'body' %}
+            {% include 'front/sections/_body.html.twig' with {data: data} %}
+        {% elseif section.type == 'image' %}
+            {% include 'front/sections/_image.html.twig' with {data: data} %}
+        {% elseif section.type == 'cards' %}
+            {% include 'front/sections/_cards.html.twig' with {data: data} %}
+        {% elseif section.type == 'faq' %}
+            {% include 'front/sections/_faq.html.twig' with {data: data} %}
+        {% elseif section.type == 'form' %}
+            {% include 'front/sections/_form.html.twig' with {data: data} %}
+        {% elseif section.type == 'cta' %}
+            {% include 'front/sections/_cta.html.twig' with {data: data} %}
+        {% elseif section.type == 'footer' %}
+            {% include 'front/sections/_footer.html.twig' with {data: data} %}
+        {% endif %}
+    {% endfor %}
+</main>
+{% endblock %}

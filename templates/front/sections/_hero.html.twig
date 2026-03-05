@@ -1,0 +1,55 @@
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                    {% if data.subtitle %}
+                        <p class="lead mb-4">{{ data.subtitle }}</p>
+                    {% endif %}
+                    {% if data.ctaText and data.ctaUrl %}
+                        <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                            {{ data.ctaText }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% if data.imageUrl %}
+                <div class="col-lg-6">
+                    <div class="hero-media">
+                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% if data.showForm %}
+<section class="section-sm bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="lead-form">
+                    <h3 class="lead-form-title mb-4">Get in Touch</h3>
+                    <form method="POST" action="{{ path('app_contact') }}">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" class="form-control" placeholder="Your Phone">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

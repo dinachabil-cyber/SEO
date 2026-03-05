@@ -6,8 +6,12 @@ use App\Repository\PageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['site', 'slug'], message: 'This slug is already used for this site.')]
 class Page
 {
     #[ORM\Id]
@@ -16,34 +20,86 @@ class Page
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'pages')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Site $site = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $slug = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $metaTitle = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $metaDescription = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $h1 = null;
-
-    #[ORM\Column(options: ['default' => true])]
-    private ?bool $isPublished = true;
 
     /**
      * @var Collection<int, PageSection>
      */
-    #[ORM\OneToMany(targetEntity: PageSection::class, mappedBy: 'page')]
+    #[ORM\OneToMany(targetEntity: PageSection::class, mappedBy: 'page', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $sections;
+
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $metaTitle = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $metaDescription = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $h1 = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isPublished = false;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
+        $this->isPublished = false;
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
         $this->sections = new ArrayCollection();
-        $this->isPublished = true;
+    }
+
+    /**
+     * @return Collection<int, PageSection>
+     */
+    public function getSections(): Collection
+    {
+        return $this->sections;
+    }
+
+    public function addSection(PageSection $section): static
+    {
+        if (!$this->sections->contains($section)) {
+            $this->sections->add($section);
+            $section->setPage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSection(PageSection $section): static
+    {
+        if ($this->sections->removeElement($section)) {
+            // set the owning side to null (unless already changed)
+            if ($section->getPage() === $this) {
+                $section->setPage(null);
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -114,36 +170,17 @@ class Page
     public function setIsPublished(bool $isPublished): static
     {
         $this->isPublished = $isPublished;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PageSection>
-     */
-    public function getSections(): Collection
-    {
-        return $this->sections;
-    }
-
-    public function addSection(PageSection $section): static
-    {
-        if (!$this->sections->contains($section)) {
-            $this->sections->add($section);
-            $section->setPage($this);
-        }
 
         return $this;
     }
 
-    public function removeSection(PageSection $section): static
+    public function getCreatedAt(): ?DateTimeImmutable
     {
-        if ($this->sections->removeElement($section)) {
-            // set the owning side to null (unless already changed)
-            if ($section->getPage() === $this) {
-                $section->setPage(null);
-            }
-        }
+        return $this->createdAt;
+    }
 
-        return $this;
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

@@ -16,28 +16,38 @@ class SiteRepository extends ServiceEntityRepository
         parent::__construct($registry, Site::class);
     }
 
-    //    /**
-    //     * @return Site[] Returns an array of Site objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find all active sites
+     *
+     * @return Site[] Returns an array of Site objects
+     */
+    public function findActiveSites(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.isActive = :val')
+            ->setParameter('val', true)
+            ->orderBy('s.name', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
-    //    public function findOneBySomeField($value): ?Site
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Find one active site by domain
+     */
+    public function findOneActiveByDomain(?string $domain): ?Site
+    {
+        if (null === $domain) {
+            return null;
+        }
+
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.domain = :domain')
+            ->andWhere('s.isActive = :active')
+            ->setParameter('domain', $domain)
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

@@ -1,11 +1,87 @@
-# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
+app:
+    resource: '../src/Controller/'
+    type: attribute
 
-# This file is the entry point to configure the routes of your app.
-# Methods with the #[Route] attribute are automatically imported.
-# See also https://symfony.com/doc/current/routing.html
+# Site routes
+app_site_index:
+    path: /admin/site
+    controller: 'App\Controller\SiteController::index'
+    methods: ['GET', 'POST']
 
-# To list all registered routes, run the following command:
-#   bin/console debug:router
+app_site_new:
+    path: /admin/site/new
+    controller: 'App\Controller\SiteController::new'
+    methods: ['GET', 'POST']
 
-controllers:
-    resource: routing.controllers
+app_site_show:
+    path: /admin/site/{id}
+    controller: 'App\Controller\SiteController::show'
+    methods: ['GET']
+
+app_site_edit:
+    path: /admin/site/{id}/edit
+    controller: 'App\Controller\SiteController::edit'
+    methods: ['GET', 'POST']
+
+app_site_delete:
+    path: /admin/site/{id}/delete
+    controller: 'App\Controller\SiteController::delete'
+    methods: ['POST']
+
+# Page routes
+app_page_new:
+    path: /admin/site/{site}/page/new
+    controller: 'App\Controller\PageController::new'
+    methods: ['GET', 'POST']
+
+app_page_edit:
+    path: /admin/site/{site}/page/{pageId}/edit
+    controller: 'App\Controller\PageController::edit'
+    methods: ['GET', 'POST']
+
+app_page_delete:
+    path: /admin/site/{site}/page/{pageId}/delete
+    controller: 'App\Controller\PageController::delete'
+    methods: ['POST']
+
+# Page Builder routes
+app_page_builder:
+    path: /admin/site/{siteId}/page/{pageId}/builder
+    controller: 'App\Controller\PageBuilderController::index'
+    methods: ['GET']
+
+app_section_new:
+    path: /admin/site/{siteId}/page/{pageId}/section/new
+    controller: 'App\Controller\PageBuilderController::new'
+    methods: ['GET', 'POST']
+
+app_section_edit:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/edit
+    controller: 'App\Controller\PageBuilderController::edit'
+    methods: ['GET', 'POST']
+
+app_section_delete:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/delete
+    controller: 'App\Controller\PageBuilderController::delete'
+    methods: ['POST']
+
+app_section_up:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/up
+    controller: 'App\Controller\PageBuilderController::up'
+    methods: ['POST']
+
+app_section_down:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/down
+    controller: 'App\Controller\PageBuilderController::down'
+    methods: ['POST']
+
+# Frontend routes
+app_home:
+    path: '/'
+    controller: 'App\Controller\HomeController::index'
+    methods: ['GET']
+
+app_front_page:
+    path: '/{slug}'
+    controller: 'App\Controller\FrontController::index'
+    methods: ['GET']

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Page - {{ site.name }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Edit Page: {{ page.h1 }}</h1>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            ← Back
+        </a>
+    </div>
+
+    {% for flashType, flashMessages in app.flashes %}
+        {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ flashType }} alert-dismissible fade show" role="alert">
+                {{ flashMessage }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Page Information</h5>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_row(form.h1) }}
+                {{ form_row(form.slug) }}
+                {{ form_row(form.metaTitle) }}
+                {{ form_row(form.metaDescription) }}
+                {{ form_row(form.isPublished) }}
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                    <a href="{{ path('app_site_show', {'id': site.id}) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Auto-suggest slug from H1
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1Input = document.querySelector('input[name="page[h1]"]');
+            const slugInput = document.querySelector('input[name="page[slug]"]');
+            
+            if (h1Input && slugInput) {
+                h1Input.addEventListener('input', function() {
+                    const slug = this.value.toLowerCase()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .trim();
+                    slugInput.value = slug;
+                });
+            }
+        });
+    </script>
+{% endblock %}

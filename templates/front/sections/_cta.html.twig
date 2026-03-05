@@ -1,0 +1,15 @@
+<section class="cta-band">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">{{ data.title }}</h2>
+                {% if data.text %}
+                    <p class="mb-5">{{ data.text }}</p>
+                {% endif %}
+                <a href="{{ data.buttonUrl }}" class="btn btn-light btn-lg">
+                    {{ data.buttonText }}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

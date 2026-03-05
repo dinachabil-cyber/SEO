@@ -17,7 +17,10 @@ class PageRepository extends ServiceEntityRepository
         parent::__construct($registry, Page::class);
     }
 
-    public function findOneBySlugAndSite(string $slug, Site $site): ?Page
+    /**
+     * Find one published page by slug and site
+     */
+    public function findPublishedBySiteAndSlug(string $slug, Site $site): ?Page
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.slug = :slug')
@@ -30,28 +33,19 @@ class PageRepository extends ServiceEntityRepository
         ;
     }
 
-    //    /**
-    //     * @return Page[] Returns an array of Page objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Page
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Find all pages by site ordered by slug
+     *
+     * @return Page[] Returns an array of Page objects
+     */
+    public function findBySiteOrdered(Site $site): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.site = :site')
+            ->setParameter('site', $site)
+            ->orderBy('p.slug', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

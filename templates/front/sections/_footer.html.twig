@@ -1,0 +1,43 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Us</h4>
+                <p>{{ data.text|raw }}</p>
+            </div>
+            
+            {% if data.links %}
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        {% set links = data.links|split('\n') %}
+                        {% for link in links if link %}
+                            {% set parts = link|split('|') %}
+                            {% if parts|length == 2 %}
+                                <li><a href="{{ parts[1] }}">{{ parts[0] }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            {% if data.phone or data.email %}
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        {% if data.phone %}
+                            <li><i class="bi bi-telephone me-2"></i> {{ data.phone }}</li>
+                        {% endif %}
+                        {% if data.email %}
+                            <li><i class="bi bi-envelope me-2"></i> {{ data.email }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="small-print">
+            <p>&copy; {{ 'now'|date('Y') }} {{ app.request.host }}. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

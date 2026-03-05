@@ -1,0 +1,26 @@
+<section class="section bg-white">
+    <div class="container">
+        {% if data.sectionTitle %}
+            <div class="text-center mb-5">
+                <h2>{{ data.sectionTitle }}</h2>
+            </div>
+        {% endif %}
+        
+        <div class="grid-3">
+            {% for card in data.cards %}
+                <div class="x-card">
+                    {% if card.imageUrl %}
+                        <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 rounded">
+                    {% endif %}
+                    <h3 class="mb-2">{{ card.title }}</h3>
+                    <p class="mb-4 text-muted">{{ card.description }}</p>
+                    {% if card.linkUrl %}
+                        <a href="{{ card.linkUrl }}" class="btn btn-primary">
+                            Learn More
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

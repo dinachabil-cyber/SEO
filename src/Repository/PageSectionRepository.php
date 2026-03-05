@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Page;
 use App\Entity\PageSection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,54 @@ class PageSectionRepository extends ServiceEntityRepository
         parent::__construct($registry, PageSection::class);
     }
 
-    //    /**
-    //     * @return PageSection[] Returns an array of PageSection objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findMaxPositionByPage(Page $page): int
+    {
+        $result = $this->createQueryBuilder('ps')
+            ->select('MAX(ps.position)')
+            ->where('ps.page = :page')
+            ->setParameter('page', $page)
+            ->getQuery()
+            ->getSingleScalarResult();
 
-    //    public function findOneBySomeField($value): ?PageSection
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $result ? (int)$result : -1;
+    }
+
+    /**
+     * @return PageSection[] Returns an array of PageSection objects ordered by position
+     */
+    public function findByPageOrdered(Page $page): array
+    {
+        return $this->createQueryBuilder('ps')
+            ->where('ps.page = :page')
+            ->setParameter('page', $page)
+            ->orderBy('ps.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findPreviousSection(PageSection $section): ?PageSection
+    {
+        return $this->createQueryBuilder('ps')
+            ->where('ps.page = :page')
+            ->andWhere('ps.position < :position')
+            ->setParameter('page', $section->getPage())
+            ->setParameter('position', $section->getPosition())
+            ->orderBy('ps.position', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findNextSection(PageSection $section): ?PageSection
+    {
+        return $this->createQueryBuilder('ps')
+            ->where('ps.page = :page')
+            ->andWhere('ps.position > :position')
+            ->setParameter('page', $section->getPage())
+            ->setParameter('position', $section->getPosition())
+            ->orderBy('ps.position', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

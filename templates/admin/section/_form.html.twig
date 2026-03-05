@@ -1,0 +1,59 @@
+{{ form_row(form.type) }}
+
+{% if form.data is defined %}
+    <div class="section-data-fields">
+        {% set dataForm = form.data %}
+        
+        {% if form.vars.value.type == 'header' %}
+            {{ form_row(dataForm.brandText) }}
+            {{ form_row(dataForm.logoUrl) }}
+            {{ form_row(dataForm.menuItems) }}
+            {{ form_row(dataForm.ctaText) }}
+            {{ form_row(dataForm.ctaUrl) }}
+            {{ form_row(dataForm.background) }}
+            
+        {% elseif form.vars.value.type == 'hero' %}
+            {{ form_row(dataForm.title) }}
+            {{ form_row(dataForm.subtitle) }}
+            {{ form_row(dataForm.imageUrl) }}
+            {{ form_row(dataForm.ctaText) }}
+            {{ form_row(dataForm.ctaUrl) }}
+            {{ form_row(dataForm.showForm) }}
+            
+        {% elseif form.vars.value.type == 'body' %}
+            {{ form_row(dataForm.content) }}
+            
+        {% elseif form.vars.value.type == 'image' %}
+            {{ form_row(dataForm.imageUrl) }}
+            {{ form_row(dataForm.alt) }}
+            {{ form_row(dataForm.caption) }}
+            
+        {% elseif form.vars.value.type == 'cards' %}
+            {{ form_row(dataForm.sectionTitle) }}
+            {{ form_row(dataForm.cards) }}
+            
+        {% elseif form.vars.value.type == 'faq' %}
+            {{ form_row(dataForm.sectionTitle) }}
+            {{ form_row(dataForm.items) }}
+            
+        {% elseif form.vars.value.type == 'form' %}
+            {{ form_row(dataForm.title) }}
+            {{ form_row(dataForm.fields) }}
+            {{ form_row(dataForm.submitText) }}
+            {{ form_row(dataForm.successMessage) }}
+            
+        {% elseif form.vars.value.type == 'cta' %}
+            {{ form_row(dataForm.title) }}
+            {{ form_row(dataForm.text) }}
+            {{ form_row(dataForm.buttonText) }}
+            {{ form_row(dataForm.buttonUrl) }}
+            
+        {% elseif form.vars.value.type == 'footer' %}
+            {{ form_row(dataForm.text) }}
+            {{ form_row(dataForm.links) }}
+            {{ form_row(dataForm.phone) }}
+            {{ form_row(dataForm.email) }}
+            
+        {% endif %}
+    </div>
+{% endif %}

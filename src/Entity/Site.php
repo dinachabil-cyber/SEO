@@ -6,8 +6,10 @@ use App\Repository\SiteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Site
 {
     #[ORM\Id]
@@ -18,7 +20,7 @@ class Site
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $domain = null;
 
     #[ORM\Column(length: 5, options: ['default' => 'fr'])]
@@ -27,10 +29,16 @@ class Site
     #[ORM\Column(options: ['default' => true])]
     private ?bool $isActive = true;
 
+    #[ORM\Column]
+    private ?DateTime $createdAt = null;
+
+    #[ORM\Column]
+    private ?DateTime $updatedAt = null;
+
     /**
      * @var Collection<int, Page>
      */
-    #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'site')]
+    #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'site', orphanRemoval: true)]
     private Collection $pages;
 
     public function __construct()
@@ -38,6 +46,21 @@ class Site
         $this->pages = new ArrayCollection();
         $this->defaultLocale = 'fr';
         $this->isActive = true;
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTime();
     }
 
     public function getId(): ?int
@@ -117,5 +140,15 @@ class Site
         }
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?DateTime
+    {
+        return $this->updatedAt;
     }
 }

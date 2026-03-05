@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Site{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="mb-4">Edit Site: {{ site.name }}</h1>
+
+    {% for flashType, flashMessages in app.flashes %}
+        {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ flashType }} alert-dismissible fade show" role="alert">
+                {{ flashMessage }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Site Information</h5>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_row(form.name) }}
+                {{ form_row(form.domain) }}
+                {{ form_row(form.defaultLocale) }}
+                {{ form_row(form.isActive) }}
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                    <a href="{{ path('app_site_show', {'id': site.id}) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Site
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

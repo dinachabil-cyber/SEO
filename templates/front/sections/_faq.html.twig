@@ -1,0 +1,26 @@
+<section class="section bg-light">
+    <div class="container">
+        {% if data.sectionTitle %}
+            <div class="text-center mb-5">
+                <h2>{{ data.sectionTitle }}</h2>
+            </div>
+        {% endif %}
+        
+        <div class="accordion" id="faqAccordion">
+            {% for item in data.items %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="true" aria-controls="faqCollapse{{ loop.index }}">
+                            {{ item.question }}
+                        </button>
+                    </h2>
+                    <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="faqHeading{{ loop.index }}" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {{ item.answer|raw }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

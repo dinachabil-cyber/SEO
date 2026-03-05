@@ -4,10 +4,14 @@ namespace App\Form;
 
 use App\Entity\Site;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class SiteType extends AbstractType
 {
@@ -15,12 +19,30 @@ class SiteType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Site Name',
-                'required' => true,
+                'label' => 'Name',
+                'constraints' => [
+                    new NotBlank(message: 'Please enter a site name'),
+                    new Length(max: 255, maxMessage: 'Name cannot exceed {{ limit }} characters'),
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter site name',
+                ],
             ])
             ->add('domain', TextType::class, [
                 'label' => 'Domain',
-                'required' => true,
+                'required' => false,
+                'constraints' => [
+                    new Regex(
+                        pattern: '/^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                        message: 'Please enter a valid domain (e.g., example.com)'
+                    ),
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'example.com',
+                ],
+                'help' => 'Optional. Include http:// or https:// if needed',
             ])
             ->add('defaultLocale', ChoiceType::class, [
                 'label' => 'Default Locale',
@@ -28,8 +50,21 @@ class SiteType extends AbstractType
                     'French' => 'fr',
                     'English' => 'en',
                     'Spanish' => 'es',
+                    'German' => 'de',
                 ],
-                'required' => true,
+                'constraints' => [
+                    new NotBlank(message: 'Please select a default locale'),
+                ],
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+            ])
+            ->add('isActive', CheckboxType::class, [
+                'label' => 'Active',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input',
+                ],
             ])
         ;
     }

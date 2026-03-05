@@ -1,0 +1,41 @@
+<header class="site-navbar" style="{% if data.background is defined %}background-color: {{ data.background }};{% endif %}">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="brand">
+                {% if data.logoText is defined %}
+                    {{ data.logoText }}
+                {% elseif data.brandText is defined %}
+                    {{ data.brandText }}
+                {% else %}
+                    {{ 'Brand' }}
+                {% endif %}
+            </div>
+            
+            <nav class="navbar-nav">
+                {% if data.menu is defined %}
+                    {% for item in data.menu %}
+                        {% if item %}
+                            <a href="/{{ item.targetSlug }}" class="nav-link">{{ item.label }}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% elseif data.menuItems is defined %}
+                    {% set menuItems = data.menuItems|split('\n') %}
+                    {% for item in menuItems %}
+                        {% if item %}
+                            {% set parts = item|split('|') %}
+                            {% if parts|length == 2 %}
+                                <a href="{{ parts[1] }}" class="nav-link">{{ parts[0] }}</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </nav>
+            
+            {% if data.ctaText is defined and data.ctaUrl is defined %}
+                <a href="{{ data.ctaUrl }}" class="btn btn-primary">
+                    {{ data.ctaText }}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</header>

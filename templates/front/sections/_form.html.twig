@@ -1,0 +1,51 @@
+<section class="section bg-white">
+    <div class="container">
+        {% if data.title %}
+            <div class="text-center mb-5">
+                <h2>{{ data.title }}</h2>
+            </div>
+        {% endif %}
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="lead-form">
+                    <form method="POST" action="{{ path('app_contact') }}">
+                        {% if 'name' in data.fields %}
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                        {% endif %}
+                        
+                        {% if 'email' in data.fields %}
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                        {% endif %}
+                        
+                        {% if 'phone' in data.fields %}
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" placeholder="Your Phone">
+                            </div>
+                        {% endif %}
+                        
+                        {% if 'message' in data.fields %}
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
+                            </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            {{ data.submitText }}
+                        </button>
+                        
+                        {% if data.successMessage %}
+                            <div id="successMessage" class="alert alert-success mt-3 d-none">
+                                {{ data.successMessage }}
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
