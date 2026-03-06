@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use App\Form\FormFieldType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -107,6 +108,54 @@ class SectionDataType extends AbstractType
             unset($formData['successMessage']);
             
             $event->setData($formData);
+        });
+
+        // Listen for form submit to restructure form section data
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($type) {
+            if ($type !== 'form') {
+                return;
+            }
+            
+            $formData = $event->getData();
+            
+            // Ensure fields are properly structured
+            if (isset($formData['fields']) && !is_array($formData['fields'])) {
+                $formData['fields'] = [];
+            }
+            
+            $event->setData($formData);
+        });
+
+        // Initialize form data when form is created
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($type) {
+            $data = $event->getData();
+            
+            if ($type === 'hero_split') {
+                // Ensure form structure exists
+                if (!isset($data['form']) || !is_array($data['form'])) {
+                    $data['form'] = [
+                        'title' => '',
+                        'submitText' => 'Envoyer',
+                        'consentText' => '',
+                        'successMessage' => '',
+                        'fields' => []
+                    ];
+                }
+                
+                // Ensure fields array exists
+                if (!isset($data['form']['fields']) || !is_array($data['form']['fields'])) {
+                    $data['form']['fields'] = [];
+                }
+                
+                $event->setData($data);
+            } elseif ($type === 'form') {
+                // Ensure fields array exists
+                if (!isset($data['fields']) || !is_array($data['fields'])) {
+                    $data['fields'] = [];
+                }
+                
+                $event->setData($data);
+            }
         });
 
         switch ($type) {
@@ -517,49 +566,6 @@ class SectionDataType extends AbstractType
             ->add('answer', TextareaType::class, [
                 'label' => 'Answer',
                 'attr' => ['rows' => 3],
-            ]);
-    }
-}class FormFieldType extends AbstractType
-{
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->add('label', TextType::class, ['label' => 'Label'])
-            ->add('name', TextType::class, ['label' => 'Name'])
-            ->add('type', ChoiceType::class, [
-                'label' => 'Type',
-                'choices' => [
-                    'Text' => 'text',
-                    'Email' => 'email',
-                    'Phone' => 'tel',
-                    'Textarea' => 'textarea',
-                    'Select' => 'select',
-                    'Checkbox' => 'checkbox',
-                ],
-            ])
-            ->add('required', CheckboxType::class, [
-                'label' => 'Required',
-                'required' => false,
-            ])
-            ->add('placeholder', TextType::class, [
-                'label' => 'Placeholder',
-                'required' => false,
-            ])
-            ->add('options', TextareaType::class, [
-                'label' => 'Options (one per line for select)',
-                'required' => false,
-                'attr' => ['rows' => 3],
-            ])
-            ->add('icon', TextType::class, [
-                'label' => 'Icon',
-                'required' => false,
-            ])
-            ->add('width', ChoiceType::class, [
-                'label' => 'Width',
-                'choices' => [
-                    'Full' => 'full',
-                    'Half' => 'half',
-                ],
             ]);
     }
 }

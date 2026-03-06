@@ -81,6 +81,22 @@ app_page_preview:
     controller: App\Controller\PageBuilderController::preview
     methods: ['GET']
 
+# Test routes - must come before app_front_page to avoid matching all slugs
+app_test:
+    path: /test
+    controller: App\Controller\TestController::index
+    methods: ['GET']
+
+app_test_form:
+    path: /test-form
+    controller: App\Controller\TestController::testForm
+    methods: ['GET', 'POST']
+
+app_test_form_field:
+    path: /test-form-field
+    controller: App\Controller\TestController::testFormField
+    methods: ['GET', 'POST']
+
 # Frontend routes
 app_home:
     path: /
@@ -92,12 +108,7 @@ app_front_page:
     controller: 'App\Controller\FrontController::index'
     methods: ['GET']
     requirements:
-        slug: '^(?!admin).*'
-
-app_test:
-    path: /test
-    controller: App\Controller\TestController::index
-    methods: ['GET']
+        slug: '^(?!admin|test|test-form|test-form-field).*'
 
 app_contact:
     path: /contact

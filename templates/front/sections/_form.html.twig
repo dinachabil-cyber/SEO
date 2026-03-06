@@ -10,78 +10,76 @@
             <div class="col-md-8 col-lg-6">
                 <div class="lead-form">
                     <form method="POST" action="{{ path('app_contact') }}">
-                        {{ csrf_token('contact_form') }}
+                        <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
+                        
                         {% if data.fields is defined %}
-                            {% for field in data.fields %}
-                                {# Handle both object fields (new format) and string fields (old format) #}
-                                {% if field is not iterable %}
-                                    <div class="mb-3">
-                                        {% if field == 'name' %}
-                                            <input type="text" class="form-control" name="name" placeholder="Your Name" required>
-                                        {% elseif field == 'email' %}
-                                            <input type="email" class="form-control" name="email" placeholder="Your Email" required>
-                                        {% elseif field == 'phone' %}
-                                            <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
-                                        {% elseif field == 'message' %}
-                                            <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <div class="mb-3 {% if data.style is defined and data.style.layout == '2col' and field.width == 'half' %}col-md-6{% else %}col-12{% endif %}">
-                                        {% if field.type == 'text' %}
-                                            <input type="text" 
-                                                   class="form-control" 
-                                                   name="{{ field.name }}" 
-                                                   placeholder="{{ field.placeholder }}" 
-                                                   {% if field.required %}required{% endif %}>
-                                        {% elseif field.type == 'email' %}
-                                            <input type="email" 
-                                                   class="form-control" 
-                                                   name="{{ field.name }}" 
-                                                   placeholder="{{ field.placeholder }}" 
-                                                   {% if field.required %}required{% endif %}>
-                                        {% elseif field.type == 'tel' %}
-                                            <input type="tel" 
-                                                   class="form-control" 
-                                                   name="{{ field.name }}" 
-                                                   placeholder="{{ field.placeholder }}" 
-                                                   {% if field.required %}required{% endif %}>
+                            <div class="row g-3">
+                                {% for field in data.fields %}
+                                    <div class="{% if field.width == 'half' %}col-md-6{% else %}col-12{% endif %}">
+                                        {% if field.type == 'text' or field.type == 'email' or field.type == 'tel' %}
+                                            <div class="mb-3">
+                                                {% if field.label %}
+                                                    <label class="form-label" for="{{ field.name }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                                {% endif %}
+                                                <input type="{{ field.type }}" 
+                                                       class="form-control" 
+                                                       id="{{ field.name }}" 
+                                                       name="{{ field.name }}" 
+                                                       placeholder="{{ field.placeholder|default('') }}" 
+                                                       {% if field.required %}required{% endif %}>
+                                            </div>
                                         {% elseif field.type == 'textarea' %}
-                                            <textarea class="form-control" 
-                                                      name="{{ field.name }}" 
-                                                      rows="4" 
-                                                      placeholder="{{ field.placeholder }}" 
-                                                      {% if field.required %}required{% endif %}></textarea>
+                                            <div class="mb-3">
+                                                {% if field.label %}
+                                                    <label class="form-label" for="{{ field.name }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                                {% endif %}
+                                                <textarea class="form-control" 
+                                                          id="{{ field.name }}" 
+                                                          name="{{ field.name }}" 
+                                                          rows="4" 
+                                                          placeholder="{{ field.placeholder|default('') }}" 
+                                                          {% if field.required %}required{% endif %}></textarea>
+                                            </div>
                                         {% elseif field.type == 'select' %}
-                                            <select class="form-control" 
-                                                    name="{{ field.name }}" 
-                                                    {% if field.required %}required{% endif %}>
-                                                {% set options = field.options|split('\n') %}
-                                                {% for option in options %}
-                                                    {% if option %}
-                                                        <option value="{{ option }}">{{ option }}</option>
+                                            <div class="mb-3">
+                                                {% if field.label %}
+                                                    <label class="form-label" for="{{ field.name }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                                {% endif %}
+                                                <select class="form-control" 
+                                                        id="{{ field.name }}" 
+                                                        name="{{ field.name }}" 
+                                                        {% if field.required %}required{% endif %}>
+                                                    {% if field.placeholder %}
+                                                        <option value="" disabled selected>{{ field.placeholder }}</option>
                                                     {% endif %}
-                                                {% endfor %}
-                                            </select>
+                                                    {% set options = field.options|split('\n') %}
+                                                    {% for option in options %}
+                                                        {% set trimmedOption = option|trim %}
+                                                        {% if trimmedOption %}
+                                                            <option value="{{ trimmedOption }}">{{ trimmedOption }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         {% elseif field.type == 'checkbox' %}
-                                            <div class="form-check">
+                                            <div class="form-check mb-3">
                                                 <input type="checkbox" 
                                                        class="form-check-input" 
                                                        id="{{ field.name }}" 
                                                        name="{{ field.name }}" 
                                                        {% if field.required %}required{% endif %}>
                                                 <label class="form-check-label" for="{{ field.name }}">
-                                                    {{ field.label }}
+                                                    {{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}
                                                 </label>
                                             </div>
                                         {% endif %}
                                     </div>
-                                {% endif %}
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
                         
                         <button type="submit" class="btn {% if data.style is defined and data.style is not null and data.style is iterable and 'buttonStyle' in data.style and data.style.buttonStyle == 'accent' %}btn-accent{% else %}btn-primary{% endif %} w-100">
-                            {{ data.submitText }}
+                            {{ data.submitText|default('Submit') }}
                         </button>
                         
                         {% if data.successMessage %}

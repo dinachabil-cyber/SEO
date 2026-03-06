@@ -3,12 +3,13 @@
         <h2 class="h4 mb-4 text-center">{{ formData.title ?? data.formTitle }}</h2>
     {% endif %}
 
-    <form class="d-flex flex-column gap-3" method="post" action="{{ path('app_contact_submit') }}">
+    <form class="d-flex flex-column gap-3" method="post" action="{{ path('app_contact') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
         <div class="row g-3">
             {% for field in formFields %}
                 <div class="{% if field.width is defined and field.width == 'half' %}col-6{% else %}col-12{% endif %}">
                     {% if field.type == 'textarea' %}
-                        {% if field.icon %}
+                        {% if field.icon is defined and field.icon %}
                             <div class="input-group">
                                 <span class="input-group-text">{{ field.icon }}</span>
                                 <textarea
@@ -27,7 +28,7 @@
                             ></textarea>
                         {% endif %}
                     {% elseif field.type == 'select' %}
-                        {% if field.icon %}
+                        {% if field.icon is defined and field.icon %}
                             <div class="input-group">
                                 <span class="input-group-text">{{ field.icon }}</span>
                                 <select class="form-select" name="{{ field.name }}" {% if field.required %}required{% endif %}>
@@ -61,7 +62,7 @@
                             <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
                         </div>
                     {% else %}
-                        {% if field.icon %}
+                        {% if field.icon is defined and field.icon %}
                             <div class="input-group">
                                 <span class="input-group-text">{{ field.icon }}</span>
                                 <input

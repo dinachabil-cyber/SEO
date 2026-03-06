@@ -3,6 +3,8 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    background-color: var(--bg);
+    min-height: 100vh;
 }
 
 /* Form Styles */
@@ -10,46 +12,16 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    animation: fadeIn var(--transition-slow);
 }
 
 .form-group {
     margin-bottom: 0;
-}
-
-.form-label {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control {
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 0.6rem 0.9rem;
-    transition: all 0.2s ease;
-}
-
-.form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-}
-
-.form-select {
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 0.6rem 0.9rem;
-    transition: all 0.2s ease;
-}
-
-.form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-}
-
-textarea.form-control {
-    min-height: 120px;
-    resize: vertical;
 }
 
 /* Section Type Badge */
@@ -58,20 +30,28 @@ textarea.form-control {
     font-size: 0.75rem;
     font-weight: 600;
     padding: 0.25rem 0.75rem;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: 0.5rem;
+    transition: all var(--transition-base);
 }
 
 /* Section Data Fields */
 .section-data-fields {
-    background-color: var(--surface);
+    background-color: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
     margin-top: 1rem;
-    animation: fadeIn 0.35s ease;
+    animation: fadeIn var(--transition-slow);
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.section-data-fields:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow);
 }
 
 .section-data-fields .form-group {
@@ -86,17 +66,35 @@ textarea.form-control {
 }
 
 .collection-item {
-    background-color: var(--surface-2);
+    background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 1.5rem;
     margin-bottom: 1rem;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    position: relative;
 }
 
 .collection-item:hover {
     border-color: var(--primary);
-    box-shadow: 0 2px 8px var(--shadow);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.collection-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.collection-item:hover::before {
+    opacity: 1;
 }
 
 .collection-item .form-group {
@@ -112,6 +110,8 @@ textarea.form-control {
     display: flex;
     gap: 0.5rem;
     margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
 }
 
 .btn-add {
@@ -121,12 +121,16 @@ textarea.form-control {
     font-weight: 600;
     padding: 0.4rem 0.8rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-add:hover {
-    background-color: #16a34a;
+    background-color: var(--success-2);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-remove {
@@ -136,12 +140,16 @@ textarea.form-control {
     font-weight: 600;
     padding: 0.4rem 0.8rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-remove:hover {
-    background-color: #dc2626;
+    background-color: var(--danger-2);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Alert Styles */
@@ -150,6 +158,10 @@ textarea.form-control {
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn var(--transition-slow);
 }
 
 .alert-warning {
@@ -165,7 +177,7 @@ textarea.form-control {
     font-weight: 600;
     padding: 0.3rem 0.75rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .alert-warning .btn-warning:hover {
@@ -189,27 +201,30 @@ textarea.form-control {
     font-weight: 600;
     padding: 0.55rem 1.1rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .btn-outline-secondary:hover {
     background-color: var(--surface-2);
     border-color: var(--text-muted);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    background: var(--primary-gradient);
     border: none;
     color: white;
     font-weight: 600;
     padding: 0.55rem 1.1rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.35);
 }
 
 /* Card Styles */
@@ -218,12 +233,14 @@ textarea.form-control {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
-    transition: all 0.25s ease;
+    transition: all var(--transition-base);
+    overflow: hidden;
 }
 
 .card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-hover);
+    border-color: var(--primary-light);
 }
 
 .card-header {
@@ -248,30 +265,6 @@ textarea.form-control {
     padding: 1.5rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .section-edit-container {
-        padding: 1rem;
-    }
-    
-    .card-body {
-        padding: 1rem;
-    }
-    
-    .section-data-fields {
-        padding: 1rem;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .btn {
-        width: 100%;
-    }
-}
-
 /* Loading State */
 .loading {
     opacity: 0.6;
@@ -290,14 +283,11 @@ textarea.form-control {
     margin-left: 0.5rem;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* Error State */
 .is-invalid {
     border-color: var(--danger) !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+    animation: shake var(--transition-base);
 }
 
 .invalid-feedback {
@@ -310,6 +300,7 @@ textarea.form-control {
 /* Success State */
 .is-valid {
     border-color: var(--success) !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 121, 0.15) !important;
 }
 
 .valid-feedback {
@@ -333,7 +324,8 @@ textarea.form-control {
     border-radius: 12px;
     position: relative;
     background-color: var(--border);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    cursor: pointer;
 }
 
 .form-check-input:checked {
@@ -349,7 +341,7 @@ textarea.form-control {
     background-color: white;
     top: 3px;
     left: 3px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .form-check-input:checked::after {
@@ -359,6 +351,7 @@ textarea.form-control {
 .form-check-label {
     margin-bottom: 0;
     font-weight: 500;
+    cursor: pointer;
 }
 
 /* Color Picker */
@@ -374,6 +367,12 @@ textarea.form-control {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.color-picker input[type="color"]:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
 }
 
 /* File Upload */
@@ -395,11 +394,105 @@ textarea.form-control {
     border-radius: var(--radius);
     padding: 0.5rem 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
+    font-weight: 500;
 }
 
 .file-upload label:hover {
     background-color: var(--primary);
     color: white;
     border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section-edit-container {
+        padding: 1rem;
+    }
+    
+    .needs-validation {
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .section-data-fields {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .form-check {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-edit-container {
+        padding: 0.5rem;
+    }
+    
+    .needs-validation {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .section-data-fields {
+        padding: 1rem;
+    }
+    
+    .collection-actions {
+        flex-direction: column;
+    }
+    
+    .btn-add,
+    .btn-remove {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

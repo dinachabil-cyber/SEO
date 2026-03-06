@@ -173,14 +173,23 @@ class PageBuilderController extends AbstractController
         $form = $this->createForm(PageSectionType::class, $section);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Section updated successfully');
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
-                'siteId' => $siteId,
-                'pageId' => $pageId,
-            ]));
+                $this->addFlash('success', 'Section updated successfully');
+                return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+                    'siteId' => $siteId,
+                    'pageId' => $pageId,
+                ]));
+            } else {
+                // Display form errors
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $errors[] = $error->getMessage();
+                }
+                $this->addFlash('error', 'Form validation failed: ' . implode(', ', $errors));
+            }
         }
 
         return $this->render('admin/section/edit.html.twig', [

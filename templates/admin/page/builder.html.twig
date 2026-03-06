@@ -40,12 +40,22 @@
                                         {% if page.isPublished %}Published{% else %}Draft{% endif %}
                                     </span>
                                 </p>
+                                    <p class="mb-1"><strong>H1:</strong> {{ page.h1 ?: '-' }}</p>
+
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="fw-bold">SEO:</h6>
-                                <p class="mb-1"><strong>Meta Description:</strong> {{ page.metaDescription }}</p>
-                                <p class="mb-1"><strong>H1:</strong> {{ page.h1 }}</p>
-                            </div>
+                           <div class="col-md-6">
+    <h6 class="fw-bold mb-3">SEO: </h6> <p class="mb-1"><strong>Google Ads:</strong> {{ page.googleAds ?: '-' }}</p>
+        <p class="mb-1"><strong>Google Analytics:</strong> {{ page.googleAnalytics ?: '-' }}</p>
+        <p class="mb-1"><strong>Google Tag Manager:</strong> {{ page.googleTagManager ?: '-' }}</p><div class="mt-3 pt-3 border-top">
+       
+    </div>
+
+    <p class="mb-1"><strong>Meta Title:</strong> {{ page.metaTitle ?: '-' }}</p>
+    <p class="mb-1"><strong>Meta Description:</strong> {{ page.metaDescription ?: '-' }}</p>
+    <p class="mb-1"><strong>Meta Keywords:</strong> {{ page.metaKeywords ?: '-' }}</p>
+
+    
+</div>
                         </div>
                     </div>
 

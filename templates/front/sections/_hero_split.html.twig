@@ -4,6 +4,17 @@
 
 <section class="section hero-split py-5">
     <div class="container">
+        <!-- Debug information -->
+        <div class="alert alert-warning d-none" id="hero-split-debug">
+            <h6>Hero Split Section Debug</h6>
+            <p><strong>Data:</strong> {{ dump(data) }}</p>
+            <p><strong>Form data:</strong> {{ dump(formData) }}</p>
+            <p><strong>Form fields count:</strong> {{ formFields|length }}</p>
+            {% if formFields %}
+                <p><strong>Form fields:</strong> {{ dump(formFields) }}</p>
+            {% endif %}
+        </div>
+        
         <div class="row align-items-stretch g-4">
             {% if layout == 'image-left-form-right' %}
                 <div class="col-lg-7">

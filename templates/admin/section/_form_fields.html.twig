@@ -1,0 +1,62 @@
+{% block form_fields %}
+<div class="mb-4">
+    <label class="form-label fw-bold">{{ label }}</label>
+    
+    <div data-controller="form-field-collection" data-form-field-collection-index-value="{{ form|length }}">
+        <!-- Debug information -->
+        <div class="alert alert-info d-none" id="form-fields-debug">
+            <h6>Debug Information</h6>
+            <p><strong>Form length:</strong> {{ form|length }}</p>
+            <p><strong>Form variables:</strong> {{ dump(form.vars) }}</p>
+            <p><strong>Prototype exists:</strong> {{ form.vars.prototype is defined ? 'Yes' : 'No' }}</p>
+            {% if form.vars.prototype is defined %}
+                <p><strong>Prototype vars:</strong> {{ dump(form.vars.prototype.vars) }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Prototype for new items -->
+        {% if form.vars.prototype is defined %}
+            <div data-form-field-collection-target="prototype" style="display: none;">
+                <div class="card mb-3 border-secondary" data-form-field-collection-target="item">
+                    <div class="card-header bg-secondary bg-opacity-10 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">New Form Field</span>
+                        <button type="button" class="btn btn-sm btn-danger" data-action="form-field-collection#remove">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {{ form_widget(form.vars.prototype) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Existing items -->
+        {% if form|length > 0 %}
+            {% for field in form %}
+                <div class="card mb-3 border-secondary" data-form-field-collection-target="item">
+                    <div class="card-header bg-secondary bg-opacity-10 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">
+                            {{ field.vars.value.label ?: 'Form Field' }}
+                            <small class="text-xs text-muted ms-2">({{ field.vars.value.type ?: 'text' }})</small>
+                        </span>
+                        <button type="button" class="btn btn-sm btn-danger" data-action="form-field-collection#remove">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {{ form_widget(field) }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-muted mb-3">No form fields added yet. Click "Add Form Field" to start building your form.</div>
+        {% endif %}
+        
+        <!-- Add button -->
+        <button type="button" class="btn btn-outline-primary w-100" data-action="form-field-collection#add">
+            <i class="bi bi-plus-circle me-1"></i> Add Form Field
+        </button>
+    </div>
+</div>
+{% endblock %}

@@ -1,20 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TestController!{% endblock %}
+{% block title %}Test Page{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/TestController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/test/index.html.twig</code></li>
-    </ul>
-</div>
+    <div class="container mt-5">
+        <h1>Test Dynamic Form Fields</h1>
+        
+        <div class="mb-4">
+            <h2>Form Section</h2>
+            {% set formData = {
+                title: 'Contact Us',
+                description: 'Please fill out the form below',
+                submitText: 'Send Message',
+                successMessage: 'Thank you for your message!',
+                consentText: 'I agree to the terms and conditions',
+                fields: [
+                    { label: 'Name', name: 'name', type: 'text', required: true, placeholder: 'Your name', width: 'half' },
+                    { label: 'Email', name: 'email', type: 'email', required: true, placeholder: 'Your email', width: 'half' },
+                    { label: 'Phone', name: 'phone', type: 'tel', required: false, placeholder: 'Your phone', width: 'half' },
+                    { label: 'Subject', name: 'subject', type: 'select', required: true, placeholder: 'Select subject', width: 'half', options: 'General Inquiry\nSupport\nFeedback\nOther' },
+                    { label: 'Message', name: 'message', type: 'textarea', required: true, placeholder: 'Your message', width: 'full' },
+                    { label: 'Subscribe', name: 'subscribe', type: 'checkbox', required: false, placeholder: '', width: 'full' }
+                ]
+            } %}
+            
+            {% include 'front/sections/_form.html.twig' with { 'data': formData } %}
+        </div>
+        
+        <div class="mb-4">
+            <h2>Hero Split Form Section</h2>
+            {% set heroSplitData = {
+                title: 'Get a Quote',
+                subtitle: 'Request a free insurance quote today',
+                imageUrl: 'https://picsum.photos/600/800',
+                imageAlt: 'Insurance Quote',
+                formTitle: 'Request Quote',
+                formFields: [
+                    { label: 'Full Name', name: 'full_name', type: 'text', required: true, placeholder: 'Your full name', width: 'half' },
+                    { label: 'Email', name: 'email', type: 'email', required: true, placeholder: 'Your email', width: 'half' },
+                    { label: 'Phone', name: 'phone', type: 'tel', required: true, placeholder: 'Your phone', width: 'half' },
+                    { label: 'Insurance Type', name: 'insurance_type', type: 'select', required: true, placeholder: 'Select insurance type', width: 'half', options: 'Auto\nHome\nHealth\nLife' },
+                    { label: 'Message', name: 'message', type: 'textarea', required: false, placeholder: 'Additional information', width: 'full' },
+                    { label: 'Agree to Terms', name: 'agree', type: 'checkbox', required: true, placeholder: '', width: 'full' }
+                ],
+                submitText: 'Get Quote',
+                consentText: 'I agree to be contacted regarding my insurance quote',
+                successMessage: 'Thank you! We will contact you shortly with your quote.'
+            } %}
+            
+            {% include 'front/sections/_hero_split.html.twig' with { 'data': heroSplitData } %}
+        </div>
+    </div>
 {% endblock %}
