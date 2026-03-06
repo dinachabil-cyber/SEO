@@ -1,7 +1,7 @@
 <section class="section bg-white">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="{% if data.style is defined and data.style.maxWidth == 'narrow' %}col-lg-8{% else %}col-12{% endif %} text-{{ data.style is defined and data.style.textAlign ? data.style.textAlign : 'left' }}">
+            <div class="{% if data.style is defined and data.style is not null and data.style is iterable and 'maxWidth' in data.style and data.style.maxWidth == 'narrow' %}col-lg-8{% else %}col-12{% endif %} text-{{ data.style is defined and data.style is not null and data.style is iterable and 'textAlign' in data.style ? data.style.textAlign : 'left' }}">
                 {% if data.title %}
                     <h2 class="mb-4">{{ data.title }}</h2>
                 {% endif %}

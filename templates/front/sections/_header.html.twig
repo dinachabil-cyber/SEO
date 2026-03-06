@@ -1,5 +1,5 @@
-<header class="site-navbar {% if data.style is defined and data.style.sticky %}sticky-top{% endif %} {% if data.style is defined and data.style.variant == 'dark' %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}" 
-        style="{% if data.style is defined and data.style.background %}background-color: {{ data.style.background }};{% endif %}">
+<header class="site-navbar {% if data.style is defined and data.style is not null and data.style.sticky %}sticky-top{% endif %} {% if data.style is defined and data.style is not null and data.style.variant == 'dark' %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}" 
+        style="{% if data.style is defined and data.style is not null and data.style.background %}background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="brand">
@@ -19,14 +19,10 @@
                             <a href="/{{ item.targetSlug }}" class="nav-link">{{ item.label }}</a>
                         {% endif %}
                     {% endfor %}
-                {% elseif data.menuItems is defined %}
-                    {% set menuItems = data.menuItems|split('\n') %}
-                    {% for item in menuItems %}
-                        {% if item %}
-                            {% set parts = item|split('|') %}
-                            {% if parts|length == 2 %}
-                                <a href="{{ parts[1] }}" class="nav-link">{{ parts[0] }}</a>
-                            {% endif %}
+                {% elseif data.menuItems is defined and data.menuItems is iterable %}
+                    {% for item in data.menuItems %}
+                        {% if item and item.label %}
+                            <a href="{{ item.url }}" class="nav-link">{{ item.label }}</a>
                         {% endif %}
                     {% endfor %}
                 {% endif %}

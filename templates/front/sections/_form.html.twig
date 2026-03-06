@@ -80,7 +80,7 @@
                             {% endfor %}
                         {% endif %}
                         
-                        <button type="submit" class="btn {% if data.style is defined and data.style.buttonStyle == 'accent' %}btn-accent{% else %}btn-primary{% endif %} w-100">
+                        <button type="submit" class="btn {% if data.style is defined and data.style is not null and data.style is iterable and 'buttonStyle' in data.style and data.style.buttonStyle == 'accent' %}btn-accent{% else %}btn-primary{% endif %} w-100">
                             {{ data.submitText }}
                         </button>
                         

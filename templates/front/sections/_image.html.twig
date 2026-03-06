@@ -4,7 +4,7 @@
             <div class="col-md-8">
                 <div class="text-center">
                     <img src="{{ data.imageUrl }}" alt="{{ data.alt }}" 
-                         class="img-fluid mb-4 {% if data.style is defined and data.style.rounded %}rounded{% endif %} {% if data.style is defined and data.style.shadow %}shadow-lg{% endif %}">
+                         class="img-fluid mb-4 {% if data.style is defined and data.style is not null and data.style.rounded %}rounded{% endif %} {% if data.style is defined and data.style is not null and data.style.shadow %}shadow-lg{% endif %}">
                     {% if data.caption %}
                         <p class="text-muted">{{ data.caption }}</p>
                     {% endif %}

@@ -10,9 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-
+use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/site/{site}/page')]
 class PageController extends AbstractController
 {
@@ -21,7 +19,7 @@ class PageController extends AbstractController
     {
         $page = new Page();
         $page->setSite($site);
-        
+
         $form = $this->createForm(PageType::class, $page);
         $form->handleRequest($request);
 
@@ -31,7 +29,10 @@ class PageController extends AbstractController
 
             $this->addFlash('success', 'Page created successfully');
 
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', ['siteId' => $site->getId(), 'pageId' => $page->getId()]));
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $site->getId(),
+                'pageId' => $page->getId(),
+            ]);
         }
 
         return $this->render('admin/page/new.html.twig', [
@@ -42,13 +43,21 @@ class PageController extends AbstractController
     }
 
     #[Route('/{pageId}/edit', name: 'app_page_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Site $site, int $pageId, PageRepository $pageRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Site $site,
+        int $pageId,
+        PageRepository $pageRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
         $page = $pageRepository->find($pageId);
-        
+
         if (!$page || $page->getSite()->getId() !== $site->getId()) {
             $this->addFlash('error', 'Page not found');
-            return $this->redirectToRoute('app_site_show', ['id' => $site->getId()], Response::HTTP_SEE_OTHER);
+
+            return $this->redirectToRoute('app_site_show', [
+                'id' => $site->getId(),
+            ]);
         }
 
         $form = $this->createForm(PageType::class, $page);
@@ -59,7 +68,9 @@ class PageController extends AbstractController
 
             $this->addFlash('success', 'Page updated successfully');
 
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_site_show', ['id' => $site->getId()]));
+            return $this->redirectToRoute('app_site_show', [
+                'id' => $site->getId(),
+            ]);
         }
 
         return $this->render('admin/page/edit.html.twig', [
@@ -70,13 +81,21 @@ class PageController extends AbstractController
     }
 
     #[Route('/{pageId}/delete', name: 'app_page_delete', methods: ['POST'])]
-    public function delete(Request $request, Site $site, int $pageId, PageRepository $pageRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function delete(
+        Request $request,
+        Site $site,
+        int $pageId,
+        PageRepository $pageRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
         $page = $pageRepository->find($pageId);
-        
+
         if (!$page || $page->getSite()->getId() !== $site->getId()) {
             $this->addFlash('error', 'Page not found');
-            return $this->redirectToRoute('app_site_show', ['id' => $site->getId()], Response::HTTP_SEE_OTHER);
+
+            return $this->redirectToRoute('app_site_show', [
+                'id' => $site->getId(),
+            ]);
         }
 
         if ($this->isCsrfTokenValid('delete' . $page->getId(), $request->request->get('_token'))) {
@@ -88,6 +107,8 @@ class PageController extends AbstractController
             $this->addFlash('error', 'Invalid CSRF token');
         }
 
-        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_site_show', ['id' => $site->getId()]));
+        return $this->redirectToRoute('app_site_show', [
+            'id' => $site->getId(),
+        ]);
     }
 }

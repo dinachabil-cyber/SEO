@@ -1,7 +1,7 @@
-<section class="cta-band {% if data.style is defined and data.style.background %}bg-{{ data.style.background }}{% else %}bg-primary{% endif %}">
+<section class="cta-band {% if data.style is defined and data.style is not null and data.style.background %}bg-{{ data.style.background }}{% else %}bg-primary{% endif %}">
     <div class="container">
-        <div class="row {% if data.style is defined and data.style.align == 'left' %}justify-content-start{% else %}justify-content-center{% endif %}">
-            <div class="col-lg-8 {% if data.style is defined and data.style.align == 'left' %}text-left{% else %}text-center{% endif %}">
+        <div class="row {% if data.style is defined and data.style is not null and data.style.align == 'left' %}justify-content-start{% else %}justify-content-center{% endif %}">
+            <div class="col-lg-8 {% if data.style is defined and data.style is not null and data.style.align == 'left' %}text-left{% else %}text-center{% endif %}">
                 <h2 class="mb-4">{{ data.title }}</h2>
                 {% if data.text %}
                     <p class="mb-5">{{ data.text }}</p>

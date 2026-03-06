@@ -12,7 +12,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 class PageSection
 {
     public const ALLOWED_TYPES = [
-        'header', 'hero', 'body', 'image', 'cards', 'faq', 'form', 'cta', 'footer'
+        'header',
+        'hero',
+        'hero_split',
+        'body',
+        'image',
+        'cards',
+        'faq',
+        'form',
+        'cta',
+        'footer',
     ];
 
     #[ORM\Id]
@@ -29,7 +38,7 @@ class PageSection
     private ?string $type = null;
 
     #[ORM\Column]
-    private ?int $position = null;
+    private ?int $position = 0;
 
     #[ORM\Column(type: 'json')]
     private array $data = [];
@@ -39,6 +48,10 @@ class PageSection
 
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'reference_section_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?ReferenceSection $referenceSection = null;
 
     public function __construct()
     {
@@ -110,10 +123,6 @@ class PageSection
         return $this;
     }
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'reference_section_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    private ?ReferenceSection $referenceSection = null;
-
     public function getReferenceSection(): ?ReferenceSection
     {
         return $this->referenceSection;
@@ -127,10 +136,33 @@ class PageSection
 
     public function getEffectiveData(): array
     {
-        if ($this->referenceSection) {
-            return $this->referenceSection->getData();
+        $data = $this->referenceSection ? $this->referenceSection->getData() : $this->data;
+
+        if (!isset($data['style']) || !is_array($data['style'])) {
+            $data['style'] = [];
         }
-        return $this->data;
+
+        $defaultStyle = [
+            'sticky' => false,
+            'variant' => 'light',
+            'background' => '',
+            'backgroundVariant' => 'surface',
+            'layout' => 'left',
+            'columns' => 3,
+            'cardVariant' => 'solid',
+            'accentColor' => 'primary',
+            'buttonStyle' => 'primary',
+            'maxWidth' => 'normal',
+            'textAlign' => 'left',
+            'align' => 'center',
+            'accordionVariant' => 'default',
+            'rounded' => false,
+            'shadow' => false,
+        ];
+
+        $data['style'] = array_merge($defaultStyle, $data['style']);
+
+        return $data;
     }
 
     public function getCreatedAt(): ?DateTimeImmutable

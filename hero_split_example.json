@@ -1,0 +1,112 @@
+{
+  "type": "hero_split",
+  "data": {
+    "title": "Welcome to Our Platform",
+    "subtitle": "Get started with our services today. Fill out the form below to request more information.",
+    "imageUrl": "https://example.com/images/hero-image.jpg",
+    "imageAlt": "Welcome hero image",
+    "form": {
+      "title": "Request Information",
+      "submitText": "Send Request",
+      "consentText": "By submitting this form, you agree to our Terms of Service and Privacy Policy.",
+      "successMessage": "Thank you! Your request has been submitted successfully. We'll contact you within 24 hours.",
+      "fields": [
+        {
+          "label": "Raison sociale",
+          "name": "company_name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Enter your company name",
+          "width": "full",
+          "options": "",
+          "icon": "🏢"
+        },
+        {
+          "label": "Activité",
+          "name": "activity",
+          "type": "select",
+          "required": true,
+          "placeholder": "Select your activity",
+          "width": "half",
+          "options": "Technology\nHealthcare\nFinance\nEducation\nRetail",
+          "icon": "💼"
+        },
+        {
+          "label": "Type véhicule",
+          "name": "vehicle_type",
+          "type": "select",
+          "required": true,
+          "placeholder": "Select vehicle type",
+          "width": "half",
+          "options": "Car\nTruck\nMotorcycle\nVan\nBicycle",
+          "icon": "🚗"
+        },
+        {
+          "label": "Nom",
+          "name": "last_name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Enter your last name",
+          "width": "half",
+          "options": "",
+          "icon": "👤"
+        },
+        {
+          "label": "Prénom",
+          "name": "first_name",
+          "type": "text",
+          "required": true,
+          "placeholder": "Enter your first name",
+          "width": "half",
+          "options": "",
+          "icon": "👤"
+        },
+        {
+          "label": "Email",
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "placeholder": "Enter your email address",
+          "width": "full",
+          "options": "",
+          "icon": "📧"
+        },
+        {
+          "label": "Téléphone",
+          "name": "phone",
+          "type": "tel",
+          "required": true,
+          "placeholder": "Enter your phone number",
+          "width": "full",
+          "options": "",
+          "icon": "📞"
+        },
+        {
+          "label": "Message",
+          "name": "message",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "Tell us more about your needs",
+          "width": "full",
+          "options": "",
+          "icon": "💬"
+        },
+        {
+          "label": "Newsletter",
+          "name": "newsletter",
+          "type": "checkbox",
+          "required": false,
+          "placeholder": "",
+          "width": "full",
+          "options": "",
+          "icon": "📰"
+        }
+      ]
+    },
+    "style": {
+      "layout": "image-left-form-right",
+      "backgroundVariant": "gradient"
+    }
+  },
+  "sortOrder": 1
+}

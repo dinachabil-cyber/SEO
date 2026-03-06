@@ -6,7 +6,7 @@
             </div>
         {% endif %}
         
-        <div class="accordion {% if data.style is defined and data.style.accordionVariant %}accordion-{{ data.style.accordionVariant }}{% endif %}" id="faqAccordion">
+        <div class="accordion {% if data.style is defined and data.style is not null and data.style.accordionVariant %}accordion-{{ data.style.accordionVariant }}{% endif %}" id="faqAccordion">
             {% for item in data.items %}
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="faqHeading{{ loop.index }}">

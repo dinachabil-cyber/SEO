@@ -1,6 +1,6 @@
 {% set hasImage = data.imageUrl is defined and data.imageUrl %}
-{% set layout = data.style is defined and data.style.layout ? data.style.layout : 'left' %}
-{% set backgroundColor = data.style is defined and data.style.background ? data.style.background : '#007bff' %}
+{% set layout = data.style is defined and data.style is not null and data.style.layout ? data.style.layout : 'left' %}
+{% set backgroundColor = data.style is defined and data.style is not null and data.style.background ? data.style.background : '#007bff' %}
 
 <section class="hero {% if hasImage %}hero-with-image{% endif %}" 
          style="{% if not hasImage %}background-color: {{ backgroundColor }};{% endif %}">

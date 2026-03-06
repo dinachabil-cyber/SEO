@@ -9,6 +9,7 @@
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
             {% if app.request.attributes.get('_route') starts with 'app_page_builder' or app.request.attributes.get('_route') starts with 'app_section' %}
                 <link rel="stylesheet" href="{{ asset('styles/page-builder.css') }}">
+                <link rel="stylesheet" href="{{ asset('styles/section-edit.css') }}">
             {% endif %}
         {% endblock %}
 

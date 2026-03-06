@@ -1,0 +1,35 @@
+{% set layout = data.style.layout ?? 'image-left-form-right' %}
+{% set formData = data.form ?? {} %}
+{% set formFields = formData.fields ?? data.formFields ?? [] %}
+
+<section class="section hero-split py-5">
+    <div class="container">
+        <div class="row align-items-stretch g-4">
+            {% if layout == 'image-left-form-right' %}
+                <div class="col-lg-7">
+                    <div class="h-100 rounded-4 overflow-hidden shadow-sm">
+                        {% if data.imageUrl %}
+                            <img src="{{ data.imageUrl }}" alt="{{ data.imageAlt ?? data.title ?? 'Hero image' }}" class="img-fluid w-100 h-100 object-fit-cover">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    {% include 'front/sections/_hero_split_form.html.twig' with {formData: formData, formFields: formFields} %}
+                </div>
+            {% else %}
+                <div class="col-lg-5">
+                    {% include 'front/sections/_hero_split_form.html.twig' with {formData: formData, formFields: formFields} %}
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="h-100 rounded-4 overflow-hidden shadow-sm">
+                        {% if data.imageUrl %}
+                            <img src="{{ data.imageUrl }}" alt="{{ data.imageAlt ?? data.title ?? 'Hero image' }}" class="img-fluid w-100 h-100 object-fit-cover">
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

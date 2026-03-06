@@ -3,57 +3,82 @@
 {% if form.data is defined %}
     <div class="section-data-fields">
         {% set dataForm = form.data %}
-        
+
         {% if form.vars.value.type == 'header' %}
             {{ form_row(dataForm.brandText) }}
             {{ form_row(dataForm.logoUrl) }}
             {{ form_row(dataForm.menuItems) }}
             {{ form_row(dataForm.ctaText) }}
             {{ form_row(dataForm.ctaUrl) }}
+            {{ form_row(dataForm.variant) }}
+            {{ form_row(dataForm.sticky) }}
             {{ form_row(dataForm.background) }}
-            
+
         {% elseif form.vars.value.type == 'hero' %}
             {{ form_row(dataForm.title) }}
             {{ form_row(dataForm.subtitle) }}
-            {{ form_row(dataForm.imageUrl) }}
             {{ form_row(dataForm.ctaText) }}
             {{ form_row(dataForm.ctaUrl) }}
-            {{ form_row(dataForm.showForm) }}
-            
+            {{ form_row(dataForm.backgroundVariant) }}
+
+        {% elseif form.vars.value.type == 'hero_split' %}
+            {{ form_row(dataForm.title) }}
+            {{ form_row(dataForm.subtitle) }}
+            {{ form_row(dataForm.imageUrl) }}
+            {{ form_row(dataForm.imageAlt) }}
+            {{ form_row(dataForm.formTitle) }}
+            {{ form_row(dataForm.formFields) }}
+            {{ form_row(dataForm.submitText) }}
+            {{ form_row(dataForm.consentText) }}
+            {{ form_row(dataForm.successMessage) }}
+            {{ form_row(dataForm.layout) }}
+            {{ form_row(dataForm.backgroundVariant) }}
+
         {% elseif form.vars.value.type == 'body' %}
+            {{ form_row(dataForm.title) }}
             {{ form_row(dataForm.content) }}
-            
+
         {% elseif form.vars.value.type == 'image' %}
             {{ form_row(dataForm.imageUrl) }}
             {{ form_row(dataForm.alt) }}
             {{ form_row(dataForm.caption) }}
-            
+
         {% elseif form.vars.value.type == 'cards' %}
             {{ form_row(dataForm.sectionTitle) }}
             {{ form_row(dataForm.cards) }}
-            
+            {{ form_row(dataForm.columns) }}
+            {{ form_row(dataForm.cardVariant) }}
+
         {% elseif form.vars.value.type == 'faq' %}
             {{ form_row(dataForm.sectionTitle) }}
             {{ form_row(dataForm.items) }}
-            
+
         {% elseif form.vars.value.type == 'form' %}
             {{ form_row(dataForm.title) }}
             {{ form_row(dataForm.fields) }}
             {{ form_row(dataForm.submitText) }}
             {{ form_row(dataForm.successMessage) }}
-            
+            {{ form_row(dataForm.consentText) }}
+
         {% elseif form.vars.value.type == 'cta' %}
             {{ form_row(dataForm.title) }}
             {{ form_row(dataForm.text) }}
             {{ form_row(dataForm.buttonText) }}
             {{ form_row(dataForm.buttonUrl) }}
-            
+            {{ form_row(dataForm.backgroundVariant) }}
+
         {% elseif form.vars.value.type == 'footer' %}
-            {{ form_row(dataForm.text) }}
-            {{ form_row(dataForm.links) }}
+            {{ form_row(dataForm.brandName) }}
+            {{ form_row(dataForm.description) }}
+            {{ form_row(dataForm.usefulLinks) }}
+            {{ form_row(dataForm.address) }}
             {{ form_row(dataForm.phone) }}
             {{ form_row(dataForm.email) }}
-            
+            {{ form_row(dataForm.copyright) }}
+            {{ form_row(dataForm.variant) }}
+
+        {% else %}
+            {{ form_widget(dataForm) }}
         {% endif %}
     </div>
 {% endif %}

@@ -1,45 +1,84 @@
-<footer class="site-footer">
+<footer class="site-footer py-5 bg-dark text-white">
     <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>About Us</h4>
-                <p>{{ data.text|raw }}</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                {% if data.brandName is defined and data.brandName %}
+                    <h4 class="mb-3">{{ data.brandName }}</h4>
+                {% endif %}
+
+                {% if data.description is defined and data.description %}
+                    <p class="text-white-50">{{ data.description|nl2br }}</p>
+                {% elseif data.text is defined and data.text %}
+                    <p class="text-white-50">{{ data.text|nl2br }}</p>
+                {% endif %}
             </div>
-            
-            {% if data.links %}
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
+
+            <div class="col-md-4">
+                {% if data.usefulLinks is defined and data.usefulLinks|length > 0 %}
+                    <h5 class="mb-3">Liens utiles</h5>
+                    <ul class="list-unstyled">
+                        {% for link in data.usefulLinks %}
+                            <li class="mb-2">
+                                <a href="{{ link.url }}" class="text-white-50 text-decoration-none">
+                                    {{ link.label }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                {% elseif data.links is defined and data.links %}
+                    <h5 class="mb-3">Liens utiles</h5>
+                    <ul class="list-unstyled">
                         {% set links = data.links|split('\n') %}
                         {% for link in links %}
                             {% if link %}
                                 {% set parts = link|split('|') %}
                                 {% if parts|length == 2 %}
-                                    <li><a href="{{ parts[1] }}">{{ parts[0] }}</a></li>
+                                    <li class="mb-2">
+                                        <a href="{{ parts[1] }}" class="text-white-50 text-decoration-none">
+                                            {{ parts[0] }}
+                                        </a>
+                                    </li>
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
                     </ul>
-                </div>
-            {% endif %}
-            
-            {% if data.phone or data.email %}
-                <div class="footer-section">
-                    <h4>Contact Us</h4>
-                    <ul>
-                        {% if data.phone %}
-                            <li><i class="bi bi-telephone me-2"></i> {{ data.phone }}</li>
-                        {% endif %}
-                        {% if data.email %}
-                            <li><i class="bi bi-envelope me-2"></i> {{ data.email }}</li>
-                        {% endif %}
-                    </ul>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <h5 class="mb-3">Contact</h5>
+
+                {% if data.address is defined and data.address %}
+                    <p class="text-white-50 mb-2">{{ data.address|nl2br }}</p>
+                {% endif %}
+
+                {% if data.phone is defined and data.phone %}
+                    <p class="mb-2">
+                        <a href="tel:{{ data.phone }}" class="text-white-50 text-decoration-none">
+                            {{ data.phone }}
+                        </a>
+                    </p>
+                {% endif %}
+
+                {% if data.email is defined and data.email %}
+                    <p class="mb-0">
+                        <a href="mailto:{{ data.email }}" class="text-white-50 text-decoration-none">
+                            {{ data.email }}
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
         </div>
-        
-        <div class="small-print">
-            <p>&copy; {{ 'now'|date('Y') }} {{ app.request.host }}. All rights reserved.</p>
+
+        <hr class="my-4 border-secondary">
+
+        <div class="text-center small text-white-50">
+            {% if data.copyright is defined and data.copyright %}
+                {{ data.copyright }}
+            {% else %}
+                © {{ "now"|date("Y") }} All rights reserved.
+            {% endif %}
         </div>
     </div>
 </footer>

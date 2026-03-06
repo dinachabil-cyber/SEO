@@ -6,25 +6,27 @@
             </div>
         {% endif %}
         
-        <div class="row {% if data.style is defined %}row-cols-1 row-cols-md-{{ data.style.columns }} g-4{% else %}row-cols-1 row-cols-md-3 g-4{% endif %}">
-            {% for card in data.cards %}
-                <div class="col">
-                    <div class="card {% if data.style is defined and data.style.cardVariant == 'outline' %}border-primary{% elseif data.style is defined and data.style.cardVariant == 'glass' %}glass{% endif %} h-100">
-                        {% if card.imageUrl %}
-                            <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="card-img-top {% if data.style is defined and data.style.cardVariant == 'solid' %}rounded-top{% endif %}">
-                        {% endif %}
-                        <div class="card-body">
-                            <h3 class="card-title mb-3">{{ card.title }}</h3>
-                            <p class="card-text text-muted mb-4">{{ card.description }}</p>
-                            {% if card.linkUrl %}
-                                <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style.accentColor == 'accent' %}btn-accent{% else %}btn-primary{% endif %}">
-                                    Learn More
-                                </a>
+        {% if data.cards is defined and data.cards is not empty %}
+            <div class="row {% if data.style is defined and data.style is not null and data.style.columns %}row-cols-1 row-cols-md-{{ data.style.columns }} g-4{% else %}row-cols-1 row-cols-md-3 g-4{% endif %}">
+                {% for card in data.cards %}
+                    <div class="col">
+                        <div class="card {% if data.style is defined and data.style is not null and data.style.cardVariant == 'outline' %}border-primary{% elseif data.style is defined and data.style is not null and data.style.cardVariant == 'glass' %}glass{% endif %} h-100">
+                            {% if card.imageUrl %}
+                                <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="card-img-top {% if data.style is defined and data.style is not null and data.style.cardVariant == 'solid' %}rounded-top{% endif %}">
                             {% endif %}
+                            <div class="card-body">
+                                <h3 class="card-title mb-3">{{ card.title }}</h3>
+                                <p class="card-text text-muted mb-4">{{ card.description }}</p>
+                                {% if card.linkUrl %}
+                                    <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.accentColor == 'accent' %}btn-accent{% else %}btn-primary{% endif %}">
+                                        Learn More
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </section>

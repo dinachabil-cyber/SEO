@@ -1,0 +1,99 @@
+<div class="bg-white rounded-4 shadow-sm p-4 h-100">
+    {% if formData.title ?? data.formTitle %}
+        <h2 class="h4 mb-4 text-center">{{ formData.title ?? data.formTitle }}</h2>
+    {% endif %}
+
+    <form class="d-flex flex-column gap-3" method="post" action="{{ path('app_contact_submit') }}">
+        <div class="row g-3">
+            {% for field in formFields %}
+                <div class="{% if field.width is defined and field.width == 'half' %}col-6{% else %}col-12{% endif %}">
+                    {% if field.type == 'textarea' %}
+                        {% if field.icon %}
+                            <div class="input-group">
+                                <span class="input-group-text">{{ field.icon }}</span>
+                                <textarea
+                                    class="form-control"
+                                    name="{{ field.name }}"
+                                    placeholder="{{ field.placeholder ?? field.label }}"
+                                    {% if field.required %}required{% endif %}
+                                ></textarea>
+                            </div>
+                        {% else %}
+                            <textarea
+                                class="form-control"
+                                name="{{ field.name }}"
+                                placeholder="{{ field.placeholder ?? field.label }}"
+                                {% if field.required %}required{% endif %}
+                            ></textarea>
+                        {% endif %}
+                    {% elseif field.type == 'select' %}
+                        {% if field.icon %}
+                            <div class="input-group">
+                                <span class="input-group-text">{{ field.icon }}</span>
+                                <select class="form-select" name="{{ field.name }}" {% if field.required %}required{% endif %}>
+                                    <option value="">{{ field.placeholder ?? field.label }}</option>
+                                    {% if field.options is defined and field.options %}
+                                        {% set opts = field.options is iterable ? field.options : field.options|split('\n') %}
+                                        {% for option in opts %}
+                                            {% if option %}
+                                                <option value="{{ option }}">{{ option }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                        {% else %}
+                            <select class="form-select" name="{{ field.name }}" {% if field.required %}required{% endif %}>
+                                <option value="">{{ field.placeholder ?? field.label }}</option>
+                                {% if field.options is defined and field.options %}
+                                    {% set opts = field.options is iterable ? field.options : field.options|split('\n') %}
+                                    {% for option in opts %}
+                                        {% if option %}
+                                            <option value="{{ option }}">{{ option }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        {% endif %}
+                    {% elseif field.type == 'checkbox' %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ field.name }}" id="{{ field.name }}">
+                            <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                        </div>
+                    {% else %}
+                        {% if field.icon %}
+                            <div class="input-group">
+                                <span class="input-group-text">{{ field.icon }}</span>
+                                <input
+                                    type="{{ field.type ?? 'text' }}"
+                                    class="form-control"
+                                    name="{{ field.name }}"
+                                    placeholder="{{ field.placeholder ?? field.label }}"
+                                    {% if field.required %}required{% endif %}
+                                >
+                            </div>
+                        {% else %}
+                            <input
+                                type="{{ field.type ?? 'text' }}"
+                                class="form-control"
+                                name="{{ field.name }}"
+                                placeholder="{{ field.placeholder ?? field.label }}"
+                                {% if field.required %}required{% endif %}
+                            >
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if formData.consentText ?? data.consentText %}
+            <div class="small text-muted border rounded p-2">
+                {{ formData.consentText ?? data.consentText }}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary w-100">
+            {{ formData.submitText ?? data.submitText ?? 'Envoyer' }}
+        </button>
+    </form>
+</div>

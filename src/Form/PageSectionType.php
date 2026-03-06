@@ -5,15 +5,15 @@ namespace App\Form;
 use App\Entity\PageSection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\ColorType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,24 +21,30 @@ class PageSectionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('type', ChoiceType::class, [
-                'choices' => array_combine(PageSection::ALLOWED_TYPES, PageSection::ALLOWED_TYPES),
-                'label' => 'Section Type',
-                'placeholder' => 'Choose a section type',
-                'constraints' => [
-                    new Assert\NotBlank(),
-                ],
-            ])
-        ;
+        $builder->add('type', ChoiceType::class, [
+            'choices' => [
+                'Header' => 'header',
+                'Hero' => 'hero',
+                'Hero Split (Image + Form)' => 'hero_split',
+                'Body' => 'body',
+                'Image' => 'image',
+                'Cards' => 'cards',
+                'FAQ' => 'faq',
+                'Form' => 'form',
+                'CTA' => 'cta',
+                'Footer' => 'footer',
+            ],
+            'label' => 'Section Type',
+            'placeholder' => 'Choose a section type',
+            'constraints' => [new Assert\NotBlank()],
+        ]);
 
-        // Dynamic fields based on type
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $section = $event->getData();
             $form = $event->getForm();
 
             if ($section && $section->getType()) {
-                $this->addDynamicFields($form, $section->getType(), $section->getData());
+                self::addDynamicFields($form, $section->getType(), $section->getData() ?? []);
             }
         });
 
@@ -46,35 +52,14 @@ class PageSectionType extends AbstractType
             $data = $event->getData();
             $form = $event->getForm();
 
-            if (isset($data['type'])) {
-                $this->addDynamicFields($form, $data['type'], $data['data'] ?? []);
+            if (!empty($data['type'])) {
+                self::addDynamicFields($form, $data['type'], $data['data'] ?? []);
             }
         });
     }
 
-    public static function addDynamicFields($form, $type, $existingData = [])
+    public static function addDynamicFields($form, string $type, array $existingData = []): void
     {
-        // Handle form fields compatibility - convert old string array to new format if needed
-        if ($type === 'form' && isset($existingData['fields']) && is_array($existingData['fields'])) {
-            $convertedFields = [];
-            foreach ($existingData['fields'] as $field) {
-                if (is_string($field)) {
-                    $convertedFields[] = [
-                        'name' => $field,
-                        'label' => ucfirst($field),
-                        'type' => $field === 'message' ? 'textarea' : 'text',
-                        'required' => true,
-                        'placeholder' => 'Your ' . ucfirst($field),
-                        'options' => '',
-                        'width' => 'full'
-                    ];
-                } else {
-                    $convertedFields[] = $field;
-                }
-            }
-            $existingData['fields'] = $convertedFields;
-        }
-
         $form->add('data', SectionDataType::class, [
             'type' => $type,
             'existing_data' => $existingData,
@@ -91,369 +76,391 @@ class PageSectionType extends AbstractType
 }
 
 class SectionDataType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        public function buildForm(FormBuilderInterface $builder, array $options): void
-        {
-            $type = $options['type'];
-            $existingData = $options['existing_data'];
+        $type = $options['type'];
+        $data = $options['existing_data'] ?? [];
 
-            switch ($type) {
-                case 'header':
-                    $builder
-                        ->add('brandText', TextType::class, [
-                            'label' => 'Brand Text',
-                            'required' => true,
-                            'data' => $existingData['brandText'] ?? '',
-                        ])
-                        ->add('logoUrl', TextType::class, [
-                            'label' => 'Logo URL',
-                            'required' => false,
-                            'data' => $existingData['logoUrl'] ?? '',
-                        ])
-                        ->add('menuItems', TextareaType::class, [
-                            'label' => 'Menu Items (Label|/url per line)',
-                            'required' => false,
-                            'data' => $existingData['menuItems'] ?? '',
-                        ])
-                        ->add('ctaText', TextType::class, [
-                            'label' => 'CTA Text',
-                            'required' => true,
-                            'data' => $existingData['ctaText'] ?? '',
-                        ])
-                        ->add('ctaUrl', TextType::class, [
-                            'label' => 'CTA URL',
-                            'required' => true,
-                            'data' => $existingData['ctaUrl'] ?? '',
-                        ])
-                        ->add('style', ChoiceType::class, [
-                            'label' => 'Style',
-                            'required' => true,
-                            'choices' => [
-                                'Light' => 'light',
-                                'Dark' => 'dark',
-                            ],
-                            'data' => $existingData['style']['variant'] ?? 'light',
-                        ])
-                        ->add('sticky', CheckboxType::class, [
-                            'label' => 'Sticky Header',
-                            'required' => false,
-                            'data' => $existingData['style']['sticky'] ?? false,
-                        ])
-                        ->add('background', ColorType::class, [
-                            'label' => 'Background Color',
-                            'required' => false,
-                            'data' => $existingData['style']['background'] ?? '',
-                        ]);
-                    break;
-
-                case 'hero':
-                    $builder
-                        ->add('title', TextType::class, [
-                            'label' => 'Title',
-                            'required' => true,
-                            'data' => $existingData['title'] ?? '',
-                        ])
-                        ->add('subtitle', TextareaType::class, [
-                            'label' => 'Subtitle',
-                            'required' => false,
-                            'data' => $existingData['subtitle'] ?? '',
-                        ])
-                        ->add('imageUrl', TextType::class, [
-                            'label' => 'Image URL',
-                            'required' => false,
-                            'data' => $existingData['imageUrl'] ?? '',
-                        ])
-                        ->add('ctaText', TextType::class, [
-                            'label' => 'CTA Text',
-                            'required' => true,
-                            'data' => $existingData['ctaText'] ?? '',
-                        ])
-                        ->add('ctaUrl', TextType::class, [
-                            'label' => 'CTA URL',
-                            'required' => true,
-                            'data' => $existingData['ctaUrl'] ?? '',
-                        ])
-                        ->add('bullets', TextareaType::class, [
-                            'label' => 'Bullets (one per line)',
-                            'required' => false,
-                            'data' => $existingData['bullets'] ?? '',
-                        ])
-                        ->add('layout', ChoiceType::class, [
-                            'label' => 'Layout',
-                            'required' => true,
-                            'choices' => [
-                                'Left' => 'left',
-                                'Right' => 'right',
-                            ],
-                            'data' => $existingData['style']['layout'] ?? 'left',
-                        ])
-                        ->add('background', ColorType::class, [
-                            'label' => 'Background Color',
-                            'required' => false,
-                            'data' => $existingData['style']['background'] ?? '',
-                        ]);
-                    break;
-
-                case 'body':
-                    $builder
-                        ->add('title', TextType::class, [
-                            'label' => 'Title',
-                            'required' => false,
-                            'data' => $existingData['title'] ?? '',
-                        ])
-                        ->add('content', TextareaType::class, [
-                            'label' => 'Content',
-                            'required' => true,
-                            'data' => $existingData['content'] ?? '',
-                            'attr' => ['rows' => 10],
-                        ])
-                        ->add('maxWidth', ChoiceType::class, [
-                            'label' => 'Max Width',
-                            'required' => true,
-                            'choices' => [
-                                'Normal' => 'normal',
-                                'Narrow' => 'narrow',
-                            ],
-                            'data' => $existingData['style']['maxWidth'] ?? 'normal',
-                        ])
-                        ->add('textAlign', ChoiceType::class, [
-                            'label' => 'Text Align',
-                            'required' => true,
-                            'choices' => [
-                                'Left' => 'left',
-                                'Center' => 'center',
-                            ],
-                            'data' => $existingData['style']['textAlign'] ?? 'left',
-                        ]);
-                    break;
-
-                case 'image':
-                    $builder
-                        ->add('imageUrl', TextType::class, [
-                            'label' => 'Image URL',
-                            'required' => true,
-                            'data' => $existingData['imageUrl'] ?? '',
-                        ])
-                        ->add('alt', TextType::class, [
-                            'label' => 'Alt Text',
-                            'required' => true,
-                            'data' => $existingData['alt'] ?? '',
-                        ])
-                        ->add('caption', TextareaType::class, [
-                            'label' => 'Caption',
-                            'required' => false,
-                            'data' => $existingData['caption'] ?? '',
-                        ])
-                        ->add('rounded', CheckboxType::class, [
-                            'label' => 'Rounded Corners',
-                            'required' => false,
-                            'data' => $existingData['style']['rounded'] ?? false,
-                        ])
-                        ->add('shadow', CheckboxType::class, [
-                            'label' => 'Shadow',
-                            'required' => false,
-                            'data' => $existingData['style']['shadow'] ?? false,
-                        ]);
-                    break;
-
-                case 'cards':
-                    $builder
-                        ->add('sectionTitle', TextType::class, [
-                            'label' => 'Section Title',
-                            'required' => false,
-                            'data' => $existingData['sectionTitle'] ?? '',
-                        ])
-                        ->add('cards', CollectionType::class, [
-                            'entry_type' => CardType::class,
-                            'entry_options' => ['label' => false],
-                            'allow_add' => true,
-                            'allow_delete' => true,
-                            'prototype' => true,
-                            'data' => $existingData['cards'] ?? [],
-                            'label' => 'Cards',
-                        ])
-                        ->add('columns', ChoiceType::class, [
-                            'label' => 'Columns',
-                            'required' => true,
-                            'choices' => [
-                                '2 Columns' => '2',
-                                '3 Columns' => '3',
-                                '4 Columns' => '4',
-                            ],
-                            'data' => $existingData['style']['columns'] ?? '3',
-                        ])
-                        ->add('cardVariant', ChoiceType::class, [
-                            'label' => 'Card Variant',
-                            'required' => true,
-                            'choices' => [
-                                'Solid' => 'solid',
-                                'Outline' => 'outline',
-                                'Glass' => 'glass',
-                            ],
-                            'data' => $existingData['style']['cardVariant'] ?? 'solid',
-                        ])
-                        ->add('accentColor', ChoiceType::class, [
-                            'label' => 'Accent Color',
-                            'required' => true,
-                            'choices' => [
-                                'Primary' => 'primary',
-                                'Accent' => 'accent',
-                            ],
-                            'data' => $existingData['style']['accentColor'] ?? 'primary',
-                        ]);
-                    break;
-
-                case 'faq':
-                    $builder
-                        ->add('sectionTitle', TextType::class, [
-                            'label' => 'Section Title',
-                            'required' => false,
-                            'data' => $existingData['sectionTitle'] ?? '',
-                        ])
-                        ->add('items', CollectionType::class, [
-                            'entry_type' => FaqItemType::class,
-                            'entry_options' => ['label' => false],
-                            'allow_add' => true,
-                            'allow_delete' => true,
-                            'prototype' => true,
-                            'data' => $existingData['items'] ?? [],
-                            'label' => 'FAQ Items',
-                        ])
-                        ->add('accordionVariant', ChoiceType::class, [
-                            'label' => 'Accordion Variant',
-                            'required' => false,
-                            'choices' => [
-                                'Default' => 'default',
-                                'Light' => 'light',
-                                'Dark' => 'dark',
-                            ],
-                            'data' => $existingData['style']['accordionVariant'] ?? 'default',
-                        ]);
-                    break;
-
-                case 'form':
-                    $builder
-                        ->add('title', TextType::class, [
-                            'label' => 'Form Title',
-                            'required' => true,
-                            'data' => $existingData['title'] ?? '',
-                        ])
-                        ->add('fields', CollectionType::class, [
-                            'entry_type' => FormFieldType::class,
-                            'entry_options' => ['label' => false],
-                            'allow_add' => true,
-                            'allow_delete' => true,
-                            'prototype' => true,
-                            'data' => $existingData['fields'] ?? [],
-                            'label' => 'Fields',
-                        ])
-                        ->add('submitText', TextType::class, [
-                            'label' => 'Submit Button Text',
-                            'required' => true,
-                            'data' => $existingData['submitText'] ?? 'Submit',
-                        ])
-                        ->add('successMessage', TextareaType::class, [
-                            'label' => 'Success Message',
-                            'required' => false,
-                            'data' => $existingData['successMessage'] ?? '',
-                        ])
-                        ->add('layout', ChoiceType::class, [
-                            'label' => 'Layout',
-                            'required' => true,
-                            'choices' => [
-                                '1 Column' => '1col',
-                                '2 Columns' => '2col',
-                            ],
-                            'data' => $existingData['style']['layout'] ?? '1col',
-                        ])
-                        ->add('buttonStyle', ChoiceType::class, [
-                            'label' => 'Button Style',
-                            'required' => true,
-                            'choices' => [
-                                'Primary' => 'primary',
-                                'Accent' => 'accent',
-                            ],
-                            'data' => $existingData['style']['buttonStyle'] ?? 'primary',
-                        ]);
-                    break;
-
-                case 'cta':
-                    $builder
-                        ->add('title', TextType::class, [
-                            'label' => 'Title',
-                            'required' => true,
-                            'data' => $existingData['title'] ?? '',
-                        ])
-                        ->add('text', TextareaType::class, [
-                            'label' => 'Text',
-                            'required' => false,
-                            'data' => $existingData['text'] ?? '',
-                        ])
-                        ->add('buttonText', TextType::class, [
-                            'label' => 'Button Text',
-                            'required' => true,
-                            'data' => $existingData['buttonText'] ?? 'Learn More',
-                        ])
-                        ->add('buttonUrl', TextType::class, [
-                            'label' => 'Button URL',
-                            'required' => true,
-                            'data' => $existingData['buttonUrl'] ?? '',
-                        ])
-                        ->add('background', ChoiceType::class, [
-                            'label' => 'Background',
-                            'required' => true,
-                            'choices' => [
-                                'Primary' => 'primary',
-                                'Gradient' => 'gradient',
-                                'Surface' => 'surface',
-                            ],
-                            'data' => $existingData['style']['background'] ?? 'primary',
-                        ])
-                        ->add('align', ChoiceType::class, [
-                            'label' => 'Text Align',
-                            'required' => true,
-                            'choices' => [
-                                'Center' => 'center',
-                                'Left' => 'left',
-                            ],
-                            'data' => $existingData['style']['align'] ?? 'center',
-                        ]);
-                    break;
-
-                case 'footer':
-                    $builder
-                        ->add('text', TextareaType::class, [
-                            'label' => 'Footer Text',
-                            'required' => true,
-                            'data' => $existingData['text'] ?? '',
-                        ])
-                        ->add('links', TextareaType::class, [
-                            'label' => 'Links (Label|/url per line)',
-                            'required' => false,
-                            'data' => $existingData['links'] ?? '',
-                        ])
-                        ->add('phone', TextType::class, [
-                            'label' => 'Phone',
-                            'required' => false,
-                            'data' => $existingData['phone'] ?? '',
-                        ])
-                        ->add('email', EmailType::class, [
-                            'label' => 'Email',
-                            'required' => false,
-                            'data' => $existingData['email'] ?? '',
-                        ])
-                        ->add('style', ChoiceType::class, [
-                            'label' => 'Style',
-                            'required' => true,
-                            'choices' => [
-                                'Light' => 'light',
-                                'Dark' => 'dark',
-                            ],
-                            'data' => $existingData['style']['variant'] ?? 'light',
-                        ]);
-                    break;
+        // Listen for form submit to restructure hero_split form data
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($type) {
+            if ($type !== 'hero_split') {
+                return;
             }
+            
+            $formData = $event->getData();
+            
+            // Restructure form fields to be nested under form object
+            $formData['form'] = [
+                'title' => $formData['formTitle'] ?? '',
+                'submitText' => $formData['submitText'] ?? 'Envoyer',
+                'consentText' => $formData['consentText'] ?? '',
+                'successMessage' => $formData['successMessage'] ?? '',
+                'fields' => $formData['formFields'] ?? []
+            ];
+            
+            // Remove top-level form fields to avoid duplication
+            unset($formData['formTitle']);
+            unset($formData['formFields']);
+            unset($formData['submitText']);
+            unset($formData['consentText']);
+            unset($formData['successMessage']);
+            
+            $event->setData($formData);
+        });
+
+        switch ($type) {
+            case 'header':
+                $builder
+                    ->add('brandText', TextType::class, [
+                        'label' => 'Brand Text',
+                        'data' => $data['brandText'] ?? '',
+                    ])
+                    ->add('logoUrl', TextType::class, [
+                        'label' => 'Logo URL',
+                        'required' => false,
+                        'data' => $data['logoUrl'] ?? '',
+                    ])
+                    ->add('menuItems', CollectionType::class, [
+                        'entry_type' => MenuItemType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['menuItems'] ?? [],
+                        'label' => 'Menu Items',
+                    ])
+                    ->add('ctaText', TextType::class, [
+                        'label' => 'CTA Text',
+                        'required' => false,
+                        'data' => $data['ctaText'] ?? '',
+                    ])
+                    ->add('ctaUrl', TextType::class, [
+                        'label' => 'CTA URL',
+                        'required' => false,
+                        'data' => $data['ctaUrl'] ?? '',
+                    ])
+                    ->add('variant', ChoiceType::class, [
+                        'label' => 'Variant',
+                        'choices' => [
+                            'Light' => 'light',
+                            'Dark' => 'dark',
+                        ],
+                        'data' => $data['style']['variant'] ?? 'light',
+                    ])
+                    ->add('sticky', CheckboxType::class, [
+                        'label' => 'Sticky',
+                        'required' => false,
+                        'data' => $data['style']['sticky'] ?? false,
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Background',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? null,
+                    ]);
+                break;
+
+            case 'hero':
+                $builder
+                    ->add('title', TextType::class, [
+                        'label' => 'Title',
+                        'data' => $data['title'] ?? '',
+                    ])
+                    ->add('subtitle', TextareaType::class, [
+                        'label' => 'Subtitle',
+                        'required' => false,
+                        'data' => $data['subtitle'] ?? '',
+                    ])
+                    ->add('ctaText', TextType::class, [
+                        'label' => 'CTA Text',
+                        'required' => false,
+                        'data' => $data['ctaText'] ?? '',
+                    ])
+                    ->add('ctaUrl', TextType::class, [
+                        'label' => 'CTA URL',
+                        'required' => false,
+                        'data' => $data['ctaUrl'] ?? '',
+                    ])
+                    ->add('backgroundVariant', ChoiceType::class, [
+                        'label' => 'Background Variant',
+                        'choices' => [
+                            'Surface' => 'surface',
+                            'Light' => 'light',
+                            'Gradient' => 'gradient',
+                        ],
+                        'data' => $data['style']['backgroundVariant'] ?? 'surface',
+                    ]);
+                break;
+
+            case 'hero_split':
+                $builder
+                    ->add('title', TextType::class, [
+                        'label' => 'Hero Title',
+                        'required' => false,
+                        'data' => $data['title'] ?? '',
+                    ])
+                    ->add('subtitle', TextareaType::class, [
+                        'label' => 'Hero Subtitle',
+                        'required' => false,
+                        'data' => $data['subtitle'] ?? '',
+                    ])
+                    ->add('imageUrl', TextType::class, [
+                        'label' => 'Image URL',
+                        'required' => false,
+                        'data' => $data['imageUrl'] ?? '',
+                    ])
+                    ->add('imageAlt', TextType::class, [
+                        'label' => 'Image Alt',
+                        'required' => false,
+                        'data' => $data['imageAlt'] ?? '',
+                    ])
+                    ->add('formTitle', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $data['form']['title'] ?? '',
+                    ])
+                    ->add('formFields', CollectionType::class, [
+                        'entry_type' => FormFieldType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['form']['fields'] ?? [],
+                        'label' => 'Form Fields',
+                    ])
+                    ->add('submitText', TextType::class, [
+                        'label' => 'Submit Button Text',
+                        'required' => false,
+                        'data' => $data['form']['submitText'] ?? 'Envoyer',
+                    ])
+                    ->add('consentText', TextareaType::class, [
+                        'label' => 'Consent Text',
+                        'required' => false,
+                        'data' => $data['form']['consentText'] ?? '',
+                    ])
+                    ->add('successMessage', TextareaType::class, [
+                        'label' => 'Success Message',
+                        'required' => false,
+                        'data' => $data['form']['successMessage'] ?? '',
+                    ])
+                    ->add('layout', ChoiceType::class, [
+                        'label' => 'Layout',
+                        'choices' => [
+                            'Image Left / Form Right' => 'image-left-form-right',
+                            'Form Left / Image Right' => 'form-left-image-right',
+                        ],
+                        'data' => $data['style']['layout'] ?? 'image-left-form-right',
+                    ])
+                    ->add('backgroundVariant', ChoiceType::class, [
+                        'label' => 'Background Variant',
+                        'choices' => [
+                            'Surface' => 'surface',
+                            'Light' => 'light',
+                            'Gradient' => 'gradient',
+                        ],
+                        'data' => $data['style']['backgroundVariant'] ?? 'light',
+                    ]);
+                break;
+
+            case 'body':
+                $builder
+                    ->add('title', TextType::class, [
+                        'label' => 'Title',
+                        'required' => false,
+                        'data' => $data['title'] ?? '',
+                    ])
+                    ->add('content', TextareaType::class, [
+                        'label' => 'Content',
+                        'attr' => ['rows' => 8],
+                        'data' => $data['content'] ?? '',
+                    ]);
+                break;
+
+            case 'image':
+                $builder
+                    ->add('imageUrl', TextType::class, [
+                        'label' => 'Image URL',
+                        'data' => $data['imageUrl'] ?? '',
+                    ])
+                    ->add('alt', TextType::class, [
+                        'label' => 'Alt',
+                        'data' => $data['alt'] ?? '',
+                    ])
+                    ->add('caption', TextareaType::class, [
+                        'label' => 'Caption',
+                        'required' => false,
+                        'data' => $data['caption'] ?? '',
+                    ]);
+                break;
+
+            case 'cards':
+                $builder
+                    ->add('sectionTitle', TextType::class, [
+                        'label' => 'Section Title',
+                        'required' => false,
+                        'data' => $data['sectionTitle'] ?? '',
+                    ])
+                    ->add('cards', CollectionType::class, [
+                        'entry_type' => CardType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['cards'] ?? [],
+                        'label' => 'Cards',
+                    ])
+                    ->add('columns', ChoiceType::class, [
+                        'label' => 'Columns',
+                        'choices' => [
+                            '2' => 2,
+                            '3' => 3,
+                            '4' => 4,
+                        ],
+                        'data' => $data['style']['columns'] ?? 3,
+                    ])
+                    ->add('cardVariant', ChoiceType::class, [
+                        'label' => 'Card Variant',
+                        'choices' => [
+                            'Solid' => 'solid',
+                            'Outline' => 'outline',
+                            'Glass' => 'glass',
+                        ],
+                        'data' => $data['style']['cardVariant'] ?? 'solid',
+                    ]);
+                break;
+
+            case 'faq':
+                $builder
+                    ->add('sectionTitle', TextType::class, [
+                        'label' => 'Section Title',
+                        'required' => false,
+                        'data' => $data['sectionTitle'] ?? '',
+                    ])
+                    ->add('items', CollectionType::class, [
+                        'entry_type' => FaqItemType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['items'] ?? [],
+                        'label' => 'FAQ Items',
+                    ]);
+                break;
+
+            case 'form':
+                $builder
+                    ->add('title', TextType::class, [
+                        'label' => 'Form Title',
+                        'data' => $data['title'] ?? '',
+                    ])
+                    ->add('fields', CollectionType::class, [
+                        'entry_type' => FormFieldType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['fields'] ?? [],
+                        'label' => 'Fields',
+                    ])
+                    ->add('submitText', TextType::class, [
+                        'label' => 'Submit Text',
+                        'data' => $data['submitText'] ?? 'Envoyer',
+                    ])
+                    ->add('successMessage', TextareaType::class, [
+                        'label' => 'Success Message',
+                        'required' => false,
+                        'data' => $data['successMessage'] ?? '',
+                    ])
+                    ->add('consentText', TextareaType::class, [
+                        'label' => 'Consent Text',
+                        'required' => false,
+                        'data' => $data['consentText'] ?? '',
+                    ]);
+                break;
+
+            case 'cta':
+                $builder
+                    ->add('title', TextType::class, [
+                        'label' => 'Title',
+                        'data' => $data['title'] ?? '',
+                    ])
+                    ->add('text', TextareaType::class, [
+                        'label' => 'Text',
+                        'required' => false,
+                        'data' => $data['text'] ?? '',
+                    ])
+                    ->add('buttonText', TextType::class, [
+                        'label' => 'Button Text',
+                        'data' => $data['buttonText'] ?? '',
+                    ])
+                    ->add('buttonUrl', TextType::class, [
+                        'label' => 'Button URL',
+                        'data' => $data['buttonUrl'] ?? '',
+                    ])
+                    ->add('backgroundVariant', ChoiceType::class, [
+                        'label' => 'Background',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Gradient' => 'gradient',
+                            'Surface' => 'surface',
+                            'Warning' => 'warning',
+                        ],
+                        'data' => $data['style']['backgroundVariant'] ?? 'primary',
+                    ]);
+                break;
+
+            case 'footer':
+                $builder
+                    ->add('brandName', TextType::class, [
+                        'label' => 'Brand Name',
+                        'required' => false,
+                        'data' => $data['brandName'] ?? '',
+                    ])
+                    ->add('description', TextareaType::class, [
+                        'label' => 'Description',
+                        'required' => false,
+                        'data' => $data['description'] ?? '',
+                    ])
+                    ->add('usefulLinks', CollectionType::class, [
+                        'entry_type' => MenuItemType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['usefulLinks'] ?? [],
+                        'label' => 'Useful Links',
+                    ])
+                    ->add('address', TextareaType::class, [
+                        'label' => 'Address',
+                        'required' => false,
+                        'data' => $data['address'] ?? '',
+                    ])
+                    ->add('phone', TextType::class, [
+                        'label' => 'Phone',
+                        'required' => false,
+                        'data' => $data['phone'] ?? '',
+                    ])
+                    ->add('email', EmailType::class, [
+                        'label' => 'Email',
+                        'required' => false,
+                        'data' => $data['email'] ?? '',
+                    ])
+                    ->add('copyright', TextType::class, [
+                        'label' => 'Copyright',
+                        'required' => false,
+                        'data' => $data['copyright'] ?? '',
+                    ])
+                    ->add('variant', ChoiceType::class, [
+                        'label' => 'Variant',
+                        'choices' => [
+                            'Light' => 'light',
+                            'Dark' => 'dark',
+                        ],
+                        'data' => $data['style']['variant'] ?? 'dark',
+                    ]);
+                break;
         }
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -462,61 +469,97 @@ class SectionDataType extends AbstractType
             'existing_data' => [],
         ]);
     }
-}
-
-class CardType extends AbstractType
+}class MenuItemType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('label', TextType::class, ['label' => 'Label'])
+            ->add('url', TextType::class, ['label' => 'URL']);
+    }
+}class CardType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title', TextType::class, ['label' => 'Title'])
-            ->add('description', TextareaType::class, ['label' => 'Description', 'attr' => ['rows' => 3]])
-            ->add('imageUrl', TextType::class, ['label' => 'Image URL', 'required' => false])
-            ->add('linkUrl', TextType::class, ['label' => 'Link URL', 'required' => false]);
+            ->add('description', TextareaType::class, [
+                'label' => 'Description',
+                'attr' => ['rows' => 3],
+            ])
+            ->add('icon', TextType::class, [
+                'label' => 'Icon (optional)',
+                'required' => false,
+            ])
+            ->add('imageUrl', TextType::class, [
+                'label' => 'Image URL',
+                'required' => false,
+            ])
+            ->add('linkUrl', TextType::class, [
+                'label' => 'Link URL',
+                'required' => false,
+            ])
+            ->add('buttonText', TextType::class, [
+                'label' => 'Button Text',
+                'required' => false,
+            ])
+            ->add('badge', TextType::class, [
+                'label' => 'Badge',
+                'required' => false,
+            ]);
+    }
+}class FaqItemType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('question', TextType::class, ['label' => 'Question'])
+            ->add('answer', TextareaType::class, [
+                'label' => 'Answer',
+                'attr' => ['rows' => 3],
+            ]);
+    }
+}class FormFieldType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('label', TextType::class, ['label' => 'Label'])
+            ->add('name', TextType::class, ['label' => 'Name'])
+            ->add('type', ChoiceType::class, [
+                'label' => 'Type',
+                'choices' => [
+                    'Text' => 'text',
+                    'Email' => 'email',
+                    'Phone' => 'tel',
+                    'Textarea' => 'textarea',
+                    'Select' => 'select',
+                    'Checkbox' => 'checkbox',
+                ],
+            ])
+            ->add('required', CheckboxType::class, [
+                'label' => 'Required',
+                'required' => false,
+            ])
+            ->add('placeholder', TextType::class, [
+                'label' => 'Placeholder',
+                'required' => false,
+            ])
+            ->add('options', TextareaType::class, [
+                'label' => 'Options (one per line for select)',
+                'required' => false,
+                'attr' => ['rows' => 3],
+            ])
+            ->add('icon', TextType::class, [
+                'label' => 'Icon',
+                'required' => false,
+            ])
+            ->add('width', ChoiceType::class, [
+                'label' => 'Width',
+                'choices' => [
+                    'Full' => 'full',
+                    'Half' => 'half',
+                ],
+            ]);
     }
 }
-
-class FaqItemType extends AbstractType
-    {
-        public function buildForm(FormBuilderInterface $builder, array $options): void
-        {
-            $builder
-                ->add('question', TextType::class, ['label' => 'Question'])
-                ->add('answer', TextareaType::class, ['label' => 'Answer', 'attr' => ['rows' => 3]]);
-        }
-    }
-
-class FormFieldType extends AbstractType
-    {
-        public function buildForm(FormBuilderInterface $builder, array $options): void
-        {
-            $builder
-                ->add('label', TextType::class, ['label' => 'Label'])
-                ->add('name', TextType::class, ['label' => 'Name'])
-                ->add('type', ChoiceType::class, [
-                    'label' => 'Type',
-                    'choices' => [
-                        'Text' => 'text',
-                        'Email' => 'email',
-                        'Phone' => 'tel',
-                        'Textarea' => 'textarea',
-                        'Select' => 'select',
-                        'Checkbox' => 'checkbox',
-                    ],
-                ])
-                ->add('required', CheckboxType::class, ['label' => 'Required', 'required' => false])
-                ->add('placeholder', TextType::class, ['label' => 'Placeholder', 'required' => false])
-                ->add('options', TextareaType::class, [
-                    'label' => 'Options (for select, one per line)',
-                    'required' => false,
-                    'attr' => ['rows' => 3],
-                ])
-                ->add('width', ChoiceType::class, [
-                    'label' => 'Width',
-                    'choices' => [
-                        'Full' => 'full',
-                        'Half' => 'half',
-                    ],
-                ]);
-        }
-    }

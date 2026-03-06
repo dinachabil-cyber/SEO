@@ -12,6 +12,8 @@
             {% include 'front/sections/_header.html.twig' with {data: data} %}
         {% elseif section.type == 'hero' %}
             {% include 'front/sections/_hero.html.twig' with {data: data} %}
+        {% elseif section.type == 'hero_split' %}
+            {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
         {% elseif section.type == 'body' %}
             {% include 'front/sections/_body.html.twig' with {data: data} %}
         {% elseif section.type == 'image' %}
@@ -26,6 +28,11 @@
             {% include 'front/sections/_cta.html.twig' with {data: data} %}
         {% elseif section.type == 'footer' %}
             {% include 'front/sections/_footer.html.twig' with {data: data} %}
+        {% else %}
+            {# Display unknown section type for debugging #}
+            <div class="alert alert-warning" role="alert">
+                Unknown section type: {{ section.type }}
+            </div>
         {% endif %}
     {% endfor %}
 </main>
