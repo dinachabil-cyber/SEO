@@ -1,0 +1,36 @@
+<div class="mb-4">
+    <label class="form-label fw-bold">{{ label }}</label>
+    
+    <div data-controller="card-collection" 
+         data-card-collection-index-value="{{ form|length }}"
+         data-card-collection-prototype-value="{{ form.vars.prototype is defined ? '<div class=\"card mb-3 border-secondary\" data-card-collection-target=\"item\"><div class=\"card-header bg-secondary bg-opacity-10 d-flex justify-content-between align-items-center\"><span class=\"text-muted\">New Card</span><button type=\"button\" class=\"btn btn-sm btn-danger\" data-action=\"card-collection#remove\"><i class=\"bi bi-trash\"></i> Remove</button></div><div class=\"card-body\">' ~ form_widget(form.vars.prototype) ~ '</div></div>'|e('html_attr') : '' }}">
+        
+        <!-- Existing items -->
+        <div data-card-collection-target="items">
+            {% if form|length > 0 %}
+                {% for card in form %}
+                    <div class="card mb-3 border-secondary" data-card-collection-target="item">
+                        <div class="card-header bg-secondary bg-opacity-10 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">
+                                {{ card.vars.value.title ?: 'Card' }}
+                            </span>
+                            <button type="button" class="btn btn-sm btn-danger" data-action="card-collection#remove">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            {{ form_widget(card) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-muted mb-3">No cards added yet. Click "Add Card" to start building your cards section.</div>
+            {% endif %}
+        </div>
+        
+        <!-- Add button -->
+        <button type="button" class="btn btn-outline-primary w-100" data-action="card-collection#add">
+            <i class="bi bi-plus-circle me-1"></i> Add Card
+        </button>
+    </div>
+</div>

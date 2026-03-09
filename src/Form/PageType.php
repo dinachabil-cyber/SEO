@@ -42,7 +42,7 @@ class PageType extends AbstractType
                     new Length(
                         max: 70,
                         maxMessage: 'Meta title cannot exceed {{ limit }} characters',
-                        min: 60,
+                        min: 30,
                         minMessage: 'Meta title should be at least {{ limit }} characters'
                     ),
                 ],
@@ -51,7 +51,7 @@ class PageType extends AbstractType
                     'placeholder' => 'Page meta title for SEO',
                     'maxlength' => 70,
                 ],
-                'help' => '60-70 characters recommended for best SEO results',
+                'help' => '30-70 characters recommended for best SEO results',
             ])
             ->add('metaDescription', TextareaType::class, [
                 'label' => 'Meta Description',
@@ -60,7 +60,7 @@ class PageType extends AbstractType
                     new Length(
                         max: 170,
                         maxMessage: 'Meta description cannot exceed {{ limit }} characters',
-                        min: 160,
+                        min: 50,
                         minMessage: 'Meta description should be at least {{ limit }} characters'
                     ),
                 ],
@@ -70,7 +70,7 @@ class PageType extends AbstractType
                     'maxlength' => 170,
                     'rows' => 3,
                 ],
-                'help' => '160-170 characters recommended for best SEO results',
+                'help' => '50-170 characters recommended for best SEO results',
             ])
             ->add('metaKeywords', TextType::class, [
                 'label' => 'Meta Keywords',

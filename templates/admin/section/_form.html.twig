@@ -48,7 +48,10 @@
 
         {% elseif form.vars.value.type == 'cards' %}
             {{ form_row(dataForm.sectionTitle) }}
-            {{ form_row(dataForm.cards) }}
+            {% include 'admin/section/_cards.html.twig' with {
+                form: dataForm.cards,
+                label: dataForm.cards.vars.label
+            } %}
             {{ form_row(dataForm.columns) }}
             {{ form_row(dataForm.cardVariant) }}
 

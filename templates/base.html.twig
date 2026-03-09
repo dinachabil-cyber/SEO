@@ -22,7 +22,7 @@
         {% block body %}{% endblock %}
         <script>
             // Theme toggle functionality
-            const themeToggle = document.querySelector('.theme-toggle input');
+            let themeToggle = document.querySelector('.theme-toggle input');
             const root = document.documentElement;
 
             // Load saved theme or use system preference

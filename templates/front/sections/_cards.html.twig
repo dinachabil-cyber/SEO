@@ -1,8 +1,9 @@
-<section class="section bg-white">
+<section class="section {% if data.style is defined and data.style is not null and data.style.background %} {% else %}bg-white{% endif %}" 
+         {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         {% if data.sectionTitle %}
             <div class="text-center mb-5">
-                <h2>{{ data.sectionTitle }}</h2>
+                <h2{% if data.style is defined and data.style is not null and data.style.textColor %} style="color: {{ data.style.textColor }};"{% endif %}>{{ data.sectionTitle }}</h2>
             </div>
         {% endif %}
         
@@ -10,16 +11,20 @@
             <div class="row {% if data.style is defined and data.style is not null and data.style.columns %}row-cols-1 row-cols-md-{{ data.style.columns }} g-4{% else %}row-cols-1 row-cols-md-3 g-4{% endif %}">
                 {% for card in data.cards %}
                     <div class="col">
-                        <div class="card {% if data.style is defined and data.style is not null and data.style.cardVariant == 'outline' %}border-primary{% elseif data.style is defined and data.style is not null and data.style.cardVariant == 'glass' %}glass{% endif %} h-100">
+                        <div class="card {% if data.style is defined and data.style is not null and data.style.cardVariant == 'outline' %}border-primary{% elseif data.style is defined and data.style is not null and data.style.cardVariant == 'glass' %}glass{% endif %} {% if data.style is defined and data.style is not null and data.style.shadow %}shadow{% endif %} {% if data.style is defined and data.style is not null and data.style.rounded %}rounded{% endif %} h-100"
+                             {% if data.style is defined and data.style is not null and data.style.borderColor %}style="border-color: {{ data.style.borderColor }};{% endif %}">
                             {% if card.imageUrl %}
                                 <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="card-img-top {% if data.style is defined and data.style is not null and data.style.cardVariant == 'solid' %}rounded-top{% endif %}">
                             {% endif %}
-                            <div class="card-body">
-                                <h3 class="card-title mb-3">{{ card.title }}</h3>
-                                <p class="card-text text-muted mb-4">{{ card.description }}</p>
+                            <div class="card-body{% if data.style is defined and data.style is not null and data.style.background %} bg-{{ data.style.background }}{% endif %}"
+                                 {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
+                                <h3 class="card-title mb-3{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                                    {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};"{% endif %}>{{ card.title }}</h3>
+                                <p class="card-text mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                                   {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};"{% endif %}>{{ card.description }}</p>
                                 {% if card.linkUrl %}
-                                    <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.accentColor == 'accent' %}btn-accent{% else %}btn-primary{% endif %}">
-                                        Learn More
+                                    <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %}">
+                                        {{ card.buttonText ?: 'Learn More' }}
                                     </a>
                                 {% endif %}
                             </div>

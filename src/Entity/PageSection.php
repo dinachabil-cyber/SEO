@@ -146,18 +146,21 @@ class PageSection
             'sticky' => false,
             'variant' => 'light',
             'background' => '',
+            'textColor' => '',
             'backgroundVariant' => 'surface',
             'layout' => 'left',
             'columns' => 3,
             'cardVariant' => 'solid',
             'accentColor' => 'primary',
+            'buttonColor' => 'primary',
             'buttonStyle' => 'primary',
+            'borderColor' => '',
+            'shadow' => false,
+            'rounded' => false,
             'maxWidth' => 'normal',
             'textAlign' => 'left',
             'align' => 'center',
             'accordionVariant' => 'default',
-            'rounded' => false,
-            'shadow' => false,
         ];
 
         $data['style'] = array_merge($defaultStyle, $data['style']);

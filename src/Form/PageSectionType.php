@@ -119,18 +119,21 @@ class SectionDataType extends AbstractType
                 'variant',
                 'sticky',
                 'background',
+                'textColor',
                 'backgroundVariant',
                 'layout',
                 'columns',
                 'cardVariant',
                 'accentColor',
+                'buttonColor',
                 'buttonStyle',
+                'borderColor',
+                'shadow',
+                'rounded',
                 'maxWidth',
                 'textAlign',
                 'align',
                 'accordionVariant',
-                'rounded',
-                'shadow',
             ];
             
             $styleData = [];
@@ -405,6 +408,43 @@ class SectionDataType extends AbstractType
                             'Glass' => 'glass',
                         ],
                         'data' => $data['style']['cardVariant'] ?? 'solid',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Card Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Card Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('borderColor', ColorType::class, [
+                        'label' => 'Card Border Color',
+                        'required' => false,
+                        'data' => $data['style']['borderColor'] ?? '',
+                    ])
+                    ->add('shadow', CheckboxType::class, [
+                        'label' => 'Card Shadow',
+                        'required' => false,
+                        'data' => $data['style']['shadow'] ?? false,
+                    ])
+                    ->add('rounded', CheckboxType::class, [
+                        'label' => 'Rounded Corners',
+                        'required' => false,
+                        'data' => $data['style']['rounded'] ?? false,
                     ]);
                 break;
 
@@ -536,6 +576,16 @@ class SectionDataType extends AbstractType
                             'Dark' => 'dark',
                         ],
                         'data' => $data['style']['variant'] ?? 'dark',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Footer Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '#111827'
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Footer Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '#ffffff',
                     ]);
                 break;
         }

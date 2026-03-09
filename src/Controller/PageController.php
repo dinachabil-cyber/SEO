@@ -23,16 +23,30 @@ class PageController extends AbstractController
         $form = $this->createForm(PageType::class, $page);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($page);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $entityManager->persist($page);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Page created successfully');
+                $this->addFlash('success', 'Page created successfully');
 
-            return $this->redirectToRoute('app_page_builder', [
-                'siteId' => $site->getId(),
-                'pageId' => $page->getId(),
-            ]);
+                return $this->redirectToRoute('app_page_builder', [
+                    'siteId' => $site->getId(),
+                    'pageId' => $page->getId(),
+                ]);
+            } else {
+                // Debug validation errors
+                $errors = [];
+                foreach ($form->getErrors(true, true) as $error) {
+                    $errors[] = sprintf(
+                        'Field: %s, Error: %s',
+                        $error->getOrigin()->getName(),
+                        $error->getMessage()
+                    );
+                }
+                error_log('Page validation errors: ' . implode("\n", $errors));
+                $this->addFlash('error', 'Validation failed: ' . implode(', ', array_map(function($e) { return str_replace('Field: ', '', $e); }, $errors)));
+            }
         }
 
         return $this->render('admin/page/new.html.twig', [
