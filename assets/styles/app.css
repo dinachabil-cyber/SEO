@@ -735,6 +735,44 @@ textarea.form-control {
   }
 }
 
+/* === Footer Styles === */
+.site-footer {
+  transition: all var(--transition-base);
+}
+
+/* Footer text and links when custom background is used */
+/* Removed the rule that was overriding custom background colors */
+
+.site-footer[style*="background-color"] h4,
+.site-footer[style*="background-color"] h5 {
+  /* Ensure headings use the specified text color or fallback */
+  color: inherit;
+}
+
+.footer-text-muted {
+  /* Muted text for custom backgrounds */
+  opacity: 0.7;
+  color: inherit;
+}
+
+.footer-link {
+  /* Links for custom backgrounds */
+  opacity: 0.7;
+  color: inherit;
+  transition: opacity var(--transition-base);
+}
+
+.footer-link:hover {
+  opacity: 1;
+  color: inherit;
+}
+
+.footer-hr {
+  /* Horizontal rule for custom backgrounds */
+  border-color: currentColor;
+  opacity: 0.3;
+}
+
 /* === Utility Classes === */
 .animate-fadeIn {
   animation: fadeIn var(--transition-slow);

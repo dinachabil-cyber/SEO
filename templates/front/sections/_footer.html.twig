@@ -1,5 +1,11 @@
-<footer class="site-footer py-5 {% if data.style is defined and data.style is not null and data.style.variant == 'dark' and not data.style.background %}bg-dark text-white{% elseif not (data.style is defined and data.style is not null and data.style.background) %}bg-light text-dark{% endif %}" 
-        style="{% if data.style is defined and data.style is not null and data.style.background %}background-color: {{ data.style.background }};{% endif %}{% if data.style is defined and data.style is not null and data.style.textColor %} color: {{ data.style.textColor }};{% endif %}">
+<footer class="site-footer py-5 {% if not (data.style.background) %}
+            {% if data.style.variant == 'dark' %}bg-dark text-white{% else %}bg-light text-dark{% endif %}
+        {% endif %}" 
+        style="{% if data.style.background %}background-color: {{ data.style.background }};{% endif %}{% if data.style.textColor %} color: {{ data.style.textColor }};{% else %}{% if not (data.style.background) %}
+            {% if data.style.variant == 'dark' %} color: #ffffff;{% else %} color: #000000;{% endif %}
+        {% else %}
+            color: #000000;
+        {% endif %}{% endif %}">
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">
@@ -8,9 +14,9 @@
                 {% endif %}
 
                 {% if data.description is defined and data.description %}
-                    <p class="text-white-50">{{ data.description|nl2br }}</p>
+                    <p{% if data.style is defined and data.style is not null and data.style.background %} class="footer-text-muted"{% else %} class="text-white-50"{% endif %}>{{ data.description|nl2br }}</p>
                 {% elseif data.text is defined and data.text %}
-                    <p class="text-white-50">{{ data.text|nl2br }}</p>
+                    <p{% if data.style is defined and data.style is not null and data.style.background %} class="footer-text-muted"{% else %} class="text-white-50"{% endif %}>{{ data.text|nl2br }}</p>
                 {% endif %}
             </div>
 
@@ -20,7 +26,7 @@
                     <ul class="list-unstyled">
                         {% for link in data.usefulLinks %}
                             <li class="mb-2">
-                                <a href="{{ link.url }}" class="text-white-50 text-decoration-none">
+                                <a href="{{ link.url }}"{% if data.style is defined and data.style is not null and data.style.background %} class="footer-link text-decoration-none"{% else %} class="text-white-50 text-decoration-none"{% endif %}>
                                     {{ link.label }}
                                 </a>
                             </li>
@@ -36,7 +42,7 @@
                                 {% set parts = link|split('|') %}
                                 {% if parts|length == 2 %}
                                     <li class="mb-2">
-                                        <a href="{{ parts[1] }}" class="text-white-50 text-decoration-none">
+                                        <a href="{{ parts[1] }}"{% if data.style is defined and data.style is not null and data.style.background %} class="footer-link text-decoration-none"{% else %} class="text-white-50 text-decoration-none"{% endif %}>
                                             {{ parts[0] }}
                                         </a>
                                     </li>
@@ -51,12 +57,12 @@
                 <h5 class="mb-3">Contact</h5>
 
                 {% if data.address is defined and data.address %}
-                    <p class="text-white-50 mb-2">{{ data.address|nl2br }}</p>
+                    <p{% if data.style is defined and data.style is not null and data.style.background %} class="footer-text-muted mb-2"{% else %} class="text-white-50 mb-2"{% endif %}>{{ data.address|nl2br }}</p>
                 {% endif %}
 
                 {% if data.phone is defined and data.phone %}
                     <p class="mb-2">
-                        <a href="tel:{{ data.phone }}" class="text-white-50 text-decoration-none">
+                        <a href="tel:{{ data.phone }}"{% if data.style is defined and data.style is not null and data.style.background %} class="footer-link text-decoration-none"{% else %} class="text-white-50 text-decoration-none"{% endif %}>
                             {{ data.phone }}
                         </a>
                     </p>
@@ -64,7 +70,7 @@
 
                 {% if data.email is defined and data.email %}
                     <p class="mb-0">
-                        <a href="mailto:{{ data.email }}" class="text-white-50 text-decoration-none">
+                        <a href="mailto:{{ data.email }}"{% if data.style is defined and data.style is not null and data.style.background %} class="footer-link text-decoration-none"{% else %} class="text-white-50 text-decoration-none"{% endif %}>
                             {{ data.email }}
                         </a>
                     </p>
@@ -72,9 +78,9 @@
             </div>
         </div>
 
-        <hr class="my-4 border-secondary">
+        <hr class="my-4 {% if data.style is defined and data.style is not null and data.style.background %}footer-hr{% else %}border-secondary{% endif %}">
 
-        <div class="text-center small text-white-50">
+        <div class="text-center small{% if data.style is defined and data.style is not null and data.style.background %} footer-text-muted{% else %} text-white-50{% endif %}">
             {% if data.copyright is defined and data.copyright %}
                 {{ data.copyright }}
             {% else %}

@@ -78,6 +78,12 @@ class PageBuilderController extends AbstractController
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
 
+        // Log referer for debugging
+        $referer = $request->headers->get('referer');
+        $builderUrl = $this->generateUrl('app_page_builder', ['siteId' => $siteId, 'pageId' => $pageId]);
+        error_log("Section new - Referer: " . $referer);
+        error_log("Section new - Builder URL: " . $builderUrl);
+
         $section = new PageSection();
         $section->setPage($page);
 
@@ -151,10 +157,28 @@ class PageBuilderController extends AbstractController
             $this->normalizeSectionPositions($page, $pageSectionRepository, $entityManager);
 
             $this->addFlash('success', 'Section added successfully');
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+            
+            // Get referer from form field (more reliable than header)
+            $referer = $request->request->get('referer');
+            $builderUrl = $this->generateUrl('app_page_builder', [
                 'siteId' => $siteId,
                 'pageId' => $pageId,
-            ]));
+            ]);
+            
+            error_log("Section new - Form referer: " . $referer);
+            error_log("Section new - Builder URL: " . $builderUrl);
+            
+            // Redirect to previous page or fallback to page builder
+            if ($referer && str_contains($referer, $builderUrl)) {
+                error_log("Redirecting to form referer: " . $referer);
+                return $this->redirect($referer);
+            }
+            
+            error_log("Redirecting to page builder fallback");
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/section/new.html.twig', [
@@ -194,12 +218,15 @@ class PageBuilderController extends AbstractController
 
                 $this->addFlash('success', 'Section updated successfully');
                 
-                // Redirect to previous page or fallback to page builder
-                $referer = $request->headers->get('referer');
-                if ($referer && str_contains($referer, $this->generateUrl('app_page_builder', [
+                // Get referer from form field (more reliable than header)
+                $referer = $request->request->get('referer');
+                $builderUrl = $this->generateUrl('app_page_builder', [
                     'siteId' => $siteId,
                     'pageId' => $pageId,
-                ]))) {
+                ]);
+                
+                // Redirect to previous page or fallback to page builder
+                if ($referer && str_contains($referer, $builderUrl)) {
                     return $this->redirect($referer);
                 }
                 

@@ -24,11 +24,12 @@
                     {% endif %}
 
                     {{ form_start(form, {attr: {class: 'needs-validation'}}) }}
+                    <input type="hidden" name="referer" value="{{ app.request.headers.get('referer') }}">
                     
                     {% include 'admin/section/_form.html.twig' %}
                     
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ path('app_page_builder', {siteId: site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
+                        <a href="{{ app.request.headers.get('referer') ?? path('app_page_builder', {siteId: site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
                             Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
