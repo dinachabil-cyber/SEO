@@ -43,6 +43,21 @@ class PageBuilderController extends AbstractController
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
 
+        return $this->render('admin/page/preview.html.twig', [
+            'site' => $page->getSite(),
+            'page' => $page,
+        ]);
+    }
+
+    #[Route('/preview-content', name: 'app_page_preview_content', methods: ['GET'])]
+    public function previewContent(int $siteId, int $pageId, PageRepository $pageRepository): Response
+    {
+        $page = $pageRepository->find($pageId);
+        
+        if (!$page || $page->getSite()->getId() !== $siteId) {
+            return new Response('Page not found', Response::HTTP_NOT_FOUND);
+        }
+
         // Load sections ordered by position
         $sections = $page->getSections();
 

@@ -1,4 +1,16 @@
 # Site routes
+# Admin root redirect
+app_admin:
+    path: /admin
+    controller: App\Controller\HomeController::admin
+    methods: ['GET']
+
+app_admin_trailing:
+    path: /admin/
+    controller: App\Controller\HomeController::admin
+    methods: ['GET']
+
+# Site routes
 app_site_index:
     path: /admin/site
     controller: App\Controller\SiteController::index

@@ -13,4 +13,11 @@ class HomeController extends AbstractController
     {
         return $this->redirectToRoute('app_site_index');
     }
+
+    #[Route('/admin', name: 'app_admin', methods: ['GET'])]
+    #[Route('/admin/', name: 'app_admin_trailing', methods: ['GET'])]
+    public function admin(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_site_index');
+    }
 }
