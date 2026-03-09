@@ -1,9 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['item', 'prototype'];
+    static targets = ['item', 'items'];
     static values = {
-        index: Number
+        index: Number,
+        prototype: String
     };
 
     connect() {
@@ -21,24 +22,30 @@ export default class extends Controller {
         event.preventDefault();
         console.log('Add button clicked');
         
-        if (!this.hasPrototypeTarget) {
-            console.error('Prototype target not found');
+        if (!this.hasPrototypeValue) {
+            console.error('Prototype value not found');
             return;
         }
         
-        const prototype = this.prototypeTarget;
-        console.log('Prototype HTML:', prototype.innerHTML);
+        const prototype = this.prototypeValue;
+        console.log('Prototype HTML:', prototype);
         
-        const newItem = prototype.innerHTML.replace(/__name__/g, this.indexValue);
+        const newItem = prototype.replace(/__name__/g, this.indexValue);
         console.log('New item HTML:', newItem);
         
-        // Find the add button to insert before it
-        const addButton = this.element.querySelector('[data-action="form-field-collection#add"]');
-        if (addButton) {
-            addButton.insertAdjacentHTML('beforebegin', newItem);
+        // Find the items container to append to
+        if (this.hasItemsTarget) {
+            this.itemsTarget.insertAdjacentHTML('beforeend', newItem);
         } else {
-            console.error('Add button not found');
-            this.element.insertAdjacentHTML('beforeend', newItem);
+            console.error('Items target not found');
+            // Fallback to inserting before the add button
+            const addButton = this.element.querySelector('[data-action="form-field-collection#add"]');
+            if (addButton) {
+                addButton.insertAdjacentHTML('beforebegin', newItem);
+            } else {
+                console.error('Add button not found');
+                this.element.insertAdjacentHTML('beforeend', newItem);
+            }
         }
         
         this.indexValue++;

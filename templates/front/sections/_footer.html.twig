@@ -1,4 +1,4 @@
-<footer class="site-footer py-5 bg-dark text-white">
+<footer class="site-footer py-5 {% if data.style is defined and data.style is not null and data.style.variant == 'dark' %}bg-dark text-white{% else %}bg-light text-dark{% endif %}">
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">

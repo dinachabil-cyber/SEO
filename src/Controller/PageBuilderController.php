@@ -178,10 +178,20 @@ class PageBuilderController extends AbstractController
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Section updated successfully');
-                return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+                
+                // Redirect to previous page or fallback to page builder
+                $referer = $request->headers->get('referer');
+                if ($referer && str_contains($referer, $this->generateUrl('app_page_builder', [
                     'siteId' => $siteId,
                     'pageId' => $pageId,
-                ]));
+                ]))) {
+                    return $this->redirect($referer);
+                }
+                
+                return $this->redirectToRoute('app_page_builder', [
+                    'siteId' => $siteId,
+                    'pageId' => $pageId,
+                ], Response::HTTP_SEE_OTHER);
             } else {
                 // Display form errors
                 $errors = [];

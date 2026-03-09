@@ -1,4 +1,4 @@
-<header class="site-navbar {% if data.style is defined and data.style is not null and data.style.sticky %}sticky-top{% endif %} {% if data.style is defined and data.style is not null and data.style.variant == 'dark' %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}" 
+<header class="site-navbar {% if data.style is defined and data.style is not null and data.style.sticky %}sticky-top{% endif %} {% if data.style is defined and data.style is not null and data.style.variant == 'dark' %}navbar-dark bg-dark{% elseif not (data.style is defined and data.style is not null and data.style.background) %}navbar-light bg-light{% endif %}" 
         style="{% if data.style is defined and data.style is not null and data.style.background %}background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">

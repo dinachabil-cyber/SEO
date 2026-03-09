@@ -110,17 +110,47 @@ class SectionDataType extends AbstractType
             $event->setData($formData);
         });
 
-        // Listen for form submit to restructure form section data
+        // Listen for form submit to restructure style-related fields
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($type) {
-            if ($type !== 'form') {
-                return;
-            }
-            
             $formData = $event->getData();
             
-            // Ensure fields are properly structured
-            if (isset($formData['fields']) && !is_array($formData['fields'])) {
-                $formData['fields'] = [];
+            // For all section types, move style fields to style array
+            $styleFields = [
+                'variant',
+                'sticky',
+                'background',
+                'backgroundVariant',
+                'layout',
+                'columns',
+                'cardVariant',
+                'accentColor',
+                'buttonStyle',
+                'maxWidth',
+                'textAlign',
+                'align',
+                'accordionVariant',
+                'rounded',
+                'shadow',
+            ];
+            
+            $styleData = [];
+            foreach ($styleFields as $field) {
+                if (isset($formData[$field])) {
+                    $styleData[$field] = $formData[$field];
+                    unset($formData[$field]);
+                }
+            }
+            
+            if (!empty($styleData)) {
+                $formData['style'] = $styleData;
+            }
+            
+            // Special handling for form section
+            if ($type === 'form') {
+                // Ensure fields are properly structured
+                if (isset($formData['fields']) && !is_array($formData['fields'])) {
+                    $formData['fields'] = [];
+                }
             }
             
             $event->setData($formData);

@@ -27,7 +27,10 @@
             {{ form_row(dataForm.imageUrl) }}
             {{ form_row(dataForm.imageAlt) }}
             {{ form_row(dataForm.formTitle) }}
-            {{ form_row(dataForm.formFields) }}
+            {% include 'admin/section/_form_fields.html.twig' with {
+                form: dataForm.formFields,
+                label: dataForm.formFields.vars.label
+            } %}
             {{ form_row(dataForm.submitText) }}
             {{ form_row(dataForm.consentText) }}
             {{ form_row(dataForm.successMessage) }}
