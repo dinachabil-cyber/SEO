@@ -34,6 +34,10 @@ class PageSection
     private ?Page $page = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
     #[Assert\Choice(choices: self::ALLOWED_TYPES, message: 'Invalid section type')]
     private ?string $type = null;
 
@@ -59,6 +63,7 @@ class PageSection
         $this->updatedAt = new DateTimeImmutable();
         $this->data = [];
         $this->position = 0;
+        $this->name = '';
     }
 
     #[ORM\PrePersist]
@@ -77,6 +82,17 @@ class PageSection
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+        return $this;
     }
 
     public function getPage(): ?Page
