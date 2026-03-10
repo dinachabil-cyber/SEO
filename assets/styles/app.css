@@ -676,6 +676,14 @@ textarea.form-control {
 
 /* === Responsive Design === */
 @media (max-width: 768px) {
+  .section {
+    padding: 2rem 0;
+  }
+  
+  .section:last-of-type {
+    padding-bottom: 3rem;
+  }
+  
   .container {
     padding: 1rem;
   }
@@ -733,6 +741,15 @@ textarea.form-control {
   .form-select {
     font-size: 0.875rem;
   }
+}
+
+/* === Section Styles === */
+.section {
+  padding: 4rem 0;
+}
+
+.section:last-of-type {
+  padding-bottom: 6rem;
 }
 
 /* === Footer Styles === */

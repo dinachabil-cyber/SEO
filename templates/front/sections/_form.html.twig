@@ -1,8 +1,9 @@
-<section class="section bg-white">
+<section class="section {% if data.style is defined and data.style is not null and data.style.background %} {% else %}bg-white{% endif %}" 
+         {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         {% if data.title %}
             <div class="text-center mb-5">
-                <h2>{{ data.title }}</h2>
+                <h2{% if data.style is defined and data.style is not null and data.style.textColor %} style="color: {{ data.style.textColor }};"{% endif %}>{{ data.title }}</h2>
             </div>
         {% endif %}
         
@@ -78,7 +79,8 @@
                             </div>
                         {% endif %}
                         
-                        <button type="submit" class="btn {% if data.style is defined and data.style is not null and data.style is iterable and 'buttonStyle' in data.style and data.style.buttonStyle == 'accent' %}btn-accent{% else %}btn-primary{% endif %} w-100">
+                        <button type="submit" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %} w-100"
+                                {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
                             {{ data.submitText|default('Submit') }}
                         </button>
                         

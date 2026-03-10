@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Page;
 use App\Entity\PageSection;
+use App\Entity\ReferenceSection;
 use App\Form\PageSectionType;
 use App\Repository\PageRepository;
 use App\Repository\PageSectionRepository;
@@ -88,7 +89,9 @@ class PageBuilderController extends AbstractController
         $section->setPage($page);
 
         // Handle section type restrictions
-        $form = $this->createForm(PageSectionType::class, $section);
+        $form = $this->createForm(PageSectionType::class, $section, [
+            'data_class' => PageSection::class,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -209,7 +212,9 @@ class PageBuilderController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
 
-        $form = $this->createForm(PageSectionType::class, $section);
+        $form = $this->createForm(PageSectionType::class, $section, [
+            'data_class' => PageSection::class,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
@@ -377,6 +382,56 @@ class PageBuilderController extends AbstractController
             'siteId' => $siteId,
             'pageId' => $pageId,
         ]));
+    }
+
+    #[Route('/section/{sectionId}/save-reference', name: 'app_section_save_reference', methods: ['GET', 'POST'])]
+    public function saveReference(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
+    {
+        $page = $pageRepository->find($pageId);
+        
+        if (!$page || $page->getSite()->getId() !== $siteId) {
+            $this->addFlash('error', 'Page not found');
+            return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
+        }
+
+        $section = $pageSectionRepository->find($sectionId);
+        
+        if (!$section || $section->getPage()->getId() !== $pageId) {
+            $this->addFlash('error', 'Section not found');
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        $referenceSection = new ReferenceSection();
+        $referenceSection->setName('Section ' . ucfirst($section->getType()) . ' (Reference)');
+        $referenceSection->setType($section->getType());
+        $referenceSection->setData($section->getData());
+
+        $form = $this->createForm(PageSectionType::class, $referenceSection, [
+            'data_class' => ReferenceSection::class,
+            'only_fields' => ['name', 'type']
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($referenceSection);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Section saved as reference');
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin/section/save_reference.html.twig', [
+            'form' => $form->createView(),
+            'section' => $section,
+            'page' => $page,
+            'site' => $page->getSite(),
+        ]);
     }
 
     #[Route('/section/{sectionId}/detach', name: 'app_section_detach', methods: ['GET'])]

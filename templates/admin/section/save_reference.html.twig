@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Save as Reference Section{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="mb-4">Save Section as Reference</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Save "{{ section.name }}" as Reference Section</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-4">
+                This will save the current section as a reusable reference section that can be imported into other pages.
+            </p>
+
+            {{ form_start(form) }}
+            
+            {{ form_row(form.name) }}
+            
+            {{ form_row(form.type) }}
+            
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ path('app_page_builder', {'siteId': site.id, 'pageId': page.id}) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save as Reference
+                </button>
+            </div>
+            
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

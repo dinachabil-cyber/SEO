@@ -83,6 +83,11 @@ app_section_down:
     controller: App\Controller\PageBuilderController::down
     methods: ['POST']
 
+app_section_save_reference:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/save-reference
+    controller: App\Controller\PageBuilderController::saveReference
+    methods: ['GET', 'POST']
+
 app_section_detach:
     path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/detach
     controller: App\Controller\PageBuilderController::detach
@@ -121,6 +126,32 @@ app_front_page:
     methods: ['GET']
     requirements:
         slug: '^(?!admin|test|test-form|test-form-field).*'
+
+# Reference Section routes
+app_reference_section_index:
+    path: /admin/reference
+    controller: App\Controller\ReferenceSectionController::index
+    methods: ['GET']
+
+app_reference_section_new:
+    path: /admin/reference/new
+    controller: App\Controller\ReferenceSectionController::new
+    methods: ['GET', 'POST']
+
+app_reference_section_show:
+    path: /admin/reference/{id}
+    controller: App\Controller\ReferenceSectionController::show
+    methods: ['GET']
+
+app_reference_section_edit:
+    path: /admin/reference/{id}/edit
+    controller: App\Controller\ReferenceSectionController::edit
+    methods: ['GET', 'POST']
+
+app_reference_section_delete:
+    path: /admin/reference/{id}/delete
+    controller: App\Controller\ReferenceSectionController::delete
+    methods: ['POST']
 
 app_contact:
     path: /contact

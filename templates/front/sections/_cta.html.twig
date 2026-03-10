@@ -1,14 +1,28 @@
-<section class="cta-band {% if data.style is defined and data.style is not null and data.style.background %}bg-{{ data.style.background }}{% else %}bg-primary{% endif %}">
+<section class="cta-band {% if data.style is defined and data.style is not null and data.style.backgroundVariant == 'primary' %}bg-primary{% elseif data.style is defined and data.style is not null and data.style.backgroundVariant == 'gradient' %}bg-gradient-primary{% elseif data.style is defined and data.style is not null and data.style.backgroundVariant == 'surface' %}bg-white{% elseif data.style is defined and data.style is not null and data.style.backgroundVariant == 'warning' %}bg-warning{% endif %}" 
+         {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
     <div class="container">
         <div class="row {% if data.style is defined and data.style is not null and data.style.align == 'left' %}justify-content-start{% else %}justify-content-center{% endif %}">
             <div class="col-lg-8 {% if data.style is defined and data.style is not null and data.style.align == 'left' %}text-left{% else %}text-center{% endif %}">
-                <h2 class="mb-4">{{ data.title }}</h2>
-                {% if data.text %}
-                    <p class="mb-5">{{ data.text }}</p>
-                {% endif %}
-                <a href="{{ data.buttonUrl }}" class="btn btn-light btn-lg">
-                    {{ data.buttonText }}
-                </a>
+                <div class="{% if data.style is defined and data.style is not null and data.style.background %} {% else %}bg-gradient-to-r from-yellow-400 to-orange-500{% endif %} rounded-xl p-8 shadow-lg"
+                     {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
+                    {% if data.icon %}
+                        <div class="mb-4" style="font-size: 3rem;{% if data.style is defined and data.style is not null and data.style.textColor %} color: {{ data.style.textColor }}80;{% else %} color: rgba(255, 255, 255, 0.8);{% endif %}">
+                            <i class="{{ data.icon }}"></i>
+                        </div>
+                    {% elseif data.iconEmoji %}
+                        <div class="mb-4" style="font-size: 3rem;">
+                            {{ data.iconEmoji }}
+                        </div>
+                    {% endif %}
+                    <h2 class="mb-4" style="{% if data.style is defined and data.style is not null and data.style.textColor %} color: {{ data.style.textColor }};{% else %} color: white;{% endif %} font-weight: 700; font-size: 2rem;">{{ data.title }}</h2>
+                    {% if data.text %}
+                        <p class="mb-5" style="{% if data.style is defined and data.style is not null and data.style.textColor %} color: {{ data.style.textColor }}90;{% else %} color: rgba(255, 255, 255, 0.9);{% endif %} font-size: 1.125rem; line-height: 1.8;">{{ data.text }}</p>
+                    {% endif %}
+                    <a href="{{ data.buttonUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %} btn-lg fw-bold"
+                       style="{% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %} background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};{% endif %} padding: 1rem 2rem; border-radius: 8px; transition: all 0.2s;">
+                        {{ data.buttonText }}
+                    </a>
+                </div>
             </div>
         </div>
     </div>

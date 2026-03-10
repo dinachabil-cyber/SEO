@@ -93,7 +93,8 @@
             </div>
         {% endif %}
 
-        <button type="submit" class="btn btn-primary w-100">
+        <button type="submit" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %} w-100"
+                {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
             {{ formData.submitText ?? data.submitText ?? 'Envoyer' }}
         </button>
     </form>

@@ -18,13 +18,23 @@
                             {% endif %}
                             <div class="card-body{% if data.style is defined and data.style is not null and data.style.background %} bg-{{ data.style.background }}{% endif %}"
                                  {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
+                                {% if card.icon %}
+                                    <div class="rounded-lg p-3 mb-4" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;{% if data.style is defined and data.style is not null and data.style.accentColor %} background-color: {{ data.style.accentColor }}20;{% endif %}">
+                                        <i class="{{ card.icon }}" style="font-size: 1.5rem;{% if data.style is defined and data.style is not null and data.style.accentColor %} color: {{ data.style.accentColor }};{% endif %}"></i>
+                                    </div>
+                                {% elseif card.iconEmoji is defined and card.iconEmoji %}
+                                    <div class="rounded-lg p-3 mb-4" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;{% if data.style is defined and data.style is not null and data.style.accentColor %} background-color: {{ data.style.accentColor }}20;{% endif %}">
+                                        <span style="font-size: 1.5rem;">{{ card.iconEmoji }}</span>
+                                    </div>
+                                {% endif %}
                                 <h3 class="card-title mb-3{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
-                                    {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};"{% endif %}>{{ card.title }}</h3>
+                                    {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ card.title }}</h3>
                                 <p class="card-text mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
-                                   {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};"{% endif %}>{{ card.description }}</p>
+                                   {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ card.description }}</p>
                                 {% if card.linkUrl %}
-                                    <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %}">
-                                        {{ card.buttonText ?: 'Learn More' }}
+                                    <a href="{{ card.linkUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %}"
+                                       {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
+                                        {{ card.buttonText ?: 'Demande votre devis gratuit en ligne' }}
                                     </a>
                                 {% endif %}
                             </div>

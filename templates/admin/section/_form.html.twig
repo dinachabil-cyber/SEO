@@ -20,6 +20,11 @@
             {{ form_row(dataForm.ctaText) }}
             {{ form_row(dataForm.ctaUrl) }}
             {{ form_row(dataForm.backgroundVariant) }}
+            {{ form_row(dataForm.background) }}
+            {{ form_row(dataForm.textColor) }}
+            {{ form_row(dataForm.accentColor) }}
+            {{ form_row(dataForm.buttonColor) }}
+            {{ form_row(dataForm.buttonCustomColor) }}
 
         {% elseif form.vars.value.type == 'hero_split' %}
             {{ form_row(dataForm.title) }}
@@ -36,6 +41,8 @@
             {{ form_row(dataForm.successMessage) }}
             {{ form_row(dataForm.layout) }}
             {{ form_row(dataForm.backgroundVariant) }}
+            {{ form_row(dataForm.buttonColor) }}
+            {{ form_row(dataForm.buttonCustomColor) }}
 
         {% elseif form.vars.value.type == 'body' %}
             {{ form_row(dataForm.title) }}
@@ -54,6 +61,12 @@
             } %}
             {{ form_row(dataForm.columns) }}
             {{ form_row(dataForm.cardVariant) }}
+            {{ form_row(dataForm.background) }}
+            {{ form_row(dataForm.textColor) }}
+            {{ form_row(dataForm.buttonColor) }}
+            {{ form_row(dataForm.buttonCustomColor) }}
+            {{ form_row(dataForm.borderColor) }}
+            {{ form_row(dataForm.shadow) }}
 
         {% elseif form.vars.value.type == 'faq' %}
             {{ form_row(dataForm.sectionTitle) }}
@@ -65,13 +78,23 @@
             {{ form_row(dataForm.submitText) }}
             {{ form_row(dataForm.successMessage) }}
             {{ form_row(dataForm.consentText) }}
+            {{ form_row(dataForm.background) }}
+            {{ form_row(dataForm.textColor) }}
+            {{ form_row(dataForm.buttonColor) }}
+            {{ form_row(dataForm.buttonCustomColor) }}
 
         {% elseif form.vars.value.type == 'cta' %}
             {{ form_row(dataForm.title) }}
             {{ form_row(dataForm.text) }}
+            {{ form_row(dataForm.icon) }}
+            {{ form_row(dataForm.iconEmoji) }}
             {{ form_row(dataForm.buttonText) }}
             {{ form_row(dataForm.buttonUrl) }}
             {{ form_row(dataForm.backgroundVariant) }}
+            {{ form_row(dataForm.background) }}
+            {{ form_row(dataForm.textColor) }}
+            {{ form_row(dataForm.buttonColor) }}
+            {{ form_row(dataForm.buttonCustomColor) }}
 
         {% elseif form.vars.value.type == 'footer' %}
             {{ form_row(dataForm.brandName) }}

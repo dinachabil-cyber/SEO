@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\PageSection;
+use App\Entity\ReferenceSection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,41 +23,60 @@ class PageSectionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('type', ChoiceType::class, [
-            'choices' => [
-                'Header' => 'header',
-                'Hero' => 'hero',
-                'Hero Split (Image + Form)' => 'hero_split',
-                'Body' => 'body',
-                'Image' => 'image',
-                'Cards' => 'cards',
-                'FAQ' => 'faq',
-                'Form' => 'form',
-                'CTA' => 'cta',
-                'Footer' => 'footer',
-            ],
-            'label' => 'Section Type',
-            'placeholder' => 'Choose a section type',
-            'constraints' => [new Assert\NotBlank()],
-        ]);
+        // Determine if we should add the name field
+        $dataClass = $options['data_class'];
+        $shouldAddName = false;
+        
+        // Add name field if data class is ReferenceSection or if name is in only_fields
+        if ($dataClass === ReferenceSection::class || ($options['only_fields'] && in_array('name', $options['only_fields']))) {
+            $shouldAddName = true;
+            $builder->add('name', TextType::class, [
+                'label' => 'Section Name',
+                'constraints' => [new Assert\NotBlank()],
+            ]);
+        }
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $section = $event->getData();
-            $form = $event->getForm();
+        // Add type field only if not restricted or type is in allowed fields
+        if (!$options['only_fields'] || in_array('type', $options['only_fields'])) {
+            $builder->add('type', ChoiceType::class, [
+                'choices' => [
+                    'Header' => 'header',
+                    'Hero' => 'hero',
+                    'Hero Split (Image + Form)' => 'hero_split',
+                    'Body' => 'body',
+                    'Image' => 'image',
+                    'Cards' => 'cards',
+                    'FAQ' => 'faq',
+                    'Form' => 'form',
+                    'CTA' => 'cta',
+                    'Footer' => 'footer',
+                ],
+                'label' => 'Section Type',
+                'placeholder' => 'Choose a section type',
+                'constraints' => [new Assert\NotBlank()],
+            ]);
+        }
 
-            if ($section && $section->getType()) {
-                self::addDynamicFields($form, $section->getType(), $section->getData() ?? []);
-            }
-        });
+        // Only add dynamic fields if not restricting fields or data is allowed
+        if (!$options['only_fields'] || in_array('data', $options['only_fields'])) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                $section = $event->getData();
+                $form = $event->getForm();
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $data = $event->getData();
-            $form = $event->getForm();
+                if ($section && $section->getType()) {
+                    self::addDynamicFields($form, $section->getType(), $section->getData() ?? []);
+                }
+            });
 
-            if (!empty($data['type'])) {
-                self::addDynamicFields($form, $data['type'], $data['data'] ?? []);
-            }
-        });
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                $data = $event->getData();
+                $form = $event->getForm();
+
+                if (!empty($data['type'])) {
+                    self::addDynamicFields($form, $data['type'], $data['data'] ?? []);
+                }
+            });
+        }
     }
 
     public static function addDynamicFields($form, string $type, array $existingData = []): void
@@ -71,7 +91,8 @@ class PageSectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => PageSection::class,
+            'data_class' => null,
+            'only_fields' => null,
         ]);
     }
 }
@@ -126,6 +147,7 @@ class SectionDataType extends AbstractType
                 'cardVariant',
                 'accentColor',
                 'buttonColor',
+                'buttonCustomColor',
                 'buttonStyle',
                 'borderColor',
                 'shadow',
@@ -271,6 +293,39 @@ class SectionDataType extends AbstractType
                             'Gradient' => 'gradient',
                         ],
                         'data' => $data['style']['backgroundVariant'] ?? 'surface',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '',
+                    ])
+                    ->add('accentColor', ColorType::class, [
+                        'label' => 'Accent Color',
+                        'required' => false,
+                        'data' => $data['style']['accentColor'] ?? '',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
                     ]);
                 break;
 
@@ -341,6 +396,24 @@ class SectionDataType extends AbstractType
                             'Gradient' => 'gradient',
                         ],
                         'data' => $data['style']['backgroundVariant'] ?? 'light',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
                     ]);
                 break;
 
@@ -428,8 +501,14 @@ class SectionDataType extends AbstractType
                             'Success' => 'success',
                             'Warning' => 'warning',
                             'Danger' => 'danger',
+                            'Custom' => 'custom',
                         ],
                         'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
                     ])
                     ->add('borderColor', ColorType::class, [
                         'label' => 'Card Border Color',
@@ -494,6 +573,34 @@ class SectionDataType extends AbstractType
                         'label' => 'Consent Text',
                         'required' => false,
                         'data' => $data['consentText'] ?? '',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
                     ]);
                 break;
 
@@ -507,6 +614,16 @@ class SectionDataType extends AbstractType
                         'label' => 'Text',
                         'required' => false,
                         'data' => $data['text'] ?? '',
+                    ])
+                    ->add('icon', TextType::class, [
+                        'label' => 'Icon (optional)',
+                        'required' => false,
+                        'data' => $data['icon'] ?? '',
+                    ])
+                    ->add('iconEmoji', TextType::class, [
+                        'label' => 'Icon Emoji (optional)',
+                        'required' => false,
+                        'data' => $data['iconEmoji'] ?? '',
                     ])
                     ->add('buttonText', TextType::class, [
                         'label' => 'Button Text',
@@ -525,6 +642,34 @@ class SectionDataType extends AbstractType
                             'Warning' => 'warning',
                         ],
                         'data' => $data['style']['backgroundVariant'] ?? 'primary',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'primary',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
                     ]);
                 break;
 
@@ -618,6 +763,10 @@ class SectionDataType extends AbstractType
             ])
             ->add('icon', TextType::class, [
                 'label' => 'Icon (optional)',
+                'required' => false,
+            ])
+            ->add('iconEmoji', TextType::class, [
+                'label' => 'Icon Emoji (optional)',
                 'required' => false,
             ])
             ->add('imageUrl', TextType::class, [

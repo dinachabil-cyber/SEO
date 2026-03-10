@@ -9,22 +9,26 @@
             {% if layout == 'left' %}
                 <div class="col-lg-6">
                     <div class="hero-content">
-                        <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                        <h1 class="display-4 mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                            {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ data.title }}</h1>
                         {% if data.subtitle %}
-                            <p class="lead mb-4">{{ data.subtitle }}</p>
+                            <p class="lead mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                               {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ data.subtitle }}</p>
                         {% endif %}
                         {% if data.bullets %}
                             <ul class="list-unstyled mb-4">
                                 {% set bullets = data.bullets|split('\n') %}
                                 {% for bullet in bullets %}
                                     {% if bullet %}
-                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> {{ bullet }}</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill{% if data.style is defined and data.style is not null and data.style.accentColor %} text-{{ data.style.accentColor }}{% else %} text-success{% endif %}"
+                                            {% if data.style is defined and data.style is not null and data.style.accentColor %}style="color: {{ data.style.accentColor }};"{% endif %}></i> {{ bullet }}</li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
                         {% endif %}
                         {% if data.ctaText and data.ctaUrl %}
-                            <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                            <a href="{{ data.ctaUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %} btn-lg"
+                               {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
                                 {{ data.ctaText }}
                             </a>
                         {% endif %}
@@ -47,22 +51,26 @@
                 {% endif %}
                 <div class="col-lg-6">
                     <div class="hero-content">
-                        <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                        <h1 class="display-4 mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                            {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ data.title }}</h1>
                         {% if data.subtitle %}
-                            <p class="lead mb-4">{{ data.subtitle }}</p>
+                            <p class="lead mb-4{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                               {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ data.subtitle }}</p>
                         {% endif %}
                         {% if data.bullets %}
                             <ul class="list-unstyled mb-4">
                                 {% set bullets = data.bullets|split('\n') %}
                                 {% for bullet in bullets %}
                                     {% if bullet %}
-                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> {{ bullet }}</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill{% if data.style is defined and data.style is not null and data.style.accentColor %} text-{{ data.style.accentColor }}{% else %} text-success{% endif %}"
+                                            {% if data.style is defined and data.style is not null and data.style.accentColor %}style="color: {{ data.style.accentColor }};"{% endif %}></i> {{ bullet }}</li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
                         {% endif %}
                         {% if data.ctaText and data.ctaUrl %}
-                            <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                            <a href="{{ data.ctaUrl }}" class="btn {% if data.style is defined and data.style is not null and data.style.buttonColor %}btn-{{ data.style.buttonColor }}{% else %}btn-primary{% endif %} btn-lg"
+                               {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
                                 {{ data.ctaText }}
                             </a>
                         {% endif %}
