@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="container">
-    <h1 class="mb-4">Edit Site: {{ site.name }}</h1>
+    <h1 class="mb-4">Edit Site: {{ site.domain }}</h1>
 
     {% for flashType, flashMessages in app.flashes %}
         {% for flashMessage in flashMessages %}
@@ -21,10 +21,10 @@
         </div>
         <div class="card-body">
             {{ form_start(form) }}
-                {{ form_row(form.name) }}
                 {{ form_row(form.domain) }}
                 {{ form_row(form.defaultLocale) }}
                 {{ form_row(form.isActive) }}
+                {{ form_row(form.hebergement) }}
                 
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">

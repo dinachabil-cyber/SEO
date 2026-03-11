@@ -1,0 +1,72 @@
+/* Alerts */
+.alert {
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: fadeIn var(--transition-slow);
+}
+
+.alert-warning {
+  background-color: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--color-warning);
+}
+
+.alert-warning .btn-warning {
+  background-color: rgba(251, 191, 36, 0.1);
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+  font-weight: var(--font-weight-semibold);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius);
+  transition: all var(--transition-base);
+}
+
+.alert-warning .btn-warning:hover {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+.alert-success {
+  background-color: rgba(16, 185, 121, 0.1);
+  border-color: rgba(16, 185, 121, 0.3);
+  color: var(--color-success);
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-danger);
+}
+
+.alert-info {
+  background-color: rgba(79, 70, 229, 0.1);
+  border-color: rgba(79, 70, 229, 0.3);
+  color: var(--color-primary);
+}
+
+/* Success/Error States */
+.success-message {
+  background: rgba(16, 185, 121, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 121, 0.3);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  animation: fadeIn var(--transition-slow);
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  animation: fadeIn var(--transition-slow);
+}

@@ -103,6 +103,11 @@ app_page_preview:
     controller: App\Controller\PageBuilderController::preview
     methods: ['GET']
 
+app_page_preview_content:
+    path: /admin/site/{siteId}/page/{pageId}/preview-content
+    controller: App\Controller\PageBuilderController::previewContent
+    methods: ['GET']
+
 # Test routes - must come before app_front_page to avoid matching all slugs
 app_test:
     path: /test

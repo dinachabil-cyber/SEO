@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ site.name }} - Pages{% endblock %}
+{% block title %}{{ site.domain }} - Pages{% endblock %}
 
 {% block body %}
 <div class="container">
@@ -9,7 +9,7 @@
             <a href="{{ path('app_site_index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
-            <h1>{{ site.name }}</h1>
+            <h1>{{ site.domain }}</h1>
         </div>
         <a href="{{ path('app_site_edit', {'id': site.id}) }}" class="btn btn-outline-primary">
             <i class="bi bi-pencil"></i> Edit Site
@@ -41,6 +41,7 @@
                             <span class="badge badge-danger">Inactive</span>
                         {% endif %}
                     </p>
+                    <p><strong>Hébergement:</strong> {% if site.hebergement %}{{ site.hebergement }}{% else %}No hébergement{% endif %}</p>
                     <p><strong>Created:</strong> {{ site.createdAt|format_datetime }}</p>
                     <p><strong>Updated:</strong> {{ site.updatedAt|format_datetime }}</p>
                 </div>

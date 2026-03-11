@@ -17,9 +17,6 @@ class Site
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $domain = null;
 
@@ -28,6 +25,9 @@ class Site
 
     #[ORM\Column(options: ['default' => true])]
     private ?bool $isActive = true;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hebergement = null;
 
     #[ORM\Column]
     private ?DateTime $createdAt = null;
@@ -68,17 +68,6 @@ class Site
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-        return $this;
-    }
-
     public function getDomain(): ?string
     {
         return $this->domain;
@@ -109,6 +98,17 @@ class Site
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getHebergement(): ?string
+    {
+        return $this->hebergement;
+    }
+
+    public function setHebergement(?string $hebergement): static
+    {
+        $this->hebergement = $hebergement;
         return $this;
     }
 

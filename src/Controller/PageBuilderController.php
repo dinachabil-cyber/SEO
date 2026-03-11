@@ -62,6 +62,13 @@ class PageBuilderController extends AbstractController
 
         // Load sections ordered by position
         $sections = $page->getSections();
+        
+        // Debug: Check what sections are being passed to the template
+        $sectionTypes = [];
+        foreach ($sections as $section) {
+            $sectionTypes[] = $section->getType();
+        }
+        error_log('Sections passed to preview: ' . implode(', ', $sectionTypes));
 
         return $this->render('front/page.html.twig', [
             'site' => $page->getSite(),

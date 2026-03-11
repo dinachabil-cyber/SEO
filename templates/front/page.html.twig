@@ -3,39 +3,64 @@
 {% block title %}{{ page.metaTitle }}{% endblock %}
 
 {% block body %}
-<main class="main-content">
-    {# Render each section #}
-    {% for section in sections %}
+{# Render header if exists #}
+{% for section in sections %}
+    {% if section.type == 'header' %}
         {% set data = section.effectiveData %}
-        
-        {% if section.type == 'header' %}
-            {% include 'front/sections/_header.html.twig' with {data: data} %}
-        {% elseif section.type == 'hero' %}
-            {% include 'front/sections/_hero.html.twig' with {data: data} %}
-        {% elseif section.type == 'hero_split' %}
-            {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
-        {% elseif section.type == 'body' %}
-            {% include 'front/sections/_body.html.twig' with {data: data} %}
-        {% elseif section.type == 'image' %}
-            {% include 'front/sections/_image.html.twig' with {data: data} %}
-        {% elseif section.type == 'cards' %}
-            {% include 'front/sections/_cards.html.twig' with {data: data} %}
-        {% elseif section.type == 'faq' %}
-            {% include 'front/sections/_faq.html.twig' with {data: data} %}
-        {% elseif section.type == 'form' %}
-            {% include 'front/sections/_form.html.twig' with {data: data} %}
-        {% elseif section.type == 'cta' %}
-            {% include 'front/sections/_cta.html.twig' with {data: data} %}
-        {% elseif section.type == 'footer' %}
-            {% include 'front/sections/_footer.html.twig' with {data: data} %}
-        {% else %}
-            {# Display unknown section type for debugging #}
-            <div class="alert alert-warning" role="alert">
-                Unknown section type: {{ section.type }}
-            </div>
+        {% include 'front/sections/_header.html.twig' with {data: data} %}
+    {% endif %}
+{% endfor %}
+
+<main class="main-content">
+    {# Render body sections #}
+    {% for section in sections %}
+        {% if section.type not in ['header', 'footer'] %}
+            {% set data = section.effectiveData %}
+            
+            {% if section.type == 'hero' %}
+                {% include 'front/sections/_hero.html.twig' with {data: data} %}
+            {% elseif section.type == 'hero_split' %}
+                {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
+            {% elseif section.type == 'body' %}
+                {% include 'front/sections/_body.html.twig' with {data: data} %}
+            {% elseif section.type == 'image' %}
+                {% include 'front/sections/_image.html.twig' with {data: data} %}
+            {% elseif section.type == 'cards' %}
+                {% include 'front/sections/_cards.html.twig' with {data: data} %}
+            {% elseif section.type == 'faq' %}
+                {% include 'front/sections/_faq.html.twig' with {data: data} %}
+            {% elseif section.type == 'form' %}
+                {% include 'front/sections/_form.html.twig' with {data: data} %}
+            {% elseif section.type == 'cta' %}
+                {% include 'front/sections/_cta.html.twig' with {data: data} %}
+            {% else %}
+                {# Display unknown section type for debugging #}
+                <div class="alert alert-warning" role="alert">
+                    Unknown section type: {{ section.type }}
+                </div>
+            {% endif %}
         {% endif %}
     {% endfor %}
 </main>
+
+{# Render footer if exists #}
+{% set hasFooter = false %}
+{% for section in sections %}
+    {% if section.type == 'footer' %}
+        {% set hasFooter = true %}
+        {% set data = section.effectiveData %}
+        {% include 'front/sections/_footer.html.twig' with {data: data} %}
+    {% endif %}
+{% endfor %}
+
+{% if not hasFooter %}
+    <div style="background: red; color: white; padding: 10px; text-align: center;">
+        Debug: No footer section found in {{ sections|length }} sections
+        {% for section in sections %}
+            <div>{{ section.type }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}
