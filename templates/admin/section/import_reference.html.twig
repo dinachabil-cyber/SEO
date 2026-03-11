@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import Reference Section - {{ page.metaTitle }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">Import Reference Section</h3>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_page_builder', {siteId: page.site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Page Builder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h4>Choose a Reference Section to Import</h4>
+                        <p class="text-muted">Select an existing reference section to import into your page. The imported section will maintain a connection to the reference, ensuring any updates to the reference will reflect in this section.</p>
+                    </div>
+
+                    {% if reference_sections is empty %}
+                        <div class="text-center py-10">
+                            <i class="bi bi-bookmarks display-1 text-muted mb-3"></i>
+                            <h4 class="mb-2">No Reference Sections Yet</h4>
+                            <p class="text-muted mb-4">Create your first reference section by saving an existing section as reference</p>
+                            <a href="{{ path('app_page_builder', {siteId: page.site.id, pageId: page.id}) }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Page Builder
+                            </a>
+                        </div>
+                    {% else %}
+                        <form method="POST" action="{{ path('app_section_import_reference', {siteId: page.site.id, pageId: page.id}) }}">
+                            <div class="row">
+                                {% for reference in reference_sections %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100 hover-shadow">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center gap-2 mb-3">
+                                                    {% if reference.type == 'header' %}
+                                                        <i class="bi bi-layout-text-window fs-4 text-primary"></i>
+                                                    {% elseif reference.type == 'hero' %}
+                                                        <i class="bi bi-lightning-fill fs-4 text-warning"></i>
+                                                    {% elseif reference.type == 'hero_split' %}
+                                                        <i class="bi bi-columns-gap fs-4 text-warning"></i>
+                                                    {% elseif reference.type == 'body' %}
+                                                        <i class="bi bi-file-earmark-text fs-4 text-secondary"></i>
+                                                    {% elseif reference.type == 'image' %}
+                                                        <i class="bi bi-card-image fs-4 text-info"></i>
+                                                    {% elseif reference.type == 'cards' %}
+                                                        <i class="bi bi-grid fs-4 text-success"></i>
+                                                    {% elseif reference.type == 'faq' %}
+                                                        <i class="bi bi-question-circle fs-4 text-danger"></i>
+                                                    {% elseif reference.type == 'form' %}
+                                                        <i class="bi bi-ui-checks-grid fs-4 text-accent"></i>
+                                                    {% elseif reference.type == 'cta' %}
+                                                        <i class="bi bi-megaphone fs-4 text-purple"></i>
+                                                    {% elseif reference.type == 'footer' %}
+                                                        <i class="bi bi-layout-text-sidebar-reverse fs-4 text-dark"></i>
+                                                    {% endif %}
+                                                    <span class="badge bg-info text-white">{{ reference.type|capitalize }}</span>
+                                                </div>
+                                                
+                                                <h5 class="card-title mb-2">{{ reference.name }}</h5>
+                                                
+                                                <p class="card-text text-muted small mb-3">
+                                                    Created: {{ reference.createdAt|date('M d, Y') }}<br>
+                                                    Updated: {{ reference.updatedAt|date('M d, Y') }}
+                                                </p>
+                                                
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="reference_section_id" id="reference-{{ reference.id }}" value="{{ reference.id }}">
+                                                    <label class="form-check-label" for="reference-{{ reference.id }}">
+                                                        Select this section
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-4 d-flex justify-content-end gap-2">
+                                <a href="{{ path('app_page_builder', {siteId: page.site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-1"></i> Import Section
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

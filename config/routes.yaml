@@ -93,6 +93,11 @@ app_section_detach:
     controller: App\Controller\PageBuilderController::detach
     methods: ['GET']
 
+app_section_import_reference:
+    path: /admin/site/{siteId}/page/{pageId}/section/import-reference
+    controller: App\Controller\PageBuilderController::importReference
+    methods: ['GET', 'POST']
+
 app_page_preview:
     path: /admin/site/{siteId}/page/{pageId}/preview
     controller: App\Controller\PageBuilderController::preview

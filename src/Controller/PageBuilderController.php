@@ -8,6 +8,7 @@ use App\Entity\ReferenceSection;
 use App\Form\PageSectionType;
 use App\Repository\PageRepository;
 use App\Repository\PageSectionRepository;
+use App\Repository\ReferenceSectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -431,6 +432,115 @@ class PageBuilderController extends AbstractController
             'section' => $section,
             'page' => $page,
             'site' => $page->getSite(),
+        ]);
+    }
+
+    #[Route('/section/import-reference', name: 'app_section_import_reference', methods: ['GET', 'POST'])]
+    public function importReference(Request $request, int $siteId, int $pageId, PageRepository $pageRepository, ReferenceSectionRepository $referenceSectionRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
+    {
+        $page = $pageRepository->find($pageId);
+        
+        if (!$page || $page->getSite()->getId() !== $siteId) {
+            $this->addFlash('error', 'Page not found');
+            return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
+        }
+
+        $referenceSections = $referenceSectionRepository->findAll();
+        
+        if ($request->isMethod('POST')) {
+            $referenceSectionId = $request->request->get('reference_section_id');
+            $referenceSection = $referenceSectionRepository->find($referenceSectionId);
+            
+            if (!$referenceSection) {
+                $this->addFlash('error', 'Reference section not found');
+                return $this->redirectToRoute('app_section_import_reference', [
+                    'siteId' => $siteId,
+                    'pageId' => $pageId,
+                ]);
+            }
+
+            $section = new PageSection();
+            $section->setPage($page);
+            $section->setName($referenceSection->getName());
+            $section->setType($referenceSection->getType());
+            $section->setReferenceSection($referenceSection);
+            
+            // Handle section type restrictions
+            $type = $section->getType();
+            
+            // Only one header allowed and must be first
+            if ($type === 'header') {
+                $existingHeader = $pageSectionRepository->createQueryBuilder('ps')
+                    ->where('ps.page = :page')
+                    ->andWhere('ps.type = :type')
+                    ->setParameter('page', $page)
+                    ->setParameter('type', 'header')
+                    ->getQuery()
+                    ->getOneOrNullResult();
+                
+                if ($existingHeader) {
+                    $this->addFlash('error', 'Only one header section is allowed per page');
+                    return $this->redirectToRoute('app_section_import_reference', [
+                        'siteId' => $siteId,
+                        'pageId' => $pageId,
+                    ]);
+                }
+                $section->setPosition(1);
+            } 
+            // Only one footer allowed and must be last
+            elseif ($type === 'footer') {
+                $existingFooter = $pageSectionRepository->createQueryBuilder('ps')
+                    ->where('ps.page = :page')
+                    ->andWhere('ps.type = :type')
+                    ->setParameter('page', $page)
+                    ->setParameter('type', 'footer')
+                    ->getQuery()
+                    ->getOneOrNullResult();
+                
+                if ($existingFooter) {
+                    $this->addFlash('error', 'Only one footer section is allowed per page');
+                    return $this->redirectToRoute('app_section_import_reference', [
+                        'siteId' => $siteId,
+                        'pageId' => $pageId,
+                    ]);
+                }
+                $section->setPosition($pageSectionRepository->findMaxPositionByPage($page) + 1);
+            } 
+            // Other sections: insert before footer if exists, else at end
+            else {
+                $footer = $pageSectionRepository->createQueryBuilder('ps')
+                    ->where('ps.page = :page')
+                    ->andWhere('ps.type = :type')
+                    ->setParameter('page', $page)
+                    ->setParameter('type', 'footer')
+                    ->getQuery()
+                    ->getOneOrNullResult();
+                
+                if ($footer) {
+                    $section->setPosition($footer->getPosition());
+                    $footer->setPosition($footer->getPosition() + 1);
+                } else {
+                    $section->setPosition($pageSectionRepository->findMaxPositionByPage($page) + 1);
+                }
+            }
+
+            $entityManager->persist($section);
+            $entityManager->flush();
+            
+            // Normalize positions to ensure sequential 1..N
+            $this->normalizeSectionPositions($page, $pageSectionRepository, $entityManager);
+            
+            $this->addFlash('success', 'Reference section imported successfully');
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin/section/import_reference.html.twig', [
+            'page' => $page,
+            'site' => $page->getSite(),
+            'reference_sections' => $referenceSections,
         ]);
     }
 
