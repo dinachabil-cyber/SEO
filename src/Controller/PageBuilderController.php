@@ -226,6 +226,9 @@ class PageBuilderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+            error_log('Form submitted');
+            error_log('Form data: ' . print_r($request->request->all(), true));
+            
             if ($form->isValid()) {
                 $entityManager->flush();
 
@@ -248,11 +251,21 @@ class PageBuilderController extends AbstractController
                     'pageId' => $pageId,
                 ], Response::HTTP_SEE_OTHER);
             } else {
-                // Display form errors
+                // Display detailed form errors
                 $errors = [];
                 foreach ($form->getErrors(true) as $error) {
-                    $errors[] = $error->getMessage();
+                    $field = $error->getOrigin();
+                    $fieldName = $field->getName();
+                    $fieldPath = '';
+                    while ($field->getParent()) {
+                        $field = $field->getParent();
+                        if ($field->getName()) {
+                            $fieldPath = $field->getName() . '.' . $fieldPath;
+                        }
+                    }
+                    $errors[] = $fieldPath . $error->getOrigin()->getName() . ': ' . $error->getMessage();
                 }
+                error_log('Form errors: ' . print_r($errors, true));
                 $this->addFlash('error', 'Form validation failed: ' . implode(', ', $errors));
             }
         }

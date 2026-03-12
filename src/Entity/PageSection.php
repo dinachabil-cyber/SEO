@@ -18,6 +18,7 @@ class PageSection
         'body',
         'image',
         'cards',
+        'cards_premium',
         'faq',
         'form',
         'cta',
@@ -34,7 +35,6 @@ class PageSection
     private ?Page $page = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]

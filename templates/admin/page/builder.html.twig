@@ -97,6 +97,8 @@
     <i class="bi bi-card-image fs-4 text-info"></i>
 {% elseif section.type == 'cards' %}
     <i class="bi bi-grid fs-4 text-success"></i>
+{% elseif section.type == 'cards_premium' %}
+    <i class="bi bi-grid-3x3 fs-4 text-warning"></i>
 {% elseif section.type == 'faq' %}
     <i class="bi bi-question-circle fs-4 text-danger"></i>
 {% elseif section.type == 'form' %}
@@ -106,7 +108,20 @@
 {% elseif section.type == 'footer' %}
     <i class="bi bi-layout-text-sidebar-reverse fs-4 text-dark"></i>
 {% endif %}
-                                            <span class="badge bg-info text-white">{{ section.type|capitalize }}</span>
+                                            {% set typeLabel = {
+                                                'header': 'HEADER',
+                                                'hero': 'HERO',
+                                                'hero_split': 'HERO SPLIT',
+                                                'body': 'BODY',
+                                                'image': 'IMAGE',
+                                                'cards': 'CARDS',
+                                                'cards_premium': 'CARDS',
+                                                'faq': 'FAQ',
+                                                'form': 'FORM',
+                                                'cta': 'CTA',
+                                                'footer': 'FOOTER'
+                                            }[section.type] ?? section.type|upper %}
+                                            <span class="badge bg-info text-white">{{ typeLabel }}</span>
                                         </div>
                                         <div class="d-flex gap-1">
                                             {% if section.referenceSection %}
@@ -190,12 +205,17 @@
     <p><strong>Image:</strong> {{ data.imageUrl ?? '' }}</p>
     <p><strong>Alt:</strong> {{ data.alt ?? '' }}</p>
 
-{% elseif section.type == 'cards' %}
+{% elseif section.type in ['cards', 'cards_premium'] %}
     {% if data.sectionTitle %}
         <p><strong>Title:</strong> {{ data.sectionTitle }}</p>
     {% endif %}
+    {% if data.sectionSubtitle %}
+        <p><strong>Subtitle:</strong> {{ data.sectionSubtitle|slice(0, 80) }}...</p>
+    {% endif %}
     <p><strong>Cards:</strong> {{ (data.cards ?? [])|length }} card(s)</p>
-    <p><strong>Columns:</strong> {{ data.style.columns ?? 3 }}</p>
+    {% if section.type == 'cards' %}
+        <p><strong>Columns:</strong> {{ data.style.columns ?? 3 }}</p>
+    {% endif %}
 
 {% elseif section.type == 'faq' %}
     {% if data.sectionTitle %}

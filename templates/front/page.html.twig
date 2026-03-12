@@ -27,6 +27,8 @@
                 {% include 'front/sections/_image.html.twig' with {data: data} %}
             {% elseif section.type == 'cards' %}
                 {% include 'front/sections/_cards.html.twig' with {data: data} %}
+            {% elseif section.type == 'cards_premium' %}
+                {% include 'front/sections/_cards_premium.html.twig' with {data: data} %}
             {% elseif section.type == 'faq' %}
                 {% include 'front/sections/_faq.html.twig' with {data: data} %}
             {% elseif section.type == 'form' %}

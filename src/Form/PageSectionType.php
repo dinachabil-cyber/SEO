@@ -45,7 +45,7 @@ class PageSectionType extends AbstractType
                     'Hero Split (Image + Form)' => 'hero_split',
                     'Body' => 'body',
                     'Image' => 'image',
-                    'Cards' => 'cards',
+                    'Cards' => 'cards_premium',
                     'FAQ' => 'faq',
                     'Form' => 'form',
                     'CTA' => 'cta',
@@ -448,6 +448,58 @@ class SectionDataType extends AbstractType
                     ]);
                 break;
 
+            case 'cards_premium':
+                $builder
+                    ->add('sectionTitle', TextType::class, [
+                        'label' => 'Section Title',
+                        'required' => false,
+                        'data' => $data['sectionTitle'] ?? '',
+                    ])
+                    ->add('sectionSubtitle', TextareaType::class, [
+                        'label' => 'Section Subtitle',
+                        'required' => false,
+                        'attr' => ['rows' => 2],
+                        'data' => $data['sectionSubtitle'] ?? '',
+                    ])
+                    ->add('cards', CollectionType::class, [
+                        'entry_type' => CardType::class,
+                        'entry_options' => ['label' => false],
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'prototype' => true,
+                        'data' => $data['cards'] ?? [],
+                        'label' => 'Cards',
+                    ])
+                    ->add('background', ColorType::class, [
+                        'label' => 'Section Background Color',
+                        'required' => false,
+                        'data' => $data['style']['background'] ?? '#f8f9fa',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'data' => $data['style']['textColor'] ?? '',
+                    ])
+                    ->add('buttonColor', ChoiceType::class, [
+                        'label' => 'Button Color',
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Accent' => 'accent',
+                            'Success' => 'success',
+                            'Warning' => 'warning',
+                            'Danger' => 'danger',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $data['style']['buttonColor'] ?? 'warning',
+                    ])
+                    ->add('buttonCustomColor', ColorType::class, [
+                        'label' => 'Custom Button Color',
+                        'required' => false,
+                        'data' => $data['style']['buttonCustomColor'] ?? '',
+                    ]);
+                break;
+                
             case 'cards':
                 $builder
                     ->add('sectionTitle', TextType::class, [
@@ -760,6 +812,13 @@ class SectionDataType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => ['rows' => 3],
+            ])
+            ->add('features', TextareaType::class, [
+                'label' => 'Features (one per line)',
+                'required' => false,
+                'attr' => ['rows' => 4, 'placeholder' => 'Feature 1
+Feature 2
+Feature 3'],
             ])
             ->add('icon', TextType::class, [
                 'label' => 'Icon (optional)',

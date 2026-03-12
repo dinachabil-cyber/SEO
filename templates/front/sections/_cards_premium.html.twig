@@ -1,0 +1,57 @@
+<section class="section premium-cards" 
+         {% if data.style is defined and data.style is not null and data.style.background %}style="background-color: {{ data.style.background }};{% endif %}">
+    <div class="container">
+        {% if data.sectionTitle %}
+            <div class="section-heading">
+                <h2{% if data.style is defined and data.style is not null and data.style.textColor %} style="color: {{ data.style.textColor }};"{% endif %}>{{ data.sectionTitle }}</h2>
+            </div>
+        {% endif %}
+        
+        {% if data.cards is defined and data.cards is not empty %}
+            <div class="premium-cards-grid">
+                {% for card in data.cards %}
+                    <div class="premium-card">
+                        {% if card.icon %}
+                            <div class="card-icon-box">
+                                <i class="{{ card.icon }}"></i>
+                            </div>
+                        {% elseif card.iconEmoji is defined and card.iconEmoji %}
+                            <div class="card-icon-box">
+                                <span style="font-size: 1.5rem;">{{ card.iconEmoji }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-content">
+                            <h3{% if data.style is defined and data.style is not null and data.style.textColor %} style="color: {{ data.style.textColor }};"{% endif %}>{{ card.title }}</h3>
+                            
+                            {% if card.description %}
+                                <p class="card-description{% if data.style is defined and data.style is not null and data.style.textColor %} text-{{ data.style.textColor }}{% endif %}"
+                                   {% if data.style is defined and data.style is not null and data.style.textColor %}style="color: {{ data.style.textColor }};{% endif %}">{{ card.description }}</p>
+                            {% endif %}
+                            
+                            {% if card.features is defined and card.features is not empty %}
+                                <ul class="card-features">
+                                    {% for feature in card.features|split('\n') %}
+                                        {% if feature is not empty %}
+                                            <li{% if data.style is defined and data.style is not null and data.style.textColor %} style="color: {{ data.style.textColor }};"{% endif %}>{{ feature|trim }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            
+                            {% if card.linkUrl %}
+                                <a href="{{ card.linkUrl }}" class="card-cta"
+                                   {% if data.style is defined and data.style is not null and data.style.buttonColor == 'custom' and data.style.buttonCustomColor %}style="background-color: {{ data.style.buttonCustomColor }}; border-color: {{ data.style.buttonCustomColor }};"{% endif %}>
+                                    <span>
+                                        {{ card.buttonText ?: 'Learn More' }}
+                                        <i class="bi bi-arrow-right"></i>
+                                    </span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Premium Cards Section</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        /* Main Application Styles */
+        :root {
+            --color-bg: #f8fafc;
+            --color-surface: #ffffff;
+            --color-surface-2: #f1f5f9;
+            --color-surface-3: #e2e8f0;
+            --color-text: #0f172a;
+            --color-text-muted: #64748b;
+            --color-text-light: #94a3b8;
+            --color-border: #e2e8f0;
+            --color-border-2: #cbd5e1;
+            --color-primary: #4f46e5;
+            --color-primary-2: #4338ca;
+            --color-primary-light: #818cf8;
+            --color-primary-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+            --color-accent: #06b6d4;
+            --color-accent-2: #0891b2;
+            --color-success: #10b981;
+            --color-success-2: #059669;
+            --color-warning: #f59e0b;
+            --color-warning-2: #d97706;
+            --color-danger: #ef4444;
+            --color-danger-2: #dc2626;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-sm: 8px;
+            --radius-full: 9999px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 0.9375rem;
+            --font-size-lg: 1rem;
+            --font-size-xl: 1.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 0.75rem;
+            --spacing-lg: 1rem;
+            --spacing-xl: 1.5rem;
+            --spacing-2xl: 2rem;
+            --spacing-3xl: 4rem;
+            --container-max-width: 1200px;
+            --container-padding: 2rem;
+            --container-padding-sm: 1rem;
+            --container-padding-xs: 0.5rem;
+        }
+
+        /* Premium Insurance Style Cards Section */
+        .section.premium-cards {
+            background-color: #f8f9fa;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section.premium-cards::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 193, 7, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .section.premium-cards .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Centered Heading */
+        .section.premium-cards .section-heading {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section.premium-cards .section-heading h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section.premium-cards .section-heading p {
+            font-size: 1.125rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 2x2 Grid Layout */
+        .section.premium-cards .premium-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Premium Cards */
+        .premium-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffc107, #ffb300);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .premium-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .premium-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Icon Box */
+        .premium-card .card-icon-box {
+            width: 56px;
+            height: 56px;
+            background: #fff8e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card .card-icon-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ffc107, #ffb300);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .premium-card:hover .card-icon-box::before {
+            opacity: 1;
+        }
+
+        .premium-card .card-icon-box i {
+            font-size: 1.5rem;
+            color: #ffc107;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .premium-card:hover .card-icon-box i {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        /* Card Content */
+        .premium-card .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .premium-card .card-description {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.9375rem;
+        }
+
+        .premium-card .card-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .premium-card .card-features li {
+            padding: 0.5rem 0;
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.9375rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .premium-card .card-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #ffc107;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        /* CTA Button */
+        .premium-card .card-cta {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #ffc107, #ffb300);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card .card-cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .premium-card .card-cta:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .premium-card .card-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+            background: linear-gradient(135deg, #ffb300, #ffa000);
+        }
+
+        .premium-card .card-cta:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .premium-card .card-cta span {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .premium-card .card-cta i {
+            transition: transform 0.3s ease;
+        }
+
+        .premium-card .card-cta:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .section.premium-cards {
+                padding: 3rem 0;
+            }
+            
+            .section.premium-cards .section-heading h2 {
+                font-size: 2rem;
+            }
+            
+            .section.premium-cards .section-heading p {
+                font-size: 1rem;
+            }
+            
+            .section.premium-cards .premium-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .premium-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .section.premium-cards .premium-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="section premium-cards">
+        <div class="container">
+            <div class="section-heading">
+                <h2>Insurance Solutions</h2>
+                <p>Comprehensive coverage tailored to your needs</p>
+            </div>
+            
+            <div class="premium-cards-grid">
+                <div class="premium-card">
+                    <div class="card-icon-box">
+                        <i class="bi bi-car-front"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Auto Insurance</h3>
+                        <p class="card-description">Protection for your vehicle with flexible coverage options.</p>
+                        <ul class="card-features">
+                            <li>Liability coverage</li>
+                            <li>Collision protection</li>
+                            <li>24/7 roadside assistance</li>
+                        </ul>
+                        <a href="#" class="card-cta">
+                            <span>Get Quote <i class="bi bi-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="premium-card">
+                    <div class="card-icon-box">
+                        <i class="bi bi-house"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Home Insurance</h3>
+                        <p class="card-description">Safeguard your home and belongings with reliable coverage.</p>
+                        <ul class="card-features">
+                            <li>Property damage</li>
+                            <li>Theft protection</li>
+                            <li>Natural disaster coverage</li>
+                        </ul>
+                        <a href="#" class="card-cta">
+                            <span>Get Quote <i class="bi bi-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="premium-card">
+                    <div class="card-icon-box">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Health Insurance</h3>
+                        <p class="card-description">Comprehensive health coverage for you and your family.</p>
+                        <ul class="card-features">
+                            <li>Medical expenses</li>
+                            <li>Prescription drugs</li>
+                            <li>Preventive care</li>
+                        </ul>
+                        <a href="#" class="card-cta">
+                            <span>Get Quote <i class="bi bi-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="premium-card">
+                    <div class="card-icon-box">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Business Insurance</h3>
+                        <p class="card-description">Protect your business with customized insurance solutions.</p>
+                        <ul class="card-features">
+                            <li>Liability coverage</li>
+                            <li>Property protection</li>
+                            <li>Business interruption</li>
+                        </ul>
+                        <a href="#" class="card-cta">
+                            <span>Get Quote <i class="bi bi-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
