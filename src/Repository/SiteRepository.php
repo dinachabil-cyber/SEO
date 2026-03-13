@@ -21,10 +21,7 @@ class SiteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->leftJoin('s.user', 'u')
-            ->addSelect('u')
-            ->addSelect('COUNT(p.id) AS HIDDEN pageCount')
-            ->leftJoin('s.pages', 'p')
-            ->groupBy('s.id');
+            ->addSelect('u');
 
         if (!empty($filters['creator'])) {
             $qb->andWhere('u.name LIKE :creator')

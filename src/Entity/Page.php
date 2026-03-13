@@ -114,7 +114,18 @@ class Page
 
     public function setSite(?Site $site): static
     {
+        // Update page count on old site
+        if ($this->site && $this->site !== $site) {
+            $this->site->decrementPageCount();
+        }
+
         $this->site = $site;
+
+        // Update page count on new site
+        if ($this->site) {
+            $this->site->incrementPageCount();
+        }
+
         return $this;
     }
 

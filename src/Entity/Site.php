@@ -358,6 +358,24 @@ class Site
 
     public function getPageCount(): int
     {
-        return $this->pages->count();
+        return $this->pageCount;
+    }
+
+    public function setPageCount(int $pageCount): static
+    {
+        $this->pageCount = $pageCount;
+        return $this;
+    }
+
+    public function incrementPageCount(): static
+    {
+        $this->pageCount++;
+        return $this;
+    }
+
+    public function decrementPageCount(): static
+    {
+        $this->pageCount--;
+        return $this;
     }
 }
