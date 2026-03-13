@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
-final class TestController extends AbstractController
+class TestPerformanceController extends AbstractController
 {
-    #[Route('/test', name: 'app_test')]
+    #[Route('/test-performance', name: 'app_test_performance')]
     public function index(): Response
     {
         return new Response('Hello World');

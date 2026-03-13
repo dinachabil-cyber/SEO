@@ -11,6 +11,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`user`')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NAME', fields: ['name'])]
+#[Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['name'], message: 'This username is already taken.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

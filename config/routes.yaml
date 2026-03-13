@@ -86,6 +86,11 @@ app_logout:
     controller: 'App\Controller\SecurityController::logout'
     methods: ['GET']
 
+app_register:
+    path: /register
+    controller: 'App\Controller\SecurityController::register'
+    methods: ['GET', 'POST']
+
 # Frontend routes
 app_home:
     path: '/'
@@ -97,4 +102,4 @@ app_front_page:
     controller: 'App\Controller\FrontController::index'
     methods: ['GET']
     requirements:
-        slug: '^(?!login$|logout$|admin/).*'
+        slug: '^(?!login$|logout$|register$|admin/).*'
