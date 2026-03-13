@@ -1,0 +1,283 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1 class="login-title">Admin Login</h1>
+            <p class="login-subtitle">Sign in to manage your sites</p>
+        </div>
+
+        {% if error %}
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-circle"></i> {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" class="login-form">
+            <div class="form-group">
+                <label for="inputUsername" class="form-label">Username</label>
+                <input type="text" id="inputUsername" name="_username"
+                       value="{{ last_username }}" class="form-control"
+                       required autocomplete="username" autofocus>
+                <div class="invalid-feedback">Please enter your username</div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputPassword" class="form-label">Password</label>
+                <input type="password" id="inputPassword" name="_password"
+                       class="form-control" required autocomplete="current-password" placeholder="Enter password">
+                <div class="invalid-feedback">Please enter your password</div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" id="rememberMe" name="_remember_me" class="form-check-input" {{ remember_me ? 'checked' }}>
+                <label for="rememberMe" class="form-check-label">Remember me</label>
+            </div>
+
+            <input type="hidden" name="_target_path" value="{{ path('app_site_index') }}">
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .login-form {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4a90d9;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+    }
+
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: #333;
+    }
+
+    .form-check {
+        text-align: left;
+    }
+
+    .form-check-input {
+        margin-right: 8px;
+    }
+
+    .form-check-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #357abd 0%, #285a8d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(74, 144, 217, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .alert i {
+        font-size: 18px;
+    }
+
+    @media (max-width: 576px) {
+        .login-card {
+            padding: 30px 20px;
+            margin: 10px;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+        }
+
+        .login-subtitle {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .login-card {
+            padding: 24px 16px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('inputPassword');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+
+    // Toggle password visibility
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPasswordVisible = passwordInput.type === 'text';
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            
+            const icon = this.querySelector('i');
+            if (isPasswordVisible) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    }
+
+    // Form validation
+    const form = document.querySelector('.login-form');
+    const usernameInput = document.getElementById('inputUsername');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            if (!usernameInput.value.trim()) {
+                usernameInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                usernameInput.classList.remove('is-invalid');
+            }
+            
+            if (!passwordInput.value) {
+                passwordInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                passwordInput.classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+        
+        // Remove invalid class on input
+        usernameInput.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+        
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    }
+});
+</script>
+{% endblock %}

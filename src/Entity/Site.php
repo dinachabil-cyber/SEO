@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -17,9 +18,6 @@ class Site
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $domain = null;
 
@@ -29,11 +27,35 @@ class Site
     #[ORM\Column(options: ['default' => true])]
     private ?bool $isActive = true;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hosting = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $databaseName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $databasePassword = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $technology = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTime $publishedAt = null;
+
     #[ORM\Column]
     private ?DateTime $createdAt = null;
 
     #[ORM\Column]
     private ?DateTime $updatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sites')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $status = null;
+
+    private ?PasswordHasherFactoryInterface $passwordHasherFactory = null;
 
     /**
      * @var Collection<int, Page>
@@ -68,17 +90,6 @@ class Site
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-        return $this;
-    }
-
     public function getDomain(): ?string
     {
         return $this->domain;
@@ -109,6 +120,73 @@ class Site
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getHosting(): ?string
+    {
+        return $this->hosting;
+    }
+
+    public function setHosting(?string $hosting): static
+    {
+        $this->hosting = $hosting;
+        return $this;
+    }
+
+    public function getDatabaseName(): ?string
+    {
+        return $this->databaseName;
+    }
+
+    public function setDatabaseName(?string $databaseName): static
+    {
+        $this->databaseName = $databaseName;
+        return $this;
+    }
+
+    public function getDatabasePassword(): ?string
+    {
+        return $this->databasePassword;
+    }
+
+    public function setDatabasePassword(?string $databasePassword): static
+    {
+        if ($databasePassword) {
+            $this->databasePassword = $this->encodePassword($databasePassword);
+        }
+        return $this;
+    }
+
+    public function verifyDatabasePassword(string $password): bool
+    {
+        return password_verify($password, $this->databasePassword);
+    }
+
+    private function encodePassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    public function getTechnology(): ?string
+    {
+        return $this->technology;
+    }
+
+    public function setTechnology(?string $technology): static
+    {
+        $this->technology = $technology;
+        return $this;
+    }
+
+    public function getPublishedAt(): ?DateTime
+    {
+        return $this->publishedAt;
+    }
+
+    public function setPublishedAt(?DateTime $publishedAt): static
+    {
+        $this->publishedAt = $publishedAt;
         return $this;
     }
 
@@ -150,5 +228,44 @@ class Site
     public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getStatusBadgeClass(): string
+    {
+        return match ($this->status) {
+            'Draft' => 'bg-secondary',
+            'In Progress' => 'bg-primary',
+            'Published' => 'bg-success',
+            'Suspended' => 'bg-danger',
+            'Archived' => 'bg-dark',
+            default => 'bg-secondary',
+        };
+    }
+
+    public function getPageCount(): int
+    {
+        return $this->pages->count();
     }
 }

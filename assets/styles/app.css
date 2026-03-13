@@ -208,6 +208,170 @@ body{
   padding:90px 0;
 }
 
+/* CARD LAYOUTS */
+
+.grid-2,
+.grid-3,
+.grid-4 {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.compact {
+  display: grid;
+  gap: 1rem;
+}
+
+.compact.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.compact.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.compact.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* CARD STYLES */
+
+.x-card {
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.x-card.rounded {
+  border-radius: var(--radius-lg);
+}
+
+.x-card.square {
+  border-radius: 0;
+}
+
+.x-card.oval img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.x-card.bordered {
+  border: 2px solid var(--border);
+}
+
+.x-card.shadowed {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.x-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* BUTTON STYLES */
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  background: var(--surface-2);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--primary);
+}
+
+/* TEXT ALIGNMENT */
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* CUSTOM BACKGROUND */
+
+.custom-bg {
+  transition: background-color 0.3s ease;
+}
+
+/* RESPONSIVE GRID */
+
+@media (max-width: 992px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .horizontal {
+    flex-direction: column;
+  }
+}
+
 
 /* ANIMATION */
 

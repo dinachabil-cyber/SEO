@@ -75,6 +75,17 @@ app_section_down:
     controller: 'App\Controller\PageBuilderController::down'
     methods: ['POST']
 
+# Security routes
+app_login:
+    path: /login
+    controller: 'App\Controller\SecurityController::login'
+    methods: ['GET', 'POST']
+
+app_logout:
+    path: /logout
+    controller: 'App\Controller\SecurityController::logout'
+    methods: ['GET']
+
 # Frontend routes
 app_home:
     path: '/'
@@ -85,3 +96,5 @@ app_front_page:
     path: '/{slug}'
     controller: 'App\Controller\FrontController::index'
     methods: ['GET']
+    requirements:
+        slug: '^(?!login$|logout$|admin/).*'

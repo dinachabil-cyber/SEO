@@ -29,8 +29,54 @@
             {{ form_row(dataForm.caption) }}
             
         {% elseif form.vars.value.type == 'cards' %}
-            {{ form_row(dataForm.sectionTitle) }}
-            {{ form_row(dataForm.cards) }}
+            <ul class="nav nav-tabs" id="cardsSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="layout-tab" data-bs-toggle="tab" data-bs-target="#layout" type="button" role="tab" aria-controls="layout" aria-selected="false">Layout</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#style" type="button" role="tab" aria-controls="style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#buttons" type="button" role="tab" aria-controls="buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="cardsSectionTabsContent">
+                <div class="tab-pane fade show active" id="content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.sectionTitle) }}
+                    {{ form_row(dataForm.cards) }}
+                </div>
+                <div class="tab-pane fade" id="layout" role="tabpanel" aria-labelledby="layout-tab">
+                    {{ form_row(dataForm.cardLayout) }}
+                    {{ form_row(dataForm.cardStyle) }}
+                    {{ form_row(dataForm.textAlignment) }}
+                </div>
+                <div class="tab-pane fade" id="style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.titleColor) }}
+                    {{ form_row(dataForm.subtitleColor) }}
+                    {{ form_row(dataForm.cardBackgroundColor) }}
+                    {{ form_row(dataForm.cardTitleColor) }}
+                    {{ form_row(dataForm.cardTextColor) }}
+                    {{ form_row(dataForm.cardBorderColor) }}
+                    {{ form_row(dataForm.cardShadow) }}
+                    {{ form_row(dataForm.cardBorderRadius) }}
+                    {{ form_row(dataForm.paddingTop) }}
+                    {{ form_row(dataForm.paddingBottom) }}
+                    {{ form_row(dataForm.marginTop) }}
+                    {{ form_row(dataForm.marginBottom) }}
+                </div>
+                <div class="tab-pane fade" id="buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    {{ form_row(dataForm.buttonBackgroundColor) }}
+                    {{ form_row(dataForm.buttonTextColor) }}
+                    {{ form_row(dataForm.buttonBorderColor) }}
+                    {{ form_row(dataForm.buttonBorderRadius) }}
+                    {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
             
         {% elseif form.vars.value.type == 'faq' %}
             {{ form_row(dataForm.sectionTitle) }}
@@ -43,10 +89,42 @@
             {{ form_row(dataForm.successMessage) }}
             
         {% elseif form.vars.value.type == 'cta' %}
-            {{ form_row(dataForm.title) }}
-            {{ form_row(dataForm.text) }}
-            {{ form_row(dataForm.buttonText) }}
-            {{ form_row(dataForm.buttonUrl) }}
+            <ul class="nav nav-tabs" id="ctaSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#style" type="button" role="tab" aria-controls="style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#buttons" type="button" role="tab" aria-controls="buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="ctaSectionTabsContent">
+                <div class="tab-pane fade show active" id="content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.title) }}
+                    {{ form_row(dataForm.text) }}
+                    {{ form_row(dataForm.buttonText) }}
+                    {{ form_row(dataForm.buttonUrl) }}
+                </div>
+                <div class="tab-pane fade" id="style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.titleColor) }}
+                    {{ form_row(dataForm.textAlignment) }}
+                    {{ form_row(dataForm.paddingTop) }}
+                    {{ form_row(dataForm.paddingBottom) }}
+                    {{ form_row(dataForm.marginTop) }}
+                    {{ form_row(dataForm.marginBottom) }}
+                </div>
+                <div class="tab-pane fade" id="buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    {{ form_row(dataForm.buttonBackgroundColor) }}
+                    {{ form_row(dataForm.buttonTextColor) }}
+                    {{ form_row(dataForm.buttonBorderColor) }}
+                    {{ form_row(dataForm.buttonBorderRadius) }}
+                    {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
             
         {% elseif form.vars.value.type == 'footer' %}
             {{ form_row(dataForm.text) }}

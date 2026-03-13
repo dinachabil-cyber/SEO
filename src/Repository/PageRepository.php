@@ -26,6 +26,8 @@ class PageRepository extends ServiceEntityRepository
             ->andWhere('p.slug = :slug')
             ->andWhere('p.site = :site')
             ->andWhere('p.isPublished = true')
+            ->leftJoin('p.sections', 's')
+            ->addSelect('s')
             ->setParameter('slug', $slug)
             ->setParameter('site', $site)
             ->getQuery()
@@ -42,10 +44,27 @@ class PageRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.site = :site')
+            ->leftJoin('p.sections', 's')
+            ->addSelect('s')
             ->setParameter('site', $site)
             ->orderBy('p.slug', 'ASC')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    /**
+     * Find page with sections by id
+     */
+    public function findWithSections(int $id): ?Page
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id = :id')
+            ->leftJoin('p.sections', 's')
+            ->addSelect('s')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
     }
 }

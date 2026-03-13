@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Site;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,49 @@ class SiteRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Site::class);
+    }
+
+    public function findFiltered(array $filters = []): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->addSelect('u');
+
+        if (!empty($filters['creator'])) {
+            $qb->andWhere('u.name LIKE :creator')
+                ->setParameter('creator', '%' . $filters['creator'] . '%');
+        }
+
+        if (!empty($filters['technology'])) {
+            $qb->andWhere('s.technology LIKE :technology')
+                ->setParameter('technology', '%' . $filters['technology'] . '%');
+        }
+
+        if (!empty($filters['hosting'])) {
+            $qb->andWhere('s.hosting LIKE :hosting')
+                ->setParameter('hosting', '%' . $filters['hosting'] . '%');
+        }
+
+        if (!empty($filters['status'])) {
+            $qb->andWhere('s.status = :status')
+                ->setParameter('status', $filters['status']);
+        }
+
+        if (!empty($filters['domain'])) {
+            $qb->andWhere('s.domain LIKE :domain')
+                ->setParameter('domain', '%' . $filters['domain'] . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findAllWithUser(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->addSelect('u')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

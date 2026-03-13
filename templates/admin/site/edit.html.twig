@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="container">
-    <h1 class="mb-4">Edit Site: {{ site.name }}</h1>
+    <h1 class="mb-4">Edit Site: {{ site.domain or 'Site ' ~ site.id }}</h1>
 
     {% for flashType, flashMessages in app.flashes %}
         {% for flashMessage in flashMessages %}
@@ -21,8 +21,12 @@
         </div>
         <div class="card-body">
             {{ form_start(form) }}
-                {{ form_row(form.name) }}
                 {{ form_row(form.domain) }}
+                {{ form_row(form.hosting) }}
+                {{ form_row(form.databaseName) }}
+                {{ form_row(form.databasePassword) }}
+                {{ form_row(form.technology) }}
+                {{ form_row(form.publishedAt) }}
                 {{ form_row(form.defaultLocale) }}
                 {{ form_row(form.isActive) }}
                 

@@ -20,7 +20,7 @@ class PageBuilderController extends AbstractController
     #[Route('/builder', name: 'app_page_builder', methods: ['GET'])]
     public function index(int $siteId, int $pageId, PageRepository $pageRepository): Response
     {
-        $page = $pageRepository->find($pageId);
+        $page = $pageRepository->findWithSections($pageId);
         
         if (!$page || $page->getSite()->getId() !== $siteId) {
             $this->addFlash('error', 'Page not found');

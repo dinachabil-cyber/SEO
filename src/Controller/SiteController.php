@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Site;
 use App\Form\SiteType;
+use App\Form\SiteFiltersType;
 use App\Repository\SiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,28 +14,25 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/site')]
+#[IsGranted('ROLE_ADMIN')]
 class SiteController extends AbstractController
 {
-    #[Route('/', name: 'app_site_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, SiteRepository $siteRepository, EntityManagerInterface $entityManager): Response
+    #[Route('/', name: 'app_site_index', methods: ['GET'])]
+    public function index(Request $request, SiteRepository $siteRepository): Response
     {
-        $site = new Site();
-        $form = $this->createForm(SiteType::class, $site);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($site);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Site created successfully');
-
-            return $this->redirectToRoute('app_site_index', [], Response::HTTP_SEE_OTHER);
+        $filtersForm = $this->createForm(SiteFiltersType::class);
+        $filtersForm->handleRequest($request);
+        
+        $filters = [];
+        if ($filtersForm->isSubmitted() && $filtersForm->isValid()) {
+            $filters = array_filter($filtersForm->getData());
         }
+        
+        $sites = $siteRepository->findFiltered($filters);
 
         return $this->render('admin/site/index.html.twig', [
-            'sites' => $siteRepository->findAll(),
-            'site' => $site,
-            'form' => $form,
+            'sites' => $sites,
+            'filtersForm' => $filtersForm,
         ]);
     }
 
@@ -42,6 +40,9 @@ class SiteController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $site = new Site();
+        $site->setUser($this->getUser());
+        $site->setStatus('Draft');
+        
         $form = $this->createForm(SiteType::class, $site);
         $form->handleRequest($request);
 

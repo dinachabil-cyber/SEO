@@ -6,6 +6,7 @@ use App\Entity\Site;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,17 +19,6 @@ class SiteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, [
-                'label' => 'Name',
-                'constraints' => [
-                    new NotBlank(message: 'Please enter a site name'),
-                    new Length(max: 255, maxMessage: 'Name cannot exceed {{ limit }} characters'),
-                ],
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Enter site name',
-                ],
-            ])
             ->add('domain', TextType::class, [
                 'label' => 'Domain',
                 'required' => false,
@@ -59,11 +49,65 @@ class SiteType extends AbstractType
                     'class' => 'form-select',
                 ],
             ])
+            ->add('hosting', TextType::class, [
+                'label' => 'Hosting',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter hosting information',
+                ],
+            ])
+            ->add('databaseName', TextType::class, [
+                'label' => 'Database Name',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter database name',
+                ],
+            ])
+            ->add('databasePassword', TextType::class, [
+                'label' => 'Database Password',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter database password',
+                ],
+            ])
+            ->add('technology', TextType::class, [
+                'label' => 'Technology',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter technology stack',
+                ],
+            ])
+            ->add('publishedAt', DateTimeType::class, [
+                'label' => 'Published At',
+                'required' => false,
+                'widget' => 'single_text',
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+            ])
             ->add('isActive', CheckboxType::class, [
                 'label' => 'Active',
                 'required' => false,
                 'attr' => [
                     'class' => 'form-check-input',
+                ],
+            ])
+            ->add('status', ChoiceType::class, [
+                'label' => 'Status',
+                'required' => true,
+                'choices' => [
+                    'Draft' => 'Draft',
+                    'In Progress' => 'In Progress',
+                    'Published' => 'Published',
+                    'Suspended' => 'Suspended',
+                    'Archived' => 'Archived',
+                ],
+                'attr' => [
+                    'class' => 'form-select',
                 ],
             ])
         ;

@@ -1,21 +1,21 @@
-<section class="section bg-white">
+<section class="section {% if data.backgroundColor %}custom-bg{% endif %}" {% if data.backgroundColor %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop %}padding-top: {{ data.paddingTop }}px;{% endif %} {% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px;{% endif %} {% if data.marginTop %}margin-top: {{ data.marginTop }}px;{% endif %} {% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px;{% endif %}"{% endif %}>
     <div class="container">
         {% if data.sectionTitle %}
-            <div class="text-center mb-5">
-                <h2>{{ data.sectionTitle }}</h2>
+            <div class="text-center mb-5 {% if data.textAlignment %}text-{{ data.textAlignment }}{% endif %}">
+                <h2 {% if data.titleColor %}style="color: {{ data.titleColor }}"{% endif %}>{{ data.sectionTitle }}</h2>
             </div>
         {% endif %}
         
-        <div class="grid-3">
+        <div class="{% if data.cardLayout %}{{ data.cardLayout }}{% else %}grid-3{% endif %}">
             {% for card in data.cards %}
-                <div class="x-card">
+                <div class="x-card {% if data.cardStyle %}{{ data.cardStyle }}{% endif %}" {% if data.cardBackgroundColor %}style="background-color: {{ data.cardBackgroundColor }}; {% if data.cardBorderColor %}border-color: {{ data.cardBorderColor }};{% endif %} {% if data.cardBorderRadius %}border-radius: {{ data.cardBorderRadius }}px;{% endif %} {% if data.cardShadow %}box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);{% endif %}"{% endif %}>
                     {% if card.imageUrl %}
-                        <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 rounded">
+                        <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 {% if data.cardStyle == 'rounded' %}rounded{% endif %} {% if data.cardStyle == 'oval' %}rounded-circle{% endif %} {% if data.cardStyle == 'square' %}rounded-0{% endif %}">
                     {% endif %}
-                    <h3 class="mb-2">{{ card.title }}</h3>
-                    <p class="mb-4 text-muted">{{ card.description }}</p>
+                    <h3 class="mb-2 {% if data.textAlignment %}text-{{ data.textAlignment }}{% endif %}" {% if data.cardTitleColor %}style="color: {{ data.cardTitleColor }}"{% endif %}>{{ card.title }}</h3>
+                    <p class="mb-4 {% if data.textAlignment %}text-{{ data.textAlignment }}{% endif %} {% if not data.cardTextColor %}text-muted{% endif %}" {% if data.cardTextColor %}style="color: {{ data.cardTextColor }}"{% endif %}>{{ card.description }}</p>
                     {% if card.linkUrl %}
-                        <a href="{{ card.linkUrl }}" class="btn btn-primary">
+                        <a href="{{ card.linkUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }};{% endif %} {% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }};{% endif %} {% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px;{% endif %}"{% endif %}>
                             Learn More
                         </a>
                     {% endif %}

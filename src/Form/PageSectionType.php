@@ -54,10 +54,16 @@ class PageSectionType extends AbstractType
 
     public static function addDynamicFields($form, $type, $existingData = [])
     {
+        // Remove existing data field if exists
+        if ($form->has('data')) {
+            $form->remove('data');
+        }
+
         $form->add('data', SectionDataType::class, [
             'type' => $type,
             'existing_data' => $existingData,
             'label' => false,
+            'data' => $existingData, // Make sure data is passed to the form
         ]);
     }
 
@@ -70,11 +76,11 @@ class PageSectionType extends AbstractType
 }
 
 class SectionDataType extends AbstractType
-{
-    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $type = $options['type'];
-        $existingData = $options['existing_data'];
+        public function buildForm(FormBuilderInterface $builder, array $options): void
+        {
+            $type = $options['type'];
+            $existingData = $options['data'] ?? $options['existing_data'] ?? [];
 
         switch ($type) {
             case 'header':
@@ -176,6 +182,7 @@ class SectionDataType extends AbstractType
 
             case 'cards':
                 $builder
+                    // Content Fields
                     ->add('sectionTitle', TextType::class, [
                         'label' => 'Section Title',
                         'required' => false,
@@ -189,6 +196,152 @@ class SectionDataType extends AbstractType
                         'prototype' => true,
                         'data' => $existingData['cards'] ?? [],
                         'label' => 'Cards',
+                    ])
+                    
+                    // Layout Fields
+                    ->add('cardLayout', ChoiceType::class, [
+                        'label' => 'Card Layout',
+                        'required' => false,
+                        'choices' => [
+                            'Vertical' => 'vertical',
+                            '2 Columns' => 'grid-2',
+                            '3 Columns' => 'grid-3',
+                            '4 Columns' => 'grid-4',
+                            'Horizontal' => 'horizontal',
+                            'Centered' => 'centered',
+                            'Compact' => 'compact',
+                        ],
+                        'data' => $existingData['cardLayout'] ?? 'grid-3',
+                        'placeholder' => 'Select layout',
+                    ])
+                    ->add('cardStyle', ChoiceType::class, [
+                        'label' => 'Card Style',
+                        'required' => false,
+                        'choices' => [
+                            'Standard' => 'standard',
+                            'Rounded' => 'rounded',
+                            'Square' => 'square',
+                            'Oval' => 'oval',
+                            'Bordered' => 'bordered',
+                            'Shadowed' => 'shadowed',
+                        ],
+                        'data' => $existingData['cardStyle'] ?? 'standard',
+                        'placeholder' => 'Select style',
+                    ])
+                    
+                    // Style Fields
+                    ->add('backgroundColor', ColorType::class, [
+                        'label' => 'Section Background Color',
+                        'required' => false,
+                        'data' => $existingData['backgroundColor'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Section Text Color',
+                        'required' => false,
+                        'data' => $existingData['textColor'] ?? '',
+                    ])
+                    ->add('titleColor', ColorType::class, [
+                        'label' => 'Section Title Color',
+                        'required' => false,
+                        'data' => $existingData['titleColor'] ?? '',
+                    ])
+                    ->add('subtitleColor', ColorType::class, [
+                        'label' => 'Section Subtitle Color',
+                        'required' => false,
+                        'data' => $existingData['subtitleColor'] ?? '',
+                    ])
+                    ->add('cardBackgroundColor', ColorType::class, [
+                        'label' => 'Card Background Color',
+                        'required' => false,
+                        'data' => $existingData['cardBackgroundColor'] ?? '',
+                    ])
+                    ->add('cardTitleColor', ColorType::class, [
+                        'label' => 'Card Title Color',
+                        'required' => false,
+                        'data' => $existingData['cardTitleColor'] ?? '',
+                    ])
+                    ->add('cardTextColor', ColorType::class, [
+                        'label' => 'Card Text Color',
+                        'required' => false,
+                        'data' => $existingData['cardTextColor'] ?? '',
+                    ])
+                    ->add('cardBorderColor', ColorType::class, [
+                        'label' => 'Card Border Color',
+                        'required' => false,
+                        'data' => $existingData['cardBorderColor'] ?? '',
+                    ])
+                    ->add('cardShadow', CheckboxType::class, [
+                        'label' => 'Show Card Shadow',
+                        'required' => false,
+                        'data' => $existingData['cardShadow'] ?? false,
+                    ])
+                    ->add('cardBorderRadius', TextType::class, [
+                        'label' => 'Card Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['cardBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonBackgroundColor', ColorType::class, [
+                        'label' => 'Button Background Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                    ])
+                    ->add('buttonTextColor', ColorType::class, [
+                        'label' => 'Button Text Color',
+                        'required' => false,
+                        'data' => $existingData['buttonTextColor'] ?? '',
+                    ])
+                    ->add('buttonBorderColor', ColorType::class, [
+                        'label' => 'Button Border Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderColor'] ?? '',
+                    ])
+                    ->add('buttonBorderRadius', TextType::class, [
+                        'label' => 'Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonStyle', ChoiceType::class, [
+                        'label' => 'Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['buttonStyle'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('textAlignment', ChoiceType::class, [
+                        'label' => 'Text Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Left' => 'left',
+                            'Center' => 'center',
+                            'Right' => 'right',
+                        ],
+                        'data' => $existingData['textAlignment'] ?? 'center',
+                        'placeholder' => 'Select alignment',
+                    ])
+                    ->add('paddingTop', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingTop'] ?? '',
+                    ])
+                    ->add('paddingBottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingBottom'] ?? '',
+                    ])
+                    ->add('marginTop', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $existingData['marginTop'] ?? '',
+                    ])
+                    ->add('marginBottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['marginBottom'] ?? '',
                     ]);
                 break;
 
@@ -244,6 +397,7 @@ class SectionDataType extends AbstractType
 
             case 'cta':
                 $builder
+                    // Content Fields
                     ->add('title', TextType::class, [
                         'label' => 'Title',
                         'required' => true,
@@ -263,6 +417,86 @@ class SectionDataType extends AbstractType
                         'label' => 'Button URL',
                         'required' => true,
                         'data' => $existingData['buttonUrl'] ?? '',
+                    ])
+                    
+                    // Style Fields
+                    ->add('backgroundColor', ColorType::class, [
+                        'label' => 'CTA Background Color',
+                        'required' => false,
+                        'data' => $existingData['backgroundColor'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'CTA Text Color',
+                        'required' => false,
+                        'data' => $existingData['textColor'] ?? '',
+                    ])
+                    ->add('titleColor', ColorType::class, [
+                        'label' => 'CTA Title Color',
+                        'required' => false,
+                        'data' => $existingData['titleColor'] ?? '',
+                    ])
+                    ->add('buttonBackgroundColor', ColorType::class, [
+                        'label' => 'Button Background Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                    ])
+                    ->add('buttonTextColor', ColorType::class, [
+                        'label' => 'Button Text Color',
+                        'required' => false,
+                        'data' => $existingData['buttonTextColor'] ?? '',
+                    ])
+                    ->add('buttonBorderColor', ColorType::class, [
+                        'label' => 'Button Border Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderColor'] ?? '',
+                    ])
+                    ->add('buttonBorderRadius', TextType::class, [
+                        'label' => 'Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonStyle', ChoiceType::class, [
+                        'label' => 'Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['buttonStyle'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('textAlignment', ChoiceType::class, [
+                        'label' => 'Text Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Left' => 'left',
+                            'Center' => 'center',
+                            'Right' => 'right',
+                        ],
+                        'data' => $existingData['textAlignment'] ?? 'center',
+                        'placeholder' => 'Select alignment',
+                    ])
+                    ->add('paddingTop', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingTop'] ?? '',
+                    ])
+                    ->add('paddingBottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingBottom'] ?? '',
+                    ])
+                    ->add('marginTop', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $existingData['marginTop'] ?? '',
+                    ])
+                    ->add('marginBottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['marginBottom'] ?? '',
                     ]);
                 break;
 
