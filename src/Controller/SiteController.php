@@ -62,8 +62,15 @@ class SiteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_site_show', methods: ['GET'])]
-    public function show(Site $site): Response
+    public function show(int $id, SiteRepository $siteRepository): Response
     {
+        $site = $siteRepository->findWithPagesAndSections($id);
+        
+        if (!$site) {
+            $this->addFlash('error', 'Site not found');
+            return $this->redirectToRoute('app_site_index');
+        }
+
         $totalPages = count($site->getPages());
         $publishedPages = count(array_filter($site->getPages()->toArray(), function ($page) {
             return $page->isIsPublished();

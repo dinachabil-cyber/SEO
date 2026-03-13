@@ -110,6 +110,54 @@ class SiteType extends AbstractType
                     'class' => 'form-select',
                 ],
             ])
+            ->add('companyName', TextType::class, [
+                'label' => 'Company Name',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter company name',
+                ],
+            ])
+            ->add('address', TextType::class, [
+                'label' => 'Address',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter address',
+                ],
+            ])
+            ->add('phone', TextType::class, [
+                'label' => 'Phone',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter phone number',
+                ],
+            ])
+            ->add('email', TextType::class, [
+                'label' => 'Email',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter email address',
+                ],
+            ])
+            ->add('legalRepresentative', TextType::class, [
+                'label' => 'Legal Representative',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter legal representative name',
+                ],
+            ])
+            ->add('registrationNumber', TextType::class, [
+                'label' => 'Registration Number',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter registration number',
+                ],
+            ])
         ;
     }
 

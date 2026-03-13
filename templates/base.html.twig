@@ -45,37 +45,39 @@
         {% block body %}{% endblock %}
         <script>
             // Theme toggle functionality
-            const themeToggle = document.querySelector('.theme-toggle input');
-            const root = document.documentElement;
+            (function() {
+                const themeToggle = document.querySelector('.theme-toggle input');
+                const root = document.documentElement;
 
-            // Load saved theme or use system preference
-            const savedTheme = localStorage.getItem('theme');
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            const initialTheme = savedTheme || systemTheme;
-            root.setAttribute('data-theme', initialTheme);
-            if (themeToggle) {
-                themeToggle.checked = initialTheme === 'dark';
-            }
-
-            // Listen for theme toggle changes
-            if (themeToggle) {
-                themeToggle.addEventListener('change', () => {
-                    const newTheme = themeToggle.checked ? 'dark' : 'light';
-                    root.setAttribute('data-theme', newTheme);
-                    localStorage.setItem('theme', newTheme);
-                });
-            }
-
-            // Listen for system theme changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.getItem('theme')) {
-                    const newTheme = e.matches ? 'dark' : 'light';
-                    root.setAttribute('data-theme', newTheme);
-                    if (themeToggle) {
-                        themeToggle.checked = newTheme === 'dark';
-                    }
+                // Load saved theme or use system preference
+                const savedTheme = localStorage.getItem('theme');
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const initialTheme = savedTheme || systemTheme;
+                root.setAttribute('data-theme', initialTheme);
+                if (themeToggle) {
+                    themeToggle.checked = initialTheme === 'dark';
                 }
-            });
+
+                // Listen for theme toggle changes
+                if (themeToggle) {
+                    themeToggle.addEventListener('change', () => {
+                        const newTheme = themeToggle.checked ? 'dark' : 'light';
+                        root.setAttribute('data-theme', newTheme);
+                        localStorage.setItem('theme', newTheme);
+                    });
+                }
+
+                // Listen for system theme changes
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    if (!localStorage.getItem('theme')) {
+                        const newTheme = e.matches ? 'dark' : 'light';
+                        root.setAttribute('data-theme', newTheme);
+                        if (themeToggle) {
+                            themeToggle.checked = newTheme === 'dark';
+                        }
+                    }
+                });
+            })();
         </script>
     </body>
 </html>

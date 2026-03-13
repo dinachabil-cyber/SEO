@@ -79,10 +79,12 @@
                                 <th>Domain</th>
                                 <th>Locale</th>
                                 <th>Hosting</th>
+                                <th>Database</th>
                                 <th>Technology</th>
                                 <th>Published At</th>
                                 <th>Creator</th>
                                 <th>Pages</th>
+                                <th>Imprint</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -112,6 +114,16 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        {% if site.databaseName %}
+                                            <span>{{ site.databaseName }} </span>
+                                            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#databaseCredentialsModal{{ site.id }}" title="Show database password">
+                                                <i class="bi bi-key"></i>
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         {% if site.technology %}
                                             {{ site.technology }}
                                         {% else %}
@@ -134,6 +146,11 @@
                                     </td>
                                     <td>
                                         {{ site.pageCount }}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imprintModal{{ site.id }}">
+                                            View Imprint
+                                        </button>
                                     </td>
                                     <td>
                                         <span class="badge {{ site.statusBadgeClass }}">{{ site.status|default('Draft') }}</span>
@@ -173,5 +190,129 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Database Credentials Modals -->
+    {% for site in sites %}
+        <div class="modal fade" id="databaseCredentialsModal{{ site.id }}" tabindex="-1" aria-labelledby="databaseCredentialsModalLabel{{ site.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="databaseCredentialsModalLabel{{ site.id }}">Site Credentials</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if app.user and site.user and app.user.id == site.user.id %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Database Name:</label>
+                                <p>{{ site.databaseName }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Database Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="password{{ site.id }}" class="form-control" value="{{ site.databasePassword }}" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password{{ site.id }}', 'toggleBtn{{ site.id }}')" id="toggleBtn{{ site.id }}">Show</button>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyPassword('password{{ site.id }}')">Copy</button>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">
+                                You do not have permission to view these credentials
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Imprint Modals -->
+    {% for site in sites %}
+        <div class="modal fade" id="imprintModal{{ site.id }}" tabindex="-1" aria-labelledby="imprintModalLabel{{ site.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imprintModalLabel{{ site.id }}">Imprint Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if site.hasImprintData() %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Company Name:</label>
+                                        <p>{{ site.companyName or '-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Address:</label>
+                                        <p>{{ site.address or '-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Phone:</label>
+                                        <p>{{ site.phone or '-' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Email:</label>
+                                        <p>{{ site.email or '-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Legal Representative:</label>
+                                        <p>{{ site.legalRepresentative or '-' }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Registration Number:</label>
+                                        <p>{{ site.registrationNumber or '-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info" role="alert">
+                                No imprint data available
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ path('app_site_edit', {'id': site.id}) }}" class="btn btn-primary">Edit Imprint</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        function togglePassword(passwordId, buttonId) {
+            const passwordInput = document.getElementById(passwordId);
+            const toggleButton = document.getElementById(buttonId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = 'Show';
+            }
+        }
+
+        function copyPassword(passwordId) {
+            const passwordInput = document.getElementById(passwordId);
+            passwordInput.select();
+            passwordInput.setSelectionRange(0, 99999); /* For mobile devices */
+            
+            navigator.clipboard.writeText(passwordInput.value).then(() => {
+                const originalValue = passwordInput.value;
+                passwordInput.value = 'Copied!';
+                setTimeout(() => {
+                    passwordInput.value = originalValue;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy password:', err);
+            });
+        }
+    </script>
 </div>
 {% endblock %}

@@ -21,7 +21,10 @@ class SiteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->leftJoin('s.user', 'u')
-            ->addSelect('u');
+            ->addSelect('u')
+            ->addSelect('COUNT(p.id) AS HIDDEN pageCount')
+            ->leftJoin('s.pages', 'p')
+            ->groupBy('s.id');
 
         if (!empty($filters['creator'])) {
             $qb->andWhere('u.name LIKE :creator')
@@ -90,6 +93,23 @@ class SiteRepository extends ServiceEntityRepository
             ->andWhere('s.isActive = :active')
             ->setParameter('domain', $domain)
             ->setParameter('active', true)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    /**
+     * Find site with all pages and their sections by id
+     */
+    public function findWithPagesAndSections(int $id): ?Site
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.id = :id')
+            ->leftJoin('s.pages', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.sections', 'sec')
+            ->addSelect('sec')
+            ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult()
         ;

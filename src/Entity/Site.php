@@ -63,6 +63,9 @@ class Site
     #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'site', orphanRemoval: true)]
     private Collection $pages;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private int $pageCount = 0;
+
     public function __construct()
     {
         $this->pages = new ArrayCollection();
@@ -262,6 +265,95 @@ class Site
             'Archived' => 'bg-dark',
             default => 'bg-secondary',
         };
+    }
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $companyName = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $legalRepresentative = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $registrationNumber = null;
+
+    public function getCompanyName(): ?string
+    {
+        return $this->companyName;
+    }
+
+    public function setCompanyName(?string $companyName): static
+    {
+        $this->companyName = $companyName;
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getLegalRepresentative(): ?string
+    {
+        return $this->legalRepresentative;
+    }
+
+    public function setLegalRepresentative(?string $legalRepresentative): static
+    {
+        $this->legalRepresentative = $legalRepresentative;
+        return $this;
+    }
+
+    public function getRegistrationNumber(): ?string
+    {
+        return $this->registrationNumber;
+    }
+
+    public function setRegistrationNumber(?string $registrationNumber): static
+    {
+        $this->registrationNumber = $registrationNumber;
+        return $this;
+    }
+
+    public function hasImprintData(): bool
+    {
+        return $this->companyName || $this->address || $this->phone || $this->email || $this->legalRepresentative || $this->registrationNumber;
     }
 
     public function getPageCount(): int
