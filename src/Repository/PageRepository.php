@@ -67,4 +67,28 @@ class PageRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    /**
+     * Find page with sections and cache the result
+     */
+    public function findWithSectionsCached(int $id): ?Page
+    {
+        $cacheKey = 'page_with_sections_' . $id;
+        $cache = $this->_em->getCache();
+        
+        if ($cache->containsEntity(Page::class, $id)) {
+            return $this->find($id);
+        }
+        
+        $page = $this->findWithSections($id);
+        if ($page) {
+            $cache->evictEntity(Page::class, $id);
+            $cache->persistEntity($page);
+            foreach ($page->getSections() as $section) {
+                $cache->persistEntity($section);
+            }
+        }
+        
+        return $page;
+    }
 }

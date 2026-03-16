@@ -38,7 +38,12 @@ class PageSectionType extends AbstractType
             $form = $event->getForm();
 
             if ($section && $section->getType()) {
-                $this->addDynamicFields($form, $section->getType(), $section->getData());
+                $existingData = $section->getData();
+                // Ensure existing data is an array
+                if (!is_array($existingData)) {
+                    $existingData = [];
+                }
+                $this->addDynamicFields($form, $section->getType(), $existingData);
             }
         });
 
@@ -47,7 +52,12 @@ class PageSectionType extends AbstractType
             $form = $event->getForm();
 
             if (isset($data['type'])) {
-                $this->addDynamicFields($form, $data['type'], $data['data'] ?? []);
+                $existingData = $data['data'] ?? [];
+                // Ensure existing data is an array
+                if (!is_array($existingData)) {
+                    $existingData = [];
+                }
+                $this->addDynamicFields($form, $data['type'], $existingData);
             }
         });
     }
@@ -85,6 +95,7 @@ class SectionDataType extends AbstractType
         switch ($type) {
             case 'header':
                 $builder
+                    // Content Fields
                     ->add('brandText', TextType::class, [
                         'label' => 'Brand Text',
                         'required' => true,
@@ -110,15 +121,194 @@ class SectionDataType extends AbstractType
                         'required' => true,
                         'data' => $existingData['ctaUrl'] ?? '',
                     ])
-                    ->add('background', ColorType::class, [
-                        'label' => 'Background Color',
+                    
+                    // Style Fields
+                    ->add('backgroundColor', ColorType::class, [
+                        'label' => 'Header Background Color',
                         'required' => false,
-                        'data' => $existingData['background'] ?? '',
+                        'data' => $existingData['backgroundColor'] ?? $existingData['background'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Header Text Color',
+                        'required' => false,
+                        'data' => $existingData['textColor'] ?? '',
+                    ])
+                    ->add('buttonBackgroundColor', ColorType::class, [
+                        'label' => 'CTA Button Background Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                    ])
+                    ->add('buttonTextColor', ColorType::class, [
+                        'label' => 'CTA Button Text Color',
+                        'required' => false,
+                        'data' => $existingData['buttonTextColor'] ?? '',
+                    ])
+                    ->add('buttonBorderColor', ColorType::class, [
+                        'label' => 'CTA Button Border Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderColor'] ?? '',
+                    ])
+                    ->add('buttonBorderRadius', TextType::class, [
+                        'label' => 'CTA Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonStyle', ChoiceType::class, [
+                        'label' => 'CTA Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['buttonStyle'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('paddingTop', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingTop'] ?? '',
+                    ])
+                    ->add('paddingBottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingBottom'] ?? '',
+                    ])
+                    ->add('marginTop', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $existingData['marginTop'] ?? '',
+                    ])
+                    ->add('marginBottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['marginBottom'] ?? '',
+                    ]);
+                break;
+
+            case 'hero_split':
+                $builder
+                    // Content Fields
+                    ->add('title', TextType::class, [
+                        'label' => 'Hero Title',
+                        'required' => true,
+                        'data' => $existingData['title'] ?? '',
+                    ])
+                    ->add('subtitle', TextareaType::class, [
+                        'label' => 'Hero Subtitle',
+                        'required' => false,
+                        'data' => $existingData['subtitle'] ?? '',
+                    ])
+                    ->add('imageUrl', TextType::class, [
+                        'label' => 'Image URL',
+                        'required' => false,
+                        'data' => $existingData['imageUrl'] ?? '',
+                    ])
+                    ->add('formTitle', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $existingData['formTitle'] ?? '',
+                    ])
+                    ->add('layout', ChoiceType::class, [
+                        'label' => 'Layout',
+                        'required' => false,
+                        'choices' => [
+                            'Text Left, Image Right' => 'text-left',
+                            'Image Left, Text Right' => 'image-left',
+                        ],
+                        'data' => $existingData['layout'] ?? 'text-left',
+                        'placeholder' => 'Select layout',
+                    ])
+                    ->add('ctaText', TextType::class, [
+                        'label' => 'CTA Text',
+                        'required' => true,
+                        'data' => $existingData['ctaText'] ?? '',
+                    ])
+                    ->add('ctaUrl', TextType::class, [
+                        'label' => 'CTA URL',
+                        'required' => true,
+                        'data' => $existingData['ctaUrl'] ?? '',
+                    ])
+                    
+                    // Style Fields
+                    ->add('backgroundColor', ColorType::class, [
+                        'label' => 'Hero Background Color',
+                        'required' => false,
+                        'data' => $existingData['backgroundColor'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Hero Text Color',
+                        'required' => false,
+                        'data' => $existingData['textColor'] ?? '',
+                    ])
+                    ->add('titleColor', ColorType::class, [
+                        'label' => 'Title Color',
+                        'required' => false,
+                        'data' => $existingData['titleColor'] ?? '',
+                    ])
+                    ->add('subtitleColor', ColorType::class, [
+                        'label' => 'Subtitle Color',
+                        'required' => false,
+                        'data' => $existingData['subtitleColor'] ?? '',
+                    ])
+                    ->add('buttonBackgroundColor', ColorType::class, [
+                        'label' => 'CTA Button Background Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                    ])
+                    ->add('buttonTextColor', ColorType::class, [
+                        'label' => 'CTA Button Text Color',
+                        'required' => false,
+                        'data' => $existingData['buttonTextColor'] ?? '',
+                    ])
+                    ->add('buttonBorderColor', ColorType::class, [
+                        'label' => 'CTA Button Border Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderColor'] ?? '',
+                    ])
+                    ->add('buttonBorderRadius', TextType::class, [
+                        'label' => 'CTA Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonStyle', ChoiceType::class, [
+                        'label' => 'CTA Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['buttonStyle'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('paddingTop', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingTop'] ?? '',
+                    ])
+                    ->add('paddingBottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingBottom'] ?? '',
+                    ])
+                    ->add('marginTop', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $existingData['marginTop'] ?? '',
+                    ])
+                    ->add('marginBottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['marginBottom'] ?? '',
                     ]);
                 break;
 
             case 'hero':
                 $builder
+                    // Content Fields
                     ->add('title', TextType::class, [
                         'label' => 'Title',
                         'required' => true,
@@ -148,6 +338,91 @@ class SectionDataType extends AbstractType
                         'label' => 'Show Form',
                         'required' => false,
                         'data' => $existingData['showForm'] ?? false,
+                    ])
+                    
+                    // Style Fields
+                    ->add('backgroundColor', ColorType::class, [
+                        'label' => 'Hero Background Color',
+                        'required' => false,
+                        'data' => $existingData['backgroundColor'] ?? '',
+                    ])
+                    ->add('textColor', ColorType::class, [
+                        'label' => 'Hero Text Color',
+                        'required' => false,
+                        'data' => $existingData['textColor'] ?? '',
+                    ])
+                    ->add('titleColor', ColorType::class, [
+                        'label' => 'Title Color',
+                        'required' => false,
+                        'data' => $existingData['titleColor'] ?? '',
+                    ])
+                    ->add('subtitleColor', ColorType::class, [
+                        'label' => 'Subtitle Color',
+                        'required' => false,
+                        'data' => $existingData['subtitleColor'] ?? '',
+                    ])
+                    ->add('buttonBackgroundColor', ColorType::class, [
+                        'label' => 'CTA Button Background Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                    ])
+                    ->add('buttonTextColor', ColorType::class, [
+                        'label' => 'CTA Button Text Color',
+                        'required' => false,
+                        'data' => $existingData['buttonTextColor'] ?? '',
+                    ])
+                    ->add('buttonBorderColor', ColorType::class, [
+                        'label' => 'CTA Button Border Color',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderColor'] ?? '',
+                    ])
+                    ->add('buttonBorderRadius', TextType::class, [
+                        'label' => 'CTA Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                    ])
+                    ->add('buttonStyle', ChoiceType::class, [
+                        'label' => 'CTA Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['buttonStyle'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('textAlignment', ChoiceType::class, [
+                        'label' => 'Text Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Left' => 'left',
+                            'Center' => 'center',
+                            'Right' => 'right',
+                        ],
+                        'data' => $existingData['textAlignment'] ?? 'center',
+                        'placeholder' => 'Select alignment',
+                    ])
+                    ->add('paddingTop', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingTop'] ?? '',
+                    ])
+                    ->add('paddingBottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['paddingBottom'] ?? '',
+                    ])
+                    ->add('marginTop', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $existingData['marginTop'] ?? '',
+                    ])
+                    ->add('marginBottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $existingData['marginBottom'] ?? '',
                     ]);
                 break;
 
@@ -181,6 +456,7 @@ class SectionDataType extends AbstractType
                 break;
 
             case 'cards':
+            case 'cards_premium':
                 $builder
                     // Content Fields
                     ->add('sectionTitle', TextType::class, [

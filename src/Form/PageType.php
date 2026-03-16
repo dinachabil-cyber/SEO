@@ -72,6 +72,42 @@ class PageType extends AbstractType
                 ],
                 'help' => '160-170 characters recommended for best SEO results',
             ])
+            ->add('metaKeywords', TextType::class, [
+                'label' => 'Meta Keywords',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'keywords, separated, by, commas',
+                ],
+                'help' => 'Comma-separated list of keywords for SEO',
+            ])
+            ->add('googleAdsId', TextType::class, [
+                'label' => 'Google Ads ID',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'AW-XXXXXXXXXX',
+                ],
+                'help' => 'Google Ads conversion tracking ID',
+            ])
+            ->add('googleAnalyticsId', TextType::class, [
+                'label' => 'Google Analytics ID',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'G-XXXXXXXXXX',
+                ],
+                'help' => 'Google Analytics 4 measurement ID',
+            ])
+            ->add('googleTagManagerId', TextType::class, [
+                'label' => 'Google Tag Manager ID',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'GTM-XXXXXXX',
+                ],
+                'help' => 'Google Tag Manager container ID',
+            ])
             ->add('h1', TextType::class, [
                 'label' => 'H1 Heading',
                 'constraints' => [

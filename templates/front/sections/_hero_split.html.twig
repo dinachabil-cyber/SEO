@@ -1,0 +1,60 @@
+<section class="hero-split {% if data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
+    <div class="container">
+        <div class="row align-items-center">
+            {% if data.layout == 'image-left' and data.imageUrl %}
+                <div class="col-lg-6">
+                    <div class="hero-media">
+                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="col-lg-6">
+                <div class="hero-content" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
+                    <h1 class="display-4 mb-4" {% if data.titleColor %}style="color: {{ data.titleColor }}"{% endif %}>{{ data.title }}</h1>
+                    {% if data.subtitle %}
+                        <p class="lead mb-4" {% if data.subtitleColor %}style="color: {{ data.subtitleColor }}"{% endif %}>{{ data.subtitle }}</p>
+                    {% endif %}
+                    {% if data.ctaText and data.ctaUrl %}
+                        <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %} btn-lg" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
+                            {{ data.ctaText }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if data.layout == 'text-left' and data.imageUrl %}
+                <div class="col-lg-6">
+                    <div class="hero-media">
+                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if data.formTitle %}
+            <div class="row justify-content-center mt-8">
+                <div class="col-md-8 col-lg-6">
+                    <div class="lead-form">
+                        <h3 class="lead-form-title mb-4">{{ data.formTitle }}</h3>
+                        <form method="POST" action="{{ path('app_contact') }}">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" placeholder="Your Phone">
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

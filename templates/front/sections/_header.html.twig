@@ -1,7 +1,7 @@
-<header class="site-navbar" style="{% if data.background is defined %}background-color: {{ data.background }};{% endif %}">
+<header class="site-navbar {% if data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <div class="brand">
+            <div class="brand" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
                 {% if data.logoText is defined %}
                     {{ data.logoText }}
                 {% elseif data.brandText is defined %}
@@ -15,24 +15,33 @@
                 {% if data.menu is defined %}
                     {% for item in data.menu %}
                         {% if item %}
-                            <a href="/{{ item.targetSlug }}" class="nav-link">{{ item.label }}</a>
+                            <a href="/{{ item.targetSlug }}" class="nav-link" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>{{ item.label }}</a>
                         {% endif %}
                     {% endfor %}
                 {% elseif data.menuItems is defined %}
-                    {% set menuItems = data.menuItems|split('\n') %}
-                    {% for item in menuItems %}
-                        {% if item %}
-                            {% set parts = item|split('|') %}
-                            {% if parts|length == 2 %}
-                                <a href="{{ parts[1] }}" class="nav-link">{{ parts[0] }}</a>
+                    {% set menuItems = data.menuItems %}
+                    {% if menuItems is string %}
+                        {% set menuItems = menuItems|split('\n') %}
+                    {% endif %}
+                    {% if menuItems is iterable %}
+                        {% for item in menuItems %}
+                            {% if item %}
+                                {% if item is string %}
+                                    {% set parts = item|split('|') %}
+                                    {% if parts|length == 2 %}
+                                        <a href="{{ parts[1] }}" class="nav-link" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>{{ parts[0] }}</a>
+                                    {% endif %}
+                                {% elseif item is array and item.label is defined and item.targetSlug is defined %}
+                                    <a href="/{{ item.targetSlug }}" class="nav-link" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>{{ item.label }}</a>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
             </nav>
             
             {% if data.ctaText is defined and data.ctaUrl is defined %}
-                <a href="{{ data.ctaUrl }}" class="btn btn-primary">
+                <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
                     {{ data.ctaText }}
                 </a>
             {% endif %}

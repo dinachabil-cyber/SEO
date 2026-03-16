@@ -39,8 +39,20 @@ class Page
     #[ORM\Column(length: 255)]
     private ?string $metaDescription = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $metaKeywords = null;
+
     #[ORM\Column(length: 255)]
     private ?string $h1 = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleAdsId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleAnalyticsId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleTagManagerId = null;
 
     #[ORM\Column(options: ['default' => false])]
     private ?bool $isPublished = false;
@@ -167,6 +179,55 @@ class Page
     public function setMetaDescription(?string $metaDescription): static
     {
         $this->metaDescription = $metaDescription;
+
+        return $this;
+    }
+
+    public function getMetaKeywords(): ?string
+    {
+        return $this->metaKeywords;
+    }
+
+    public function setMetaKeywords(?string $metaKeywords): static
+    {
+        $this->metaKeywords = $metaKeywords;
+
+        return $this;
+    }
+
+    public function getGoogleAdsId(): ?string
+    {
+        return $this->googleAdsId;
+    }
+
+    public function setGoogleAdsId(?string $googleAdsId): static
+    {
+        $this->googleAdsId = $googleAdsId;
+
+        return $this;
+    }
+
+    public function getGoogleAnalyticsId(): ?string
+    {
+        return $this->googleAnalyticsId;
+    }
+
+    public function setGoogleAnalyticsId(?string $googleAnalyticsId): static
+    {
+        $this->googleAnalyticsId = $googleAnalyticsId;
+
+        return $this;
+    }
+
+    public function getGoogleTagManagerId(): ?string
+    {
+        return $this->googleTagManagerId;
+    }
+
+    public function setGoogleTagManagerId(?string $googleTagManagerId): static
+    {
+        $this->googleTagManagerId = $googleTagManagerId;
+
         return $this;
     }
 

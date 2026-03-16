@@ -1,14 +1,14 @@
-<section class="hero">
+<section class="hero {% if data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <div class="hero-content">
-                    <h1 class="display-4 mb-4">{{ data.title }}</h1>
+                <div class="hero-content {% if data.textAlignment %}text-{{ data.textAlignment }}{% endif %}" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
+                    <h1 class="display-4 mb-4" {% if data.titleColor %}style="color: {{ data.titleColor }}"{% endif %}>{{ data.title }}</h1>
                     {% if data.subtitle %}
-                        <p class="lead mb-4">{{ data.subtitle }}</p>
+                        <p class="lead mb-4" {% if data.subtitleColor %}style="color: {{ data.subtitleColor }}"{% endif %}>{{ data.subtitle }}</p>
                     {% endif %}
                     {% if data.ctaText and data.ctaUrl %}
-                        <a href="{{ data.ctaUrl }}" class="btn btn-primary btn-lg">
+                        <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %} btn-lg" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
                             {{ data.ctaText }}
                         </a>
                     {% endif %}

@@ -8,16 +8,20 @@
     {% for section in page.sections %}
         {% set data = section.effectiveData %}
         
-        {% if section.type == 'header' %}
+         {% if section.type == 'header' %}
             {% include 'front/sections/_header.html.twig' with {data: data} %}
         {% elseif section.type == 'hero' %}
             {% include 'front/sections/_hero.html.twig' with {data: data} %}
+        {% elseif section.type == 'hero_split' %}
+            {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
         {% elseif section.type == 'body' %}
             {% include 'front/sections/_body.html.twig' with {data: data} %}
         {% elseif section.type == 'image' %}
             {% include 'front/sections/_image.html.twig' with {data: data} %}
         {% elseif section.type == 'cards' %}
             {% include 'front/sections/_cards.html.twig' with {data: data} %}
+        {% elseif section.type == 'cards_premium' %}
+            {% include 'front/sections/_cards_premium.html.twig' with {data: data} %}
         {% elseif section.type == 'faq' %}
             {% include 'front/sections/_faq.html.twig' with {data: data} %}
         {% elseif section.type == 'form' %}
