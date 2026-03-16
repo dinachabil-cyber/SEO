@@ -154,13 +154,13 @@
                                             <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
                                         {% elseif section.type == 'hero_split' %}
                                             <p><strong>Hero Title:</strong> {{ data.title ?? '' }}</p>
-                                            {% if data.imageUrl %}
+                                            {% if data.imageUrl is defined and data.imageUrl %}
                                                 <p><strong>Image:</strong> {{ data.imageUrl ?? '' }}</p>
                                             {% endif %}
-                                            {% if data.formTitle %}
+                                            {% if data.formTitle is defined and data.formTitle %}
                                                 <p><strong>Form Title:</strong> {{ data.formTitle ?? '' }}</p>
                                             {% endif %}
-                                            {% if data.layout %}
+                                            {% if data.layout is defined and data.layout %}
                                                 <p><strong>Layout:</strong> {{ data.layout ?? '' }}</p>
                                             {% endif %}
                                         {% elseif section.type == 'body' %}

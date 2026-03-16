@@ -42,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Site>
      */
-    #[ORM\OneToMany(targetEntity: Site::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Site::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $sites;
 
     public function __construct()
@@ -144,7 +144,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->sites->contains($site)) {
             $this->sites->add($site);
-            $site->setUser($this);
+            $site->setOwner($this);
         }
 
         return $this;
@@ -154,8 +154,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->sites->removeElement($site)) {
             // set the owning side to null (unless already changed)
-            if ($site->getUser() === $this) {
-                $site->setUser(null);
+            if ($site->getOwner() === $this) {
+                $site->setOwner(null);
             }
         }
 

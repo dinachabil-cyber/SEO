@@ -52,8 +52,8 @@ class Site
     private ?DateTime $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sites')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    private ?User $user = null;
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $owner = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
@@ -275,14 +275,14 @@ class Site
         return $this->updatedAt;
     }
 
-    public function getUser(): ?User
+    public function getOwner(): ?User
     {
-        return $this->user;
+        return $this->owner;
     }
 
-    public function setUser(?User $user): static
+    public function setOwner(?User $owner): static
     {
-        $this->user = $user;
+        $this->owner = $owner;
         return $this;
     }
 

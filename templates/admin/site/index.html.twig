@@ -141,8 +141,8 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if site.user and site.user.name %}
-                                            {{ site.user.name }}
+                                        {% if site.owner and site.owner.name %}
+                                            {{ site.owner.name }}
                                         {% else %}
                                             <span class="text-muted">Unknown</span>
                                         {% endif %}
@@ -202,7 +202,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        {% if app.user and site.user and app.user.id == site.user.id %}
+                        {% if app.user and site.owner and app.user.id == site.owner.id %}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Database Name:</label>
                                 <p>{{ site.databaseName }}</p>

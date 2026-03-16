@@ -1,38 +1,38 @@
-<section class="hero-split {% if data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
+<section class="hero-split {% if data.backgroundColor is defined and data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor is defined and data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop is defined and data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom is defined and data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop is defined and data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom is defined and data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
     <div class="container">
         <div class="row align-items-center">
-            {% if data.layout == 'image-left' and data.imageUrl %}
+            {% if data.layout is defined and data.layout == 'image-left' and data.imageUrl is defined and data.imageUrl %}
                 <div class="col-lg-6">
                     <div class="hero-media">
-                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                        <img src="{{ data.imageUrl }}" alt="{{ data.title is defined ? data.title : '' }}">
                     </div>
                 </div>
             {% endif %}
             
             <div class="col-lg-6">
-                <div class="hero-content" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
-                    <h1 class="display-4 mb-4" {% if data.titleColor %}style="color: {{ data.titleColor }}"{% endif %}>{{ data.title }}</h1>
-                    {% if data.subtitle %}
-                        <p class="lead mb-4" {% if data.subtitleColor %}style="color: {{ data.subtitleColor }}"{% endif %}>{{ data.subtitle }}</p>
+                <div class="hero-content" {% if data.textColor is defined and data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
+                    <h1 class="display-4 mb-4" {% if data.titleColor is defined and data.titleColor %}style="color: {{ data.titleColor }}"{% endif %}>{{ data.title is defined ? data.title : '' }}</h1>
+                    {% if data.subtitle is defined and data.subtitle %}
+                        <p class="lead mb-4" {% if data.subtitleColor is defined and data.subtitleColor %}style="color: {{ data.subtitleColor }}"{% endif %}>{{ data.subtitle }}</p>
                     {% endif %}
-                    {% if data.ctaText and data.ctaUrl %}
-                        <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %} btn-lg" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
+                    {% if data.ctaText is defined and data.ctaText and data.ctaUrl is defined and data.ctaUrl %}
+                        <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle is defined and data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %} btn-lg" {% if data.buttonBackgroundColor is defined and data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined and data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor is defined and data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius is defined and data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
                             {{ data.ctaText }}
                         </a>
                     {% endif %}
                 </div>
             </div>
             
-            {% if data.layout == 'text-left' and data.imageUrl %}
+            {% if data.layout is defined and data.layout == 'text-left' and data.imageUrl is defined and data.imageUrl %}
                 <div class="col-lg-6">
                     <div class="hero-media">
-                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                        <img src="{{ data.imageUrl }}" alt="{{ data.title is defined ? data.title : '' }}">
                     </div>
                 </div>
             {% endif %}
         </div>
         
-        {% if data.formTitle %}
+        {% if data.formTitle is defined and data.formTitle %}
             <div class="row justify-content-center mt-8">
                 <div class="col-md-8 col-lg-6">
                     <div class="lead-form">

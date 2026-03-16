@@ -30,7 +30,7 @@ class UpdateAdminPasswordCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['name' => 'admin']);
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['name' => 'dina chabil']);
 
         if (!$user) {
             $output->writeln('<error>User not found</error>');

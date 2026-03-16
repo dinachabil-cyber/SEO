@@ -1,7 +1,7 @@
-<header class="site-navbar {% if data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
+<header class="site-navbar {% if data.backgroundColor is defined and data.backgroundColor %}custom-bg{% endif %}" style="{% if data.backgroundColor is defined and data.backgroundColor %}background-color: {{ data.backgroundColor }}; {% endif %}{% if data.paddingTop is defined and data.paddingTop %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom is defined and data.paddingBottom %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop is defined and data.marginTop %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom is defined and data.marginBottom %}margin-bottom: {{ data.marginBottom }}px; {% endif %}">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <div class="brand" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
+            <div class="brand" {% if data.textColor is defined and data.textColor %}style="color: {{ data.textColor }}"{% endif %}>
                 {% if data.logoText is defined %}
                     {{ data.logoText }}
                 {% elseif data.brandText is defined %}
@@ -20,18 +20,18 @@
                     {% endfor %}
                 {% elseif data.menuItems is defined %}
                     {% set menuItems = data.menuItems %}
-                    {% if menuItems is string %}
+                    {% if menuItems is not iterable %}
                         {% set menuItems = menuItems|split('\n') %}
                     {% endif %}
                     {% if menuItems is iterable %}
                         {% for item in menuItems %}
                             {% if item %}
-                                {% if item is string %}
+                                {% if item is not iterable %}
                                     {% set parts = item|split('|') %}
                                     {% if parts|length == 2 %}
                                         <a href="{{ parts[1] }}" class="nav-link" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>{{ parts[0] }}</a>
                                     {% endif %}
-                                {% elseif item is array and item.label is defined and item.targetSlug is defined %}
+                                {% elseif item.label is defined and item.targetSlug is defined %}
                                     <a href="/{{ item.targetSlug }}" class="nav-link" {% if data.textColor %}style="color: {{ data.textColor }}"{% endif %}>{{ item.label }}</a>
                                 {% endif %}
                             {% endif %}
@@ -41,7 +41,7 @@
             </nav>
             
             {% if data.ctaText is defined and data.ctaUrl is defined %}
-                <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
+                <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle is defined and data.buttonStyle %}{{ data.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor is defined and data.buttonBackgroundColor %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined and data.buttonTextColor %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor is defined and data.buttonBorderColor %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius is defined and data.buttonBorderRadius %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}"{% endif %}>
                     {{ data.ctaText }}
                 </a>
             {% endif %}

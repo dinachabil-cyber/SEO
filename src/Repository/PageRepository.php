@@ -74,14 +74,14 @@ class PageRepository extends ServiceEntityRepository
     public function findWithSectionsCached(int $id): ?Page
     {
         $cacheKey = 'page_with_sections_' . $id;
-        $cache = $this->_em->getCache();
+        $cache = $this->getEntityManager()->getCache();
         
-        if ($cache->containsEntity(Page::class, $id)) {
+        if ($cache && $cache->containsEntity(Page::class, $id)) {
             return $this->find($id);
         }
         
         $page = $this->findWithSections($id);
-        if ($page) {
+        if ($page && $cache) {
             $cache->evictEntity(Page::class, $id);
             $cache->persistEntity($page);
             foreach ($page->getSections() as $section) {

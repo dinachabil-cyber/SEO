@@ -20,12 +20,17 @@ class SiteRepository extends ServiceEntityRepository
     public function findFiltered(array $filters = []): array
     {
         $qb = $this->createQueryBuilder('s')
-            ->leftJoin('s.user', 'u')
+            ->leftJoin('s.owner', 'u')
             ->addSelect('u');
 
         if (!empty($filters['creator'])) {
             $qb->andWhere('u.name LIKE :creator')
                 ->setParameter('creator', '%' . $filters['creator'] . '%');
+        }
+
+        if (!empty($filters['owner'])) {
+            $qb->andWhere('s.owner = :owner')
+                ->setParameter('owner', $filters['owner']);
         }
 
         if (!empty($filters['technology'])) {
@@ -51,10 +56,10 @@ class SiteRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findAllWithUser(): array
+    public function findAllWithOwner(): array
     {
         return $this->createQueryBuilder('s')
-            ->leftJoin('s.user', 'u')
+            ->leftJoin('s.owner', 'u')
             ->addSelect('u')
             ->getQuery()
             ->getResult();
