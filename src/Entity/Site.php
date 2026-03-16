@@ -18,6 +18,9 @@ class Site
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $domain = null;
 
@@ -93,6 +96,18 @@ class Site
         return $this->id;
     }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getDomain(): ?string
     {
         return $this->domain;
@@ -150,25 +165,52 @@ class Site
 
     public function getDatabasePassword(): ?string
     {
-        return $this->databasePassword;
+        if (empty($this->databasePassword)) {
+            return null;
+        }
+        
+        // Decrypt the password using OpenSSL
+        $key = $this->getEncryptionKey();
+        $data = base64_decode($this->databasePassword);
+        $ivLength = openssl_cipher_iv_length('aes-256-cbc');
+        $iv = substr($data, 0, $ivLength);
+        $encryptedPassword = substr($data, $ivLength);
+        
+        $decrypted = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv);
+        
+        return $decrypted === false ? null : $decrypted;
     }
 
     public function setDatabasePassword(?string $databasePassword): static
     {
         if ($databasePassword) {
-            $this->databasePassword = $this->encodePassword($databasePassword);
+            $this->databasePassword = $this->encryptPassword($databasePassword);
+        } else {
+            $this->databasePassword = null;
         }
         return $this;
     }
 
-    public function verifyDatabasePassword(string $password): bool
+    private function encryptPassword(string $password): string
     {
-        return password_verify($password, $this->databasePassword);
+        $key = $this->getEncryptionKey();
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $encrypted = openssl_encrypt($password, 'aes-256-cbc', $key, 0, $iv);
+        
+        return base64_encode($iv . $encrypted);
     }
 
-    private function encodePassword(string $password): string
+    private function getEncryptionKey(): string
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        // Get encryption key from environment variables
+        $key = $_ENV['DATABASE_PASSWORD_ENCRYPTION_KEY'] ?? '';
+        
+        if (empty($key)) {
+            throw new \RuntimeException('DATABASE_PASSWORD_ENCRYPTION_KEY environment variable must be set');
+        }
+        
+        // Ensure key is 32 bytes for AES-256
+        return hash('sha256', $key, true);
     }
 
     public function getTechnology(): ?string

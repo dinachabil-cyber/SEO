@@ -102,6 +102,14 @@ class Page
         $this->updatedAt = new DateTimeImmutable();
     }
 
+    #[ORM\PreRemove]
+    public function onPreRemove(): void
+    {
+        if ($this->site) {
+            $this->site->decrementPageCount();
+        }
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -19,6 +19,23 @@ class SiteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('name', TextType::class, [
+                'label' => 'Name',
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(message: 'Please enter a site name'),
+                    new Length(
+                        min: 2,
+                        max: 255,
+                        minMessage: 'Site name must be at least {{ limit }} characters long',
+                        maxMessage: 'Site name cannot be longer than {{ limit }} characters',
+                    ),
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter site name',
+                ],
+            ])
             ->add('domain', TextType::class, [
                 'label' => 'Domain',
                 'required' => false,
@@ -71,6 +88,7 @@ class SiteType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Enter database password',
+                    'type' => 'password',
                 ],
             ])
             ->add('technology', TextType::class, [
