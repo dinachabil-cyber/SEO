@@ -40,6 +40,11 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/password-reset/request, roles: ROLE_USER }
+        - { path: ^/password-reset/submit, roles: ROLE_USER }
+        - { path: ^/password-reset/status, roles: ROLE_USER }
+        - { path: ^/admin/users, roles: ROLE_ADMIN }
+        - { path: ^/admin/password-reset, roles: ROLE_ADMIN }
         - { path: ^/admin, roles: ROLE_USER }
 
 when@test:

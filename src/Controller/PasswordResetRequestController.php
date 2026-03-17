@@ -6,6 +6,7 @@ use App\Entity\PasswordResetRequest;
 use App\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,9 +24,15 @@ class PasswordResetRequestController extends AbstractController
     #[Route('/submit', name: 'password_reset_submit', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function submit(
+        Request $request,
         PasswordResetRequestRepository $repository,
         EntityManagerInterface $entityManager
     ): Response {
+        $csrfToken = $request->request->get('_csrf_token');
+        if (!$this->isCsrfTokenValid('password_reset', $csrfToken)) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+        
         $user = $this->getUser();
         
         // Check if user already has a pending request
@@ -36,11 +43,11 @@ class PasswordResetRequestController extends AbstractController
             return $this->redirectToRoute('password_reset_request');
         }
         
-        $request = new PasswordResetRequest();
-        $request->setUser($user);
-        $request->setStatus(PasswordResetRequest::STATUS_PENDING);
+        $resetRequest = new PasswordResetRequest();
+        $resetRequest->setUser($user);
+        $resetRequest->setStatus(PasswordResetRequest::STATUS_PENDING);
         
-        $entityManager->persist($request);
+        $entityManager->persist($resetRequest);
         $entityManager->flush();
         
         $this->addFlash('success', 'Your password reset request has been submitted. An admin will review it shortly.');

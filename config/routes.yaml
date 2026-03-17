@@ -108,3 +108,81 @@ app_front_page:
     methods: ['GET']
     requirements:
         slug: '^(?!login$|logout$|register$|admin/).*'
+
+# Admin User Management Routes
+admin_user_index:
+    path: /admin/users
+    controller: 'App\Controller\AdminUserController::index'
+    methods: ['GET']
+
+admin_user_show:
+    path: /admin/users/{id}
+    controller: 'App\Controller\AdminUserController::show'
+    methods: ['GET']
+
+admin_user_edit:
+    path: /admin/users/{id}/edit
+    controller: 'App\Controller\AdminUserController::edit'
+    methods: ['GET', 'POST']
+
+admin_user_change_password:
+    path: /admin/users/{id}/change-password
+    controller: 'App\Controller\AdminUserController::changePassword'
+    methods: ['GET', 'POST']
+
+admin_user_enable:
+    path: /admin/users/{id}/enable
+    controller: 'App\Controller\AdminUserController::enable'
+    methods: ['POST']
+
+admin_user_disable:
+    path: /admin/users/{id}/disable
+    controller: 'App\Controller\AdminUserController::disable'
+    methods: ['POST']
+
+# Admin Password Reset Request Routes
+admin_password_reset_index:
+    path: /admin/password-reset-requests
+    controller: 'App\Controller\AdminPasswordResetRequestController::index'
+    methods: ['GET']
+
+admin_password_reset_show:
+    path: /admin/password-reset-requests/{id}
+    controller: 'App\Controller\AdminPasswordResetRequestController::show'
+    methods: ['GET']
+
+admin_password_reset_approve:
+    path: /admin/password-reset-requests/{id}/approve
+    controller: 'App\Controller\AdminPasswordResetRequestController::approve'
+    methods: ['POST']
+
+admin_password_reset_reject:
+    path: /admin/password-reset-requests/{id}/reject
+    controller: 'App\Controller\AdminPasswordResetRequestController::reject'
+    methods: ['POST']
+
+admin_password_reset_set_password:
+    path: /admin/password-reset-requests/{id}/set-password
+    controller: 'App\Controller\AdminPasswordResetRequestController::setPassword'
+    methods: ['GET', 'POST']
+
+admin_password_reset_complete:
+    path: /admin/password-reset-requests/{id}/complete
+    controller: 'App\Controller\AdminPasswordResetRequestController::complete'
+    methods: ['POST']
+
+# User Password Reset Routes
+password_reset_request:
+    path: /password-reset/request
+    controller: 'App\Controller\PasswordResetRequestController::request'
+    methods: ['GET']
+
+password_reset_submit:
+    path: /password-reset/submit
+    controller: 'App\Controller\PasswordResetRequestController::submit'
+    methods: ['POST']
+
+password_reset_status:
+    path: /password-reset/status
+    controller: 'App\Controller\PasswordResetRequestController::status'
+    methods: ['GET']
