@@ -13,35 +13,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 class SiteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, [
-                'label' => 'Name',
-                'required' => true,
-                'constraints' => [
-                    new NotBlank(message: 'Please enter a site name'),
-                    new Length(
-                        min: 2,
-                        max: 255,
-                        minMessage: 'Site name must be at least {{ limit }} characters long',
-                        maxMessage: 'Site name cannot be longer than {{ limit }} characters',
-                    ),
-                ],
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Enter site name',
-                ],
-            ])
             ->add('domain', TextType::class, [
                 'label' => 'Domain',
-                'required' => false,
+                'required' => true,
                 'constraints' => [
+                    new NotBlank(message: 'Please enter a domain'),
                     new Regex(
-                        pattern: '/^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                        pattern: '/^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/',
                         message: 'Please enter a valid domain (e.g., example.com)'
                     ),
                 ],
@@ -49,7 +34,7 @@ class SiteType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'example.com',
                 ],
-                'help' => 'Optional. Include http:// or https:// if needed',
+                'help' => 'Include http:// or https:// if needed',
             ])
             ->add('defaultLocale', ChoiceType::class, [
                 'label' => 'Default Locale',

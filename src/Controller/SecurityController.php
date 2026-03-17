@@ -45,6 +45,20 @@ class SecurityController extends AbstractController
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
+        // Debug logs
+        if ($form->isSubmitted()) {
+            error_log('Registration form submitted');
+            
+            if (!$form->isValid()) {
+                error_log('Form is invalid');
+                foreach ($form->getErrors(true) as $error) {
+                    error_log('Form error: ' . $error->getMessage());
+                }
+            } else {
+                error_log('Form is valid');
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setPassword(
                 $passwordHasher->hashPassword(
@@ -54,14 +68,33 @@ class SecurityController extends AbstractController
             );
             $user->setRoles(['ROLE_USER']);
 
+            error_log('About to persist user: ' . $user->getName());
             $entityManager->persist($user);
             $entityManager->flush();
+            error_log('User persisted successfully');
 
             return $this->redirectToRoute('app_login');
         }
 
+        // Debug: Dump form state
+        $debugInfo = [
+            'isSubmitted' => $form->isSubmitted(),
+            'isValid' => null,
+            'errors' => [],
+        ];
+        
+        if ($form->isSubmitted()) {
+            $debugInfo['isValid'] = $form->isValid();
+            if (!$form->isValid()) {
+                foreach ($form->getErrors(true) as $error) {
+                    $debugInfo['errors'][] = $error->getMessage();
+                }
+            }
+        }
+        
         return $this->render('security/register.html.twig', [
             'registrationForm' => $form->createView(),
+            'debugInfo' => $debugInfo,
         ]);
     }
 }

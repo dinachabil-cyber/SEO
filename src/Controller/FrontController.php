@@ -6,7 +6,9 @@ use App\Entity\Page;
 use App\Repository\PageRepository;
 use App\Repository\SiteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/')]
@@ -32,5 +34,31 @@ class FrontController extends AbstractController
             'page' => $page,
             'site' => $site,
         ]);
+    }
+
+    #[Route('/contact', name: 'app_contact', methods: ['POST'])]
+    public function contact(Request $request): RedirectResponse
+    {
+        // Handle the form submission here
+        // For example, you could send an email, save to database, etc.
+        
+        // Get form data
+        $name = $request->request->get('name');
+        $email = $request->request->get('email');
+        $phone = $request->request->get('phone');
+        $message = $request->request->get('message');
+        
+        // Add your form handling logic here
+        // Example: Send email, save to database, etc.
+        
+        // Turbo requires form submissions to redirect
+        // Redirect back to the same page or to a thank you page
+        $referer = $request->headers->get('referer');
+        if ($referer) {
+            return $this->redirect($referer);
+        }
+        
+        // Fallback redirect to home page
+        return $this->redirectToRoute('app_home');
     }
 }

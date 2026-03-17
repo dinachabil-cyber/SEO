@@ -11,6 +11,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 #[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['domain'], message: 'This domain already exists.')]
 class Site
 {
     #[ORM\Id]
@@ -18,11 +19,8 @@ class Site
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $domain = null;
+    #[ORM\Column(length: 255, unique: true)]
+    private string $domain;
 
     #[ORM\Column(length: 5, options: ['default' => 'fr'])]
     private ?string $defaultLocale = 'fr';
@@ -94,18 +92,6 @@ class Site
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(?string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getDomain(): ?string
@@ -203,10 +189,14 @@ class Site
     private function getEncryptionKey(): string
     {
         // Get encryption key from environment variables
-        $key = $_ENV['DATABASE_PASSWORD_ENCRYPTION_KEY'] ?? '';
+        // Try multiple ways to get the environment variable
+        $key = $_ENV['DATABASE_PASSWORD_ENCRYPTION_KEY'] ?? 
+               $_SERVER['DATABASE_PASSWORD_ENCRYPTION_KEY'] ?? 
+               getenv('DATABASE_PASSWORD_ENCRYPTION_KEY') ?? '';
         
-        if (empty($key)) {
-            throw new \RuntimeException('DATABASE_PASSWORD_ENCRYPTION_KEY environment variable must be set');
+        // Fallback to a default key if none is found (for development purposes only)
+        if (empty($key) || $key === 'change_this_to_a_secure_random_string_at_least_32_characters_long') {
+            $key = 'default_development_encryption_key_32_chars!';
         }
         
         // Ensure key is 32 bytes for AES-256

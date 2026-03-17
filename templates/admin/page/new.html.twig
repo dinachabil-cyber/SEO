@@ -25,7 +25,7 @@
             <h5 class="card-title mb-0">Page Information</h5>
         </div>
         <div class="card-body">
-            {{ form_start(form) }}
+            {{ form_start(form, { 'attr': { 'data-turbo': 'false' } }) }}
                 {{ form_row(form.h1) }}
                 {{ form_row(form.slug) }}
                 {{ form_row(form.metaTitle) }}

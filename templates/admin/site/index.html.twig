@@ -21,7 +21,7 @@
             <h5 class="card-title mb-0">Filters</h5>
         </div>
         <div class="card-body">
-            {{ form_start(filtersForm, { 'attr': { 'class': 'row g-3' } }) }}
+            {{ form_start(filtersForm, { 'attr': { 'class': 'row g-3', 'data-turbo': 'false' } }) }}
             <div class="col-md-3">
                 {{ form_label(filtersForm.creator) }}
                 {{ form_widget(filtersForm.creator) }}

@@ -17,8 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class DashboardController extends AbstractController
 {
-    #[Route('/', name: 'app_dashboard', methods: ['GET'])]
-    #[Route('/dashboard', name: 'app_user_dashboard', methods: ['GET'])]
+    #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
     public function dashboard(Request $request, SiteRepository $siteRepository): Response
     {
         $filtersForm = $this->createForm(SiteFiltersType::class);

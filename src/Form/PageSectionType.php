@@ -87,10 +87,32 @@ class PageSectionType extends AbstractType
 
 class SectionDataType extends AbstractType
     {
+        /**
+         * Ensure value is a string (convert arrays/objects to string)
+         */
+        private function ensureString($value): string
+        {
+            if (is_string($value)) {
+                return $value;
+            }
+            if (is_array($value) || is_object($value)) {
+                error_log(sprintf('Converting %s to string: %s', gettype($value), print_r($value, true)));
+                return ''; // Return empty string for arrays/objects
+            }
+            return (string) $value; // Convert other types (numeric, boolean, etc.) to string
+        }
+
         public function buildForm(FormBuilderInterface $builder, array $options): void
         {
             $type = $options['type'];
             $existingData = $options['data'] ?? $options['existing_data'] ?? [];
+
+        // Debug: Log existingData to help identify which field has array value
+        foreach ($existingData as $key => $value) {
+            if (is_array($value) && $key !== 'cards' && $key !== 'items') { // Skip known array fields
+                error_log(sprintf('WARNING: Field "%s" in section type "%s" has array value: %s', $key, $type, print_r($value, true)));
+            }
+        }
 
         switch ($type) {
             case 'header':
@@ -99,59 +121,59 @@ class SectionDataType extends AbstractType
                     ->add('brandText', TextType::class, [
                         'label' => 'Brand Text',
                         'required' => true,
-                        'data' => $existingData['brandText'] ?? '',
+                        'data' => $this->ensureString($existingData['brandText'] ?? ''),
                     ])
                     ->add('logoUrl', TextType::class, [
                         'label' => 'Logo URL',
                         'required' => false,
-                        'data' => $existingData['logoUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['logoUrl'] ?? ''),
                     ])
                     ->add('menuItems', TextareaType::class, [
                         'label' => 'Menu Items (Label|/url per line)',
                         'required' => false,
-                        'data' => $existingData['menuItems'] ?? '',
+                        'data' => $this->ensureString($existingData['menuItems'] ?? ''),
                     ])
                     ->add('ctaText', TextType::class, [
                         'label' => 'CTA Text',
                         'required' => true,
-                        'data' => $existingData['ctaText'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaText'] ?? ''),
                     ])
                     ->add('ctaUrl', TextType::class, [
                         'label' => 'CTA URL',
                         'required' => true,
-                        'data' => $existingData['ctaUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
                     ])
                     
                     // Style Fields
                     ->add('backgroundColor', ColorType::class, [
                         'label' => 'Header Background Color',
                         'required' => false,
-                        'data' => $existingData['backgroundColor'] ?? $existingData['background'] ?? '',
+                        'data' => $this->ensureString($existingData['backgroundColor'] ?? $existingData['background'] ?? ''),
                     ])
                     ->add('textColor', ColorType::class, [
                         'label' => 'Header Text Color',
                         'required' => false,
-                        'data' => $existingData['textColor'] ?? '',
+                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
                     ])
                     ->add('buttonBackgroundColor', ColorType::class, [
                         'label' => 'CTA Button Background Color',
                         'required' => false,
-                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
                     ])
                     ->add('buttonTextColor', ColorType::class, [
                         'label' => 'CTA Button Text Color',
                         'required' => false,
-                        'data' => $existingData['buttonTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
                     ])
                     ->add('buttonBorderColor', ColorType::class, [
                         'label' => 'CTA Button Border Color',
                         'required' => false,
-                        'data' => $existingData['buttonBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
                     ])
                     ->add('buttonBorderRadius', TextType::class, [
                         'label' => 'CTA Button Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
                     ])
                     ->add('buttonStyle', ChoiceType::class, [
                         'label' => 'CTA Button Style',
@@ -168,22 +190,22 @@ class SectionDataType extends AbstractType
                     ->add('paddingTop', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $existingData['paddingTop'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
                     ])
                     ->add('paddingBottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['paddingBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
                     ])
                     ->add('marginTop', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $existingData['marginTop'] ?? '',
+                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
                     ])
                     ->add('marginBottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['marginBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
                     ]);
                 break;
 
@@ -193,22 +215,22 @@ class SectionDataType extends AbstractType
                     ->add('title', TextType::class, [
                         'label' => 'Hero Title',
                         'required' => true,
-                        'data' => $existingData['title'] ?? '',
+                        'data' => $this->ensureString($existingData['title'] ?? ''),
                     ])
                     ->add('subtitle', TextareaType::class, [
                         'label' => 'Hero Subtitle',
                         'required' => false,
-                        'data' => $existingData['subtitle'] ?? '',
+                        'data' => $this->ensureString($existingData['subtitle'] ?? ''),
                     ])
                     ->add('imageUrl', TextType::class, [
                         'label' => 'Image URL',
                         'required' => false,
-                        'data' => $existingData['imageUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['imageUrl'] ?? ''),
                     ])
                     ->add('formTitle', TextType::class, [
                         'label' => 'Form Title',
                         'required' => false,
-                        'data' => $existingData['formTitle'] ?? '',
+                        'data' => $this->ensureString($existingData['formTitle'] ?? ''),
                     ])
                     ->add('layout', ChoiceType::class, [
                         'label' => 'Layout',
@@ -223,54 +245,54 @@ class SectionDataType extends AbstractType
                     ->add('ctaText', TextType::class, [
                         'label' => 'CTA Text',
                         'required' => true,
-                        'data' => $existingData['ctaText'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaText'] ?? ''),
                     ])
                     ->add('ctaUrl', TextType::class, [
                         'label' => 'CTA URL',
                         'required' => true,
-                        'data' => $existingData['ctaUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
                     ])
                     
                     // Style Fields
                     ->add('backgroundColor', ColorType::class, [
                         'label' => 'Hero Background Color',
                         'required' => false,
-                        'data' => $existingData['backgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['backgroundColor'] ?? ''),
                     ])
                     ->add('textColor', ColorType::class, [
                         'label' => 'Hero Text Color',
                         'required' => false,
-                        'data' => $existingData['textColor'] ?? '',
+                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
                     ])
                     ->add('titleColor', ColorType::class, [
                         'label' => 'Title Color',
                         'required' => false,
-                        'data' => $existingData['titleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['titleColor'] ?? ''),
                     ])
                     ->add('subtitleColor', ColorType::class, [
                         'label' => 'Subtitle Color',
                         'required' => false,
-                        'data' => $existingData['subtitleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['subtitleColor'] ?? ''),
                     ])
                     ->add('buttonBackgroundColor', ColorType::class, [
                         'label' => 'CTA Button Background Color',
                         'required' => false,
-                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
                     ])
                     ->add('buttonTextColor', ColorType::class, [
                         'label' => 'CTA Button Text Color',
                         'required' => false,
-                        'data' => $existingData['buttonTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
                     ])
                     ->add('buttonBorderColor', ColorType::class, [
                         'label' => 'CTA Button Border Color',
                         'required' => false,
-                        'data' => $existingData['buttonBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
                     ])
                     ->add('buttonBorderRadius', TextType::class, [
                         'label' => 'CTA Button Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
                     ])
                     ->add('buttonStyle', ChoiceType::class, [
                         'label' => 'CTA Button Style',
@@ -287,22 +309,22 @@ class SectionDataType extends AbstractType
                     ->add('paddingTop', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $existingData['paddingTop'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
                     ])
                     ->add('paddingBottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['paddingBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
                     ])
                     ->add('marginTop', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $existingData['marginTop'] ?? '',
+                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
                     ])
                     ->add('marginBottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['marginBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
                     ]);
                 break;
 
@@ -312,27 +334,27 @@ class SectionDataType extends AbstractType
                     ->add('title', TextType::class, [
                         'label' => 'Title',
                         'required' => true,
-                        'data' => $existingData['title'] ?? '',
+                        'data' => $this->ensureString($existingData['title'] ?? ''),
                     ])
                     ->add('subtitle', TextareaType::class, [
                         'label' => 'Subtitle',
                         'required' => false,
-                        'data' => $existingData['subtitle'] ?? '',
+                        'data' => $this->ensureString($existingData['subtitle'] ?? ''),
                     ])
                     ->add('imageUrl', TextType::class, [
                         'label' => 'Image URL',
                         'required' => false,
-                        'data' => $existingData['imageUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['imageUrl'] ?? ''),
                     ])
                     ->add('ctaText', TextType::class, [
                         'label' => 'CTA Text',
                         'required' => true,
-                        'data' => $existingData['ctaText'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaText'] ?? ''),
                     ])
                     ->add('ctaUrl', TextType::class, [
                         'label' => 'CTA URL',
                         'required' => true,
-                        'data' => $existingData['ctaUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
                     ])
                     ->add('showForm', CheckboxType::class, [
                         'label' => 'Show Form',
@@ -344,42 +366,42 @@ class SectionDataType extends AbstractType
                     ->add('backgroundColor', ColorType::class, [
                         'label' => 'Hero Background Color',
                         'required' => false,
-                        'data' => $existingData['backgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['backgroundColor'] ?? ''),
                     ])
                     ->add('textColor', ColorType::class, [
                         'label' => 'Hero Text Color',
                         'required' => false,
-                        'data' => $existingData['textColor'] ?? '',
+                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
                     ])
                     ->add('titleColor', ColorType::class, [
                         'label' => 'Title Color',
                         'required' => false,
-                        'data' => $existingData['titleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['titleColor'] ?? ''),
                     ])
                     ->add('subtitleColor', ColorType::class, [
                         'label' => 'Subtitle Color',
                         'required' => false,
-                        'data' => $existingData['subtitleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['subtitleColor'] ?? ''),
                     ])
                     ->add('buttonBackgroundColor', ColorType::class, [
                         'label' => 'CTA Button Background Color',
                         'required' => false,
-                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
                     ])
                     ->add('buttonTextColor', ColorType::class, [
                         'label' => 'CTA Button Text Color',
                         'required' => false,
-                        'data' => $existingData['buttonTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
                     ])
                     ->add('buttonBorderColor', ColorType::class, [
                         'label' => 'CTA Button Border Color',
                         'required' => false,
-                        'data' => $existingData['buttonBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
                     ])
                     ->add('buttonBorderRadius', TextType::class, [
                         'label' => 'CTA Button Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
                     ])
                     ->add('buttonStyle', ChoiceType::class, [
                         'label' => 'CTA Button Style',
@@ -407,22 +429,22 @@ class SectionDataType extends AbstractType
                     ->add('paddingTop', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $existingData['paddingTop'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
                     ])
                     ->add('paddingBottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['paddingBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
                     ])
                     ->add('marginTop', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $existingData['marginTop'] ?? '',
+                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
                     ])
                     ->add('marginBottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['marginBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
                     ]);
                 break;
 
@@ -431,7 +453,7 @@ class SectionDataType extends AbstractType
                     ->add('content', TextareaType::class, [
                         'label' => 'Content',
                         'required' => true,
-                        'data' => $existingData['content'] ?? '',
+                        'data' => $this->ensureString($existingData['content'] ?? ''),
                         'attr' => ['rows' => 10],
                     ]);
                 break;
@@ -441,17 +463,17 @@ class SectionDataType extends AbstractType
                     ->add('imageUrl', TextType::class, [
                         'label' => 'Image URL',
                         'required' => true,
-                        'data' => $existingData['imageUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['imageUrl'] ?? ''),
                     ])
                     ->add('alt', TextType::class, [
                         'label' => 'Alt Text',
                         'required' => true,
-                        'data' => $existingData['alt'] ?? '',
+                        'data' => $this->ensureString($existingData['alt'] ?? ''),
                     ])
                     ->add('caption', TextareaType::class, [
                         'label' => 'Caption',
                         'required' => false,
-                        'data' => $existingData['caption'] ?? '',
+                        'data' => $this->ensureString($existingData['caption'] ?? ''),
                     ]);
                 break;
 
@@ -462,7 +484,7 @@ class SectionDataType extends AbstractType
                     ->add('sectionTitle', TextType::class, [
                         'label' => 'Section Title',
                         'required' => false,
-                        'data' => $existingData['sectionTitle'] ?? '',
+                        'data' => $this->ensureString($existingData['sectionTitle'] ?? ''),
                     ])
                     ->add('cards', CollectionType::class, [
                         'entry_type' => CardType::class,
@@ -509,42 +531,42 @@ class SectionDataType extends AbstractType
                     ->add('backgroundColor', ColorType::class, [
                         'label' => 'Section Background Color',
                         'required' => false,
-                        'data' => $existingData['backgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['backgroundColor'] ?? ''),
                     ])
                     ->add('textColor', ColorType::class, [
                         'label' => 'Section Text Color',
                         'required' => false,
-                        'data' => $existingData['textColor'] ?? '',
+                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
                     ])
                     ->add('titleColor', ColorType::class, [
                         'label' => 'Section Title Color',
                         'required' => false,
-                        'data' => $existingData['titleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['titleColor'] ?? ''),
                     ])
                     ->add('subtitleColor', ColorType::class, [
                         'label' => 'Section Subtitle Color',
                         'required' => false,
-                        'data' => $existingData['subtitleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['subtitleColor'] ?? ''),
                     ])
                     ->add('cardBackgroundColor', ColorType::class, [
                         'label' => 'Card Background Color',
                         'required' => false,
-                        'data' => $existingData['cardBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['cardBackgroundColor'] ?? ''),
                     ])
                     ->add('cardTitleColor', ColorType::class, [
                         'label' => 'Card Title Color',
                         'required' => false,
-                        'data' => $existingData['cardTitleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['cardTitleColor'] ?? ''),
                     ])
                     ->add('cardTextColor', ColorType::class, [
                         'label' => 'Card Text Color',
                         'required' => false,
-                        'data' => $existingData['cardTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['cardTextColor'] ?? ''),
                     ])
                     ->add('cardBorderColor', ColorType::class, [
                         'label' => 'Card Border Color',
                         'required' => false,
-                        'data' => $existingData['cardBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['cardBorderColor'] ?? ''),
                     ])
                     ->add('cardShadow', CheckboxType::class, [
                         'label' => 'Show Card Shadow',
@@ -554,27 +576,27 @@ class SectionDataType extends AbstractType
                     ->add('cardBorderRadius', TextType::class, [
                         'label' => 'Card Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['cardBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['cardBorderRadius'] ?? ''),
                     ])
                     ->add('buttonBackgroundColor', ColorType::class, [
                         'label' => 'Button Background Color',
                         'required' => false,
-                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
                     ])
                     ->add('buttonTextColor', ColorType::class, [
                         'label' => 'Button Text Color',
                         'required' => false,
-                        'data' => $existingData['buttonTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
                     ])
                     ->add('buttonBorderColor', ColorType::class, [
                         'label' => 'Button Border Color',
                         'required' => false,
-                        'data' => $existingData['buttonBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
                     ])
                     ->add('buttonBorderRadius', TextType::class, [
                         'label' => 'Button Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
                     ])
                     ->add('buttonStyle', ChoiceType::class, [
                         'label' => 'Button Style',
@@ -602,22 +624,22 @@ class SectionDataType extends AbstractType
                     ->add('paddingTop', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $existingData['paddingTop'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
                     ])
                     ->add('paddingBottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['paddingBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
                     ])
                     ->add('marginTop', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $existingData['marginTop'] ?? '',
+                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
                     ])
                     ->add('marginBottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['marginBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
                     ]);
                 break;
 
@@ -626,7 +648,7 @@ class SectionDataType extends AbstractType
                     ->add('sectionTitle', TextType::class, [
                         'label' => 'Section Title',
                         'required' => false,
-                        'data' => $existingData['sectionTitle'] ?? '',
+                        'data' => $this->ensureString($existingData['sectionTitle'] ?? ''),
                     ])
                     ->add('items', CollectionType::class, [
                         'entry_type' => FaqItemType::class,
@@ -644,7 +666,7 @@ class SectionDataType extends AbstractType
                     ->add('title', TextType::class, [
                         'label' => 'Form Title',
                         'required' => true,
-                        'data' => $existingData['title'] ?? '',
+                        'data' => $this->ensureString($existingData['title'] ?? ''),
                     ])
                     ->add('fields', ChoiceType::class, [
                         'label' => 'Fields',
@@ -662,12 +684,12 @@ class SectionDataType extends AbstractType
                     ->add('submitText', TextType::class, [
                         'label' => 'Submit Button Text',
                         'required' => true,
-                        'data' => $existingData['submitText'] ?? 'Submit',
+                        'data' => $this->ensureString($existingData['submitText'] ?? 'Submit'),
                     ])
                     ->add('successMessage', TextareaType::class, [
                         'label' => 'Success Message',
                         'required' => false,
-                        'data' => $existingData['successMessage'] ?? '',
+                        'data' => $this->ensureString($existingData['successMessage'] ?? ''),
                     ]);
                 break;
 
@@ -677,59 +699,59 @@ class SectionDataType extends AbstractType
                     ->add('title', TextType::class, [
                         'label' => 'Title',
                         'required' => true,
-                        'data' => $existingData['title'] ?? '',
+                        'data' => $this->ensureString($existingData['title'] ?? ''),
                     ])
                     ->add('text', TextareaType::class, [
                         'label' => 'Text',
                         'required' => false,
-                        'data' => $existingData['text'] ?? '',
+                        'data' => $this->ensureString($existingData['text'] ?? ''),
                     ])
                     ->add('buttonText', TextType::class, [
                         'label' => 'Button Text',
                         'required' => true,
-                        'data' => $existingData['buttonText'] ?? 'Learn More',
+                        'data' => $this->ensureString($existingData['buttonText'] ?? 'Learn More'),
                     ])
                     ->add('buttonUrl', TextType::class, [
                         'label' => 'Button URL',
                         'required' => true,
-                        'data' => $existingData['buttonUrl'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonUrl'] ?? ''),
                     ])
                     
                     // Style Fields
                     ->add('backgroundColor', ColorType::class, [
                         'label' => 'CTA Background Color',
                         'required' => false,
-                        'data' => $existingData['backgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['backgroundColor'] ?? ''),
                     ])
                     ->add('textColor', ColorType::class, [
                         'label' => 'CTA Text Color',
                         'required' => false,
-                        'data' => $existingData['textColor'] ?? '',
+                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
                     ])
                     ->add('titleColor', ColorType::class, [
                         'label' => 'CTA Title Color',
                         'required' => false,
-                        'data' => $existingData['titleColor'] ?? '',
+                        'data' => $this->ensureString($existingData['titleColor'] ?? ''),
                     ])
                     ->add('buttonBackgroundColor', ColorType::class, [
                         'label' => 'Button Background Color',
                         'required' => false,
-                        'data' => $existingData['buttonBackgroundColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
                     ])
                     ->add('buttonTextColor', ColorType::class, [
                         'label' => 'Button Text Color',
                         'required' => false,
-                        'data' => $existingData['buttonTextColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
                     ])
                     ->add('buttonBorderColor', ColorType::class, [
                         'label' => 'Button Border Color',
                         'required' => false,
-                        'data' => $existingData['buttonBorderColor'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
                     ])
                     ->add('buttonBorderRadius', TextType::class, [
                         'label' => 'Button Border Radius (px)',
                         'required' => false,
-                        'data' => $existingData['buttonBorderRadius'] ?? '',
+                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
                     ])
                     ->add('buttonStyle', ChoiceType::class, [
                         'label' => 'Button Style',
@@ -757,22 +779,22 @@ class SectionDataType extends AbstractType
                     ->add('paddingTop', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $existingData['paddingTop'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
                     ])
                     ->add('paddingBottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['paddingBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
                     ])
                     ->add('marginTop', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $existingData['marginTop'] ?? '',
+                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
                     ])
                     ->add('marginBottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $existingData['marginBottom'] ?? '',
+                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
                     ]);
                 break;
 
@@ -781,22 +803,22 @@ class SectionDataType extends AbstractType
                     ->add('text', TextareaType::class, [
                         'label' => 'Footer Text',
                         'required' => true,
-                        'data' => $existingData['text'] ?? '',
+                        'data' => $this->ensureString($existingData['text'] ?? ''),
                     ])
                     ->add('links', TextareaType::class, [
                         'label' => 'Links (Label|/url per line)',
                         'required' => false,
-                        'data' => $existingData['links'] ?? '',
+                        'data' => $this->ensureString($existingData['links'] ?? ''),
                     ])
                     ->add('phone', TextType::class, [
                         'label' => 'Phone',
                         'required' => false,
-                        'data' => $existingData['phone'] ?? '',
+                        'data' => $this->ensureString($existingData['phone'] ?? ''),
                     ])
                     ->add('email', EmailType::class, [
                         'label' => 'Email',
                         'required' => false,
-                        'data' => $existingData['email'] ?? '',
+                        'data' => $this->ensureString($existingData['email'] ?? ''),
                     ]);
                 break;
         }

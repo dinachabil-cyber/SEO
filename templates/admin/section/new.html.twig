@@ -17,7 +17,7 @@
                 </div>
                 
                 <div class="card-body">
-                    {{ form_start(form, {attr: {class: 'needs-validation'}}) }}
+                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false'}}) }}
                     
                     {% include 'admin/section/_form.html.twig' %}
                     

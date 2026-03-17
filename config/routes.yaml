@@ -91,6 +91,11 @@ app_register:
     controller: 'App\Controller\SecurityController::register'
     methods: ['GET', 'POST']
 
+app_dashboard:
+    path: /dashboard
+    controller: 'App\Controller\DashboardController::dashboard'
+    methods: ['GET']
+
 # Frontend routes
 app_home:
     path: '/'

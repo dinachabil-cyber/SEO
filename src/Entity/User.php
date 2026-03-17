@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Entity\PasswordResetRequest;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,15 +40,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(options: ['default' => true])]
+    private bool $isEnabled = true;
+
     /**
      * @var Collection<int, Site>
      */
     #[ORM\OneToMany(targetEntity: Site::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $sites;
 
+    /**
+     * @var Collection<int, PasswordResetRequest>
+     */
+    #[ORM\OneToMany(targetEntity: PasswordResetRequest::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $passwordResetRequests;
+
     public function __construct()
     {
         $this->sites = new ArrayCollection();
+        $this->passwordResetRequests = new ArrayCollection();
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = new DateTimeImmutable();
     }
@@ -160,5 +171,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->isEnabled;
+    }
+
+    public function setEnabled(bool $isEnabled): static
+    {
+        $this->isEnabled = $isEnabled;
+        $this->updatedAt = new DateTimeImmutable();
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PasswordResetRequest>
+     */
+    public function getPasswordResetRequests(): Collection
+    {
+        return $this->passwordResetRequests;
+    }
+
+    public function addPasswordResetRequest(PasswordResetRequest $request): static
+    {
+        if (!$this->passwordResetRequests->contains($request)) {
+            $this->passwordResetRequests->add($request);
+            $request->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePasswordResetRequest(PasswordResetRequest $request): static
+    {
+        if ($this->passwordResetRequests->removeElement($request)) {
+            // set the owning side to null (unless already changed)
+            if ($request->getUser() === $this) {
+                $request->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function hasPendingResetRequest(): bool
+    {
+        foreach ($this->passwordResetRequests as $request) {
+            if ($request->isPending()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

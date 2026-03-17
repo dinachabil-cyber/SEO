@@ -17,7 +17,7 @@
 
     <div class="row">
         <div class="col-12">
-            {{ form_start(form, { 'attr': { 'class': 'site-form' } }) }}
+            {{ form_start(form, { 'attr': { 'class': 'site-form', 'data-turbo': 'false' } }) }}
             
             <!-- Site Information Section -->
             <div class="card mb-4">
@@ -28,13 +28,6 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                {{ form_label(form.name, null, { 'attr': { 'class': 'form-label fw-bold' } }) }}
-                                {{ form_widget(form.name) }}
-                                {{ form_errors(form.name) }}
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{ form_label(form.domain, null, { 'attr': { 'class': 'form-label fw-bold' } }) }}

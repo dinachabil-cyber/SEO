@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/site')]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_USER')]
 class SiteController extends AbstractController
 {
     #[Route('/', name: 'app_site_index', methods: ['GET'])]
@@ -26,6 +26,12 @@ class SiteController extends AbstractController
         $filters = [];
         if ($filtersForm->isSubmitted() && $filtersForm->isValid()) {
             $filters = array_filter($filtersForm->getData());
+        }
+        
+        // Only show sites owned by the current user if not admin
+        $user = $this->getUser();
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $filters['owner'] = $user;
         }
         
         $sites = $siteRepository->findFiltered($filters);
@@ -46,13 +52,36 @@ class SiteController extends AbstractController
         $form = $this->createForm(SiteType::class, $site);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($site);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            // Debug information
+            error_log('Form submitted');
+            error_log('Form isValid(): ' . ($form->isValid() ? 'true' : 'false'));
+            
+            if (!$form->isValid()) {
+                // Form is invalid - render the form again with errors
+            }
 
-            $this->addFlash('success', 'Site created successfully');
+            if ($form->isValid()) {
+                try {
+                    error_log('Attempting to persist site');
+                    $entityManager->persist($site);
+                    error_log('Site persisted, flushing to database');
+                    $entityManager->flush();
+                    error_log('Site flushed successfully');
 
-            return $this->redirectToRoute('app_site_index', [], Response::HTTP_SEE_OTHER);
+                    $this->addFlash('success', 'Site created successfully');
+
+                    return $this->redirectToRoute('app_site_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                    $this->addFlash('error', 'This domain already exists. Please use a different domain.');
+                    error_log('Unique constraint violation: ' . $e->getMessage());
+                    error_log('Stack trace: ' . $e->getTraceAsString());
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'An error occurred while creating the site. Please try again later. Error: ' . $e->getMessage());
+                    error_log('Error creating site: ' . $e->getMessage());
+                    error_log('Stack trace: ' . $e->getTraceAsString());
+                }
+            }
         }
 
         return $this->render('admin/site/new.html.twig', [
@@ -68,6 +97,12 @@ class SiteController extends AbstractController
         
         if (!$site) {
             $this->addFlash('error', 'Site not found');
+            return $this->redirectToRoute('app_site_index');
+        }
+
+        // Check if user has access to this site
+        if (!$this->isGranted('ROLE_ADMIN') && $site->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Access denied');
             return $this->redirectToRoute('app_site_index');
         }
 
@@ -88,15 +123,29 @@ class SiteController extends AbstractController
     #[Route('/{id}/edit', name: 'app_site_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Site $site, EntityManagerInterface $entityManager): Response
     {
+        // Check if user has access to this site
+        if (!$this->isGranted('ROLE_ADMIN') && $site->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Access denied');
+            return $this->redirectToRoute('app_site_index');
+        }
+
         $form = $this->createForm(SiteType::class, $site);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            try {
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Site updated successfully');
+                $this->addFlash('success', 'Site updated successfully');
 
-            return $this->redirectToRoute('app_site_index', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_site_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                $this->addFlash('error', 'This domain already exists. Please use a different domain.');
+                error_log('Unique constraint violation: ' . $e->getMessage());
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'An error occurred while updating the site. Please try again later.');
+                error_log('Error updating site: ' . $e->getMessage());
+            }
         }
 
         return $this->render('admin/site/edit.html.twig', [
@@ -108,6 +157,12 @@ class SiteController extends AbstractController
     #[Route('/{id}/delete', name: 'app_site_delete', methods: ['POST'])]
     public function delete(Request $request, Site $site, EntityManagerInterface $entityManager): Response
     {
+        // Check if user has access to this site
+        if (!$this->isGranted('ROLE_ADMIN') && $site->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Access denied');
+            return $this->redirectToRoute('app_site_index');
+        }
+
         if ($this->isCsrfTokenValid('delete' . $site->getId(), $request->request->get('_token'))) {
             $entityManager->remove($site);
             $entityManager->flush();

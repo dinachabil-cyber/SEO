@@ -1,11 +1,61 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Test</title>
-    </head>
-    <body>
-        <h1>Hello TestController! ✅</h1>
-        <p>This is a simple test without any assets.</p>
-    </body>
-</html>
+{% extends 'base.html.twig' %}
+
+{% block title %}Test{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Hello TestController! ✅</h1>
+    <p>This is a simple test with the base template including the user menu.</p>
+    
+    <script>
+        // Debug script to check dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page DOM loaded');
+            
+            // Check if bootstrap is loaded
+            if (typeof bootstrap !== 'undefined') {
+                console.log('Bootstrap loaded successfully');
+            } else {
+                console.error('Bootstrap not loaded');
+            }
+            
+            // Find dropdown elements
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+            
+            if (dropdownToggle) {
+                console.log('Dropdown toggle found');
+                
+                dropdownToggle.addEventListener('click', function(e) {
+                    console.log('Dropdown toggle clicked');
+                    console.log('Current aria-expanded:', this.getAttribute('aria-expanded'));
+                });
+                
+                dropdownToggle.addEventListener('show.bs.dropdown', function() {
+                    console.log('Dropdown show event fired');
+                });
+                
+                dropdownToggle.addEventListener('shown.bs.dropdown', function() {
+                    console.log('Dropdown shown event fired');
+                });
+                
+                dropdownToggle.addEventListener('hide.bs.dropdown', function() {
+                    console.log('Dropdown hide event fired');
+                });
+                
+                dropdownToggle.addEventListener('hidden.bs.dropdown', function() {
+                    console.log('Dropdown hidden event fired');
+                });
+            } else {
+                console.error('Dropdown toggle not found');
+            }
+            
+            if (dropdownMenu) {
+                console.log('Dropdown menu found');
+            } else {
+                console.error('Dropdown menu not found');
+            }
+        });
+    </script>
+</div>
+{% endblock %}
