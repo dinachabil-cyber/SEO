@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -29,6 +30,18 @@ class PageSectionType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(),
                 ],
+            ])
+            // Hidden field to store hero blocks JSON
+            ->add('blocks_json', HiddenType::class, [
+                'label' => false,
+                'required' => false,
+                'mapped' => false,
+            ])
+            // Hidden field to store form fields JSON
+            ->add('form_fields_json', HiddenType::class, [
+                'label' => false,
+                'required' => false,
+                'mapped' => false,
             ])
         ;
 
@@ -58,6 +71,49 @@ class PageSectionType extends AbstractType
                     $existingData = [];
                 }
                 $this->addDynamicFields($form, $data['type'], $existingData);
+            }
+        });
+
+        // Handle form submission - merge JSON data into the data array
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+
+            // Get the JSON data from hidden fields
+            $blocksJson = $form->get('blocks_json')->getData();
+            $formFieldsJson = $form->get('form_fields_json')->getData();
+
+            if ($data instanceof PageSection) {
+                $sectionData = $data->getData();
+                if (!is_array($sectionData)) {
+                    $sectionData = [];
+                }
+
+                // Process hero blocks JSON
+                if ($blocksJson) {
+                    if (is_string($blocksJson) && !empty($blocksJson)) {
+                        $decoded = json_decode($blocksJson, true);
+                        if (is_array($decoded)) {
+                            $sectionData['blocks'] = $decoded;
+                        }
+                    } elseif (is_array($blocksJson)) {
+                        $sectionData['blocks'] = $blocksJson;
+                    }
+                }
+
+                // Process form fields JSON
+                if ($formFieldsJson) {
+                    if (is_string($formFieldsJson) && !empty($formFieldsJson)) {
+                        $decoded = json_decode($formFieldsJson, true);
+                        if (is_array($decoded)) {
+                            $sectionData['form_fields'] = $decoded;
+                        }
+                    } elseif (is_array($formFieldsJson)) {
+                        $sectionData['form_fields'] = $formFieldsJson;
+                    }
+                }
+
+                $data->setData($sectionData);
             }
         });
     }
@@ -244,12 +300,12 @@ class SectionDataType extends AbstractType
                     ])
                     ->add('ctaText', TextType::class, [
                         'label' => 'CTA Text',
-                        'required' => true,
+                        'required' => false,
                         'data' => $this->ensureString($existingData['ctaText'] ?? ''),
                     ])
                     ->add('ctaUrl', TextType::class, [
                         'label' => 'CTA URL',
-                        'required' => true,
+                        'required' => false,
                         'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
                     ])
                     
@@ -330,92 +386,123 @@ class SectionDataType extends AbstractType
 
             case 'hero':
                 $builder
-                    // Content Fields
-                    ->add('title', TextType::class, [
-                        'label' => 'Title',
+                    // ========== BLOCKS TAB (Dynamic Builder) ==========
+                    ->add('blocks', HeroBlocksType::class, [
+                        'label' => false,
+                        'data' => $existingData['blocks'] ?? [],
+                    ])
+
+                    // ========== CONTENT TAB (Legacy - for backward compatibility) ==========
+                    ->add('hero_title', TextType::class, [
+                        'label' => 'Hero Title',
                         'required' => true,
+                        'data' => $this->ensureString($existingData['hero_title'] ?? $existingData['title'] ?? ''),
+                    ])
+                    ->add('hero_subtitle', TextareaType::class, [
+                        'label' => 'Hero Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['hero_subtitle'] ?? $existingData['subtitle'] ?? ''),
+                    ])
+                    ->add('badge_text', TextType::class, [
+                        'label' => 'Badge Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['badge_text'] ?? ''),
+                    ])
+                    ->add('description', TextareaType::class, [
+                        'label' => 'Description',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['description'] ?? ''),
+                    ])
+                    ->add('primary_button_text', TextType::class, [
+                        'label' => 'Primary Button Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_text'] ?? $existingData['ctaText'] ?? ''),
+                    ])
+                    ->add('primary_button_url', TextType::class, [
+                        'label' => 'Primary Button URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_url'] ?? $existingData['ctaUrl'] ?? ''),
+                    ])
+                    ->add('secondary_button_text', TextType::class, [
+                        'label' => 'Secondary Button Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_text'] ?? ''),
+                    ])
+                    ->add('secondary_button_url', TextType::class, [
+                        'label' => 'Secondary Button URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_url'] ?? ''),
+                    ])
+
+                    // Legacy fields for backward compatibility (hidden)
+                    ->add('title', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
                         'data' => $this->ensureString($existingData['title'] ?? ''),
                     ])
-                    ->add('subtitle', TextareaType::class, [
-                        'label' => 'Subtitle',
+                    ->add('subtitle', HiddenType::class, [
                         'required' => false,
+                        'mapped' => false,
                         'data' => $this->ensureString($existingData['subtitle'] ?? ''),
                     ])
-                    ->add('imageUrl', TextType::class, [
-                        'label' => 'Image URL',
+                    ->add('ctaText', HiddenType::class, [
                         'required' => false,
-                        'data' => $this->ensureString($existingData['imageUrl'] ?? ''),
-                    ])
-                    ->add('ctaText', TextType::class, [
-                        'label' => 'CTA Text',
-                        'required' => true,
+                        'mapped' => false,
                         'data' => $this->ensureString($existingData['ctaText'] ?? ''),
                     ])
-                    ->add('ctaUrl', TextType::class, [
-                        'label' => 'CTA URL',
-                        'required' => true,
+                    ->add('ctaUrl', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
                         'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
                     ])
-                    ->add('showForm', CheckboxType::class, [
-                        'label' => 'Show Form',
+                    ->add('imageUrl', HiddenType::class, [
                         'required' => false,
+                        'mapped' => false,
+                        'data' => $this->ensureString($existingData['imageUrl'] ?? ''),
+                    ])
+                    ->add('showForm', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
                         'data' => $existingData['showForm'] ?? false,
                     ])
-                    
-                    // Style Fields
-                    ->add('backgroundColor', ColorType::class, [
-                        'label' => 'Hero Background Color',
+
+                    // ========== MEDIA TAB ==========
+                    ->add('hero_image_url', TextType::class, [
+                        'label' => 'Hero Image URL',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['backgroundColor'] ?? ''),
+                        'data' => $this->ensureString($existingData['hero_image_url'] ?? $existingData['imageUrl'] ?? ''),
                     ])
-                    ->add('textColor', ColorType::class, [
-                        'label' => 'Hero Text Color',
+                    ->add('mobile_image_url', TextType::class, [
+                        'label' => 'Mobile Image URL',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['textColor'] ?? ''),
+                        'data' => $this->ensureString($existingData['mobile_image_url'] ?? ''),
                     ])
-                    ->add('titleColor', ColorType::class, [
-                        'label' => 'Title Color',
+                    ->add('image_alt_text', TextType::class, [
+                        'label' => 'Image Alt Text',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['titleColor'] ?? ''),
+                        'data' => $this->ensureString($existingData['image_alt_text'] ?? ''),
                     ])
-                    ->add('subtitleColor', ColorType::class, [
-                        'label' => 'Subtitle Color',
+                    ->add('show_image', CheckboxType::class, [
+                        'label' => 'Show Image',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['subtitleColor'] ?? ''),
+                        'data' => $existingData['show_image'] ?? true,
                     ])
-                    ->add('buttonBackgroundColor', ColorType::class, [
-                        'label' => 'CTA Button Background Color',
-                        'required' => false,
-                        'data' => $this->ensureString($existingData['buttonBackgroundColor'] ?? ''),
-                    ])
-                    ->add('buttonTextColor', ColorType::class, [
-                        'label' => 'CTA Button Text Color',
-                        'required' => false,
-                        'data' => $this->ensureString($existingData['buttonTextColor'] ?? ''),
-                    ])
-                    ->add('buttonBorderColor', ColorType::class, [
-                        'label' => 'CTA Button Border Color',
-                        'required' => false,
-                        'data' => $this->ensureString($existingData['buttonBorderColor'] ?? ''),
-                    ])
-                    ->add('buttonBorderRadius', TextType::class, [
-                        'label' => 'CTA Button Border Radius (px)',
-                        'required' => false,
-                        'data' => $this->ensureString($existingData['buttonBorderRadius'] ?? ''),
-                    ])
-                    ->add('buttonStyle', ChoiceType::class, [
-                        'label' => 'CTA Button Style',
+
+                    // ========== LAYOUT TAB ==========
+                    ->add('layout_type', ChoiceType::class, [
+                        'label' => 'Layout Type',
                         'required' => false,
                         'choices' => [
-                            'Primary' => 'primary',
-                            'Secondary' => 'secondary',
-                            'Outline' => 'outline',
-                            'Ghost' => 'ghost',
+                            'Text Left, Image Right' => 'text_left_image_right',
+                            'Image Left, Text Right' => 'image_left_text_right',
+                            'Centered' => 'centered',
+                            'Form Right, Image Left' => 'form_right_image_left',
+                            'Form Only' => 'form_only',
                         ],
-                        'data' => $existingData['buttonStyle'] ?? 'primary',
-                        'placeholder' => 'Select style',
+                        'data' => $existingData['layout_type'] ?? 'centered',
+                        'placeholder' => 'Select layout',
                     ])
-                    ->add('textAlignment', ChoiceType::class, [
+                    ->add('text_alignment', ChoiceType::class, [
                         'label' => 'Text Alignment',
                         'required' => false,
                         'choices' => [
@@ -423,28 +510,183 @@ class SectionDataType extends AbstractType
                             'Center' => 'center',
                             'Right' => 'right',
                         ],
-                        'data' => $existingData['textAlignment'] ?? 'center',
+                        'data' => $existingData['text_alignment'] ?? 'center',
                         'placeholder' => 'Select alignment',
                     ])
-                    ->add('paddingTop', TextType::class, [
+                    ->add('content_width', ChoiceType::class, [
+                        'label' => 'Content Width',
+                        'required' => false,
+                        'choices' => [
+                            'Narrow' => 'narrow',
+                            'Medium' => 'medium',
+                            'Wide' => 'wide',
+                            'Full Width' => 'full',
+                        ],
+                        'data' => $existingData['content_width'] ?? 'medium',
+                        'placeholder' => 'Select width',
+                    ])
+                    ->add('section_height', ChoiceType::class, [
+                        'label' => 'Section Height',
+                        'required' => false,
+                        'choices' => [
+                            'Auto' => 'auto',
+                            'Small' => 'small',
+                            'Medium' => 'medium',
+                            'Large' => 'large',
+                            'Full Height' => 'full',
+                        ],
+                        'data' => $existingData['section_height'] ?? 'medium',
+                        'placeholder' => 'Select height',
+                    ])
+                    ->add('vertical_alignment', ChoiceType::class, [
+                        'label' => 'Vertical Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Top' => 'top',
+                            'Center' => 'center',
+                            'Bottom' => 'bottom',
+                        ],
+                        'data' => $existingData['vertical_alignment'] ?? 'center',
+                        'placeholder' => 'Select alignment',
+                    ])
+                    ->add('column_gap', TextType::class, [
+                        'label' => 'Column Gap (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['column_gap'] ?? '30'),
+                    ])
+
+                    // ========== STYLE TAB ==========
+                    ->add('background_color', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['background_color'] ?? $existingData['backgroundColor'] ?? ''),
+                    ])
+                    ->add('background_gradient', TextType::class, [
+                        'label' => 'Background Gradient (CSS)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['background_gradient'] ?? ''),
+                        'attr' => ['placeholder' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'],
+                    ])
+                    ->add('hero_text_color', ColorType::class, [
+                        'label' => 'Hero Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['hero_text_color'] ?? $existingData['textColor'] ?? ''),
+                    ])
+                    ->add('title_color', ColorType::class, [
+                        'label' => 'Title Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['title_color'] ?? $existingData['titleColor'] ?? ''),
+                    ])
+                    ->add('subtitle_color', ColorType::class, [
+                        'label' => 'Subtitle Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['subtitle_color'] ?? $existingData['subtitleColor'] ?? ''),
+                    ])
+                    ->add('description_color', ColorType::class, [
+                        'label' => 'Description Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['description_color'] ?? ''),
+                    ])
+                    ->add('card_background_color', ColorType::class, [
+                        'label' => 'Card Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['card_background_color'] ?? ''),
+                    ])
+                    ->add('border_radius', TextType::class, [
+                        'label' => 'Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['border_radius'] ?? ''),
+                    ])
+                    ->add('box_shadow', CheckboxType::class, [
+                        'label' => 'Show Box Shadow',
+                        'required' => false,
+                        'data' => $existingData['box_shadow'] ?? false,
+                    ])
+                    ->add('padding_top', TextType::class, [
                         'label' => 'Padding Top (px)',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['paddingTop'] ?? ''),
+                        'data' => $this->ensureString($existingData['padding_top'] ?? $existingData['paddingTop'] ?? '60'),
                     ])
-                    ->add('paddingBottom', TextType::class, [
+                    ->add('padding_bottom', TextType::class, [
                         'label' => 'Padding Bottom (px)',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['paddingBottom'] ?? ''),
+                        'data' => $this->ensureString($existingData['padding_bottom'] ?? $existingData['paddingBottom'] ?? '60'),
                     ])
-                    ->add('marginTop', TextType::class, [
+                    ->add('margin_top', TextType::class, [
                         'label' => 'Margin Top (px)',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['marginTop'] ?? ''),
+                        'data' => $this->ensureString($existingData['margin_top'] ?? $existingData['marginTop'] ?? ''),
                     ])
-                    ->add('marginBottom', TextType::class, [
+                    ->add('margin_bottom', TextType::class, [
                         'label' => 'Margin Bottom (px)',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['marginBottom'] ?? ''),
+                        'data' => $this->ensureString($existingData['margin_bottom'] ?? $existingData['marginBottom'] ?? ''),
+                    ])
+
+                    // ========== BUTTONS TAB ==========
+                    ->add('primary_button_background_color', ColorType::class, [
+                        'label' => 'Primary Button Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_background_color'] ?? $existingData['buttonBackgroundColor'] ?? ''),
+                    ])
+                    ->add('primary_button_text_color', ColorType::class, [
+                        'label' => 'Primary Button Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_text_color'] ?? $existingData['buttonTextColor'] ?? ''),
+                    ])
+                    ->add('primary_button_border_color', ColorType::class, [
+                        'label' => 'Primary Button Border Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_border_color'] ?? $existingData['buttonBorderColor'] ?? ''),
+                    ])
+                    ->add('primary_button_border_radius', TextType::class, [
+                        'label' => 'Primary Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['primary_button_border_radius'] ?? $existingData['buttonBorderRadius'] ?? ''),
+                    ])
+                    ->add('primary_button_style', ChoiceType::class, [
+                        'label' => 'Primary Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['primary_button_style'] ?? 'primary',
+                        'placeholder' => 'Select style',
+                    ])
+                    ->add('secondary_button_background_color', ColorType::class, [
+                        'label' => 'Secondary Button Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_background_color'] ?? ''),
+                    ])
+                    ->add('secondary_button_text_color', ColorType::class, [
+                        'label' => 'Secondary Button Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_text_color'] ?? ''),
+                    ])
+                    ->add('secondary_button_border_color', ColorType::class, [
+                        'label' => 'Secondary Button Border Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_border_color'] ?? ''),
+                    ])
+                    ->add('secondary_button_border_radius', TextType::class, [
+                        'label' => 'Secondary Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['secondary_button_border_radius'] ?? ''),
+                    ])
+                    ->add('secondary_button_style', ChoiceType::class, [
+                        'label' => 'Secondary Button Style',
+                        'required' => false,
+                        'choices' => [
+                            'Primary' => 'primary',
+                            'Secondary' => 'secondary',
+                            'Outline' => 'outline',
+                            'Ghost' => 'ghost',
+                        ],
+                        'data' => $existingData['secondary_button_style'] ?? 'outline',
+                        'placeholder' => 'Select style',
                     ]);
                 break;
 
@@ -663,33 +905,277 @@ class SectionDataType extends AbstractType
 
             case 'form':
                 $builder
-                    ->add('title', TextType::class, [
+                    // ========== FIELDS TAB (Dynamic Builder) ==========
+                    ->add('form_fields', FormFieldsType::class, [
+                        'label' => false,
+                        'data' => $existingData['form_fields'] ?? [],
+                    ])
+
+                    // ========== CONTENT TAB (Legacy) ==========
+                    ->add('section_title', TextType::class, [
+                        'label' => 'Section Title',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['section_title'] ?? ''),
+                    ])
+                    ->add('section_subtitle', TextareaType::class, [
+                        'label' => 'Section Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['section_subtitle'] ?? ''),
+                    ])
+                    ->add('form_title', TextType::class, [
                         'label' => 'Form Title',
-                        'required' => true,
-                        'data' => $this->ensureString($existingData['title'] ?? ''),
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_title'] ?? $existingData['title'] ?? ''),
                     ])
-                    ->add('fields', ChoiceType::class, [
-                        'label' => 'Fields',
-                        'required' => true,
-                        'multiple' => true,
-                        'expanded' => true,
-                        'choices' => [
-                            'Name' => 'name',
-                            'Email' => 'email',
-                            'Phone' => 'phone',
-                            'Message' => 'message',
-                        ],
-                        'data' => $existingData['fields'] ?? [],
+                    ->add('form_description', TextareaType::class, [
+                        'label' => 'Form Description',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_description'] ?? ''),
                     ])
-                    ->add('submitText', TextType::class, [
+                    ->add('submit_button_text', TextType::class, [
                         'label' => 'Submit Button Text',
-                        'required' => true,
-                        'data' => $this->ensureString($existingData['submitText'] ?? 'Submit'),
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['submit_button_text'] ?? $existingData['submitText'] ?? 'Submit'),
                     ])
-                    ->add('successMessage', TextareaType::class, [
+                    ->add('success_message', TextareaType::class, [
                         'label' => 'Success Message',
                         'required' => false,
+                        'data' => $this->ensureString($existingData['success_message'] ?? $existingData['successMessage'] ?? 'Thank you! Your message has been sent.'),
+                    ])
+
+                    // Legacy fields for backward compatibility (hidden)
+                    ->add('title', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
+                        'data' => $this->ensureString($existingData['title'] ?? ''),
+                    ])
+                    ->add('submitText', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
+                        'data' => $this->ensureString($existingData['submitText'] ?? ''),
+                    ])
+                    ->add('successMessage', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
                         'data' => $this->ensureString($existingData['successMessage'] ?? ''),
+                    ])
+                    ->add('fields', HiddenType::class, [
+                        'required' => false,
+                        'mapped' => false,
+                        'data' => (isset($existingData['fields']) && is_array($existingData['fields'])) ? json_encode($existingData['fields']) : '',
+                    ])
+
+                    // ========== FORM SETTINGS TAB ==========
+                    ->add('form_type', ChoiceType::class, [
+                        'label' => 'Form Type',
+                        'required' => false,
+                        'choices' => [
+                            'Contact' => 'contact',
+                            'Lead Generation' => 'lead',
+                            'Quote Request' => 'quote',
+                            'Newsletter' => 'newsletter',
+                            'Custom' => 'custom',
+                        ],
+                        'data' => $existingData['form_type'] ?? 'contact',
+                        'placeholder' => 'Select form type',
+                    ])
+                    ->add('form_key', TextType::class, [
+                        'label' => 'Form Key / ID',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_key'] ?? $existingData['form_id'] ?? ''),
+                        'attr' => ['placeholder' => 'e.g., contact-form-001'],
+                    ])
+                    ->add('show_name_field', CheckboxType::class, [
+                        'label' => 'Show Name Field',
+                        'required' => false,
+                        'data' => $existingData['show_name_field'] ?? true,
+                    ])
+                    ->add('show_email_field', CheckboxType::class, [
+                        'label' => 'Show Email Field',
+                        'required' => false,
+                        'data' => $existingData['show_email_field'] ?? true,
+                    ])
+                    ->add('show_phone_field', CheckboxType::class, [
+                        'label' => 'Show Phone Field',
+                        'required' => false,
+                        'data' => $existingData['show_phone_field'] ?? false,
+                    ])
+                    ->add('show_message_field', CheckboxType::class, [
+                        'label' => 'Show Message Field',
+                        'required' => false,
+                        'data' => $existingData['show_message_field'] ?? false,
+                    ])
+                    ->add('show_company_field', CheckboxType::class, [
+                        'label' => 'Show Company Field',
+                        'required' => false,
+                        'data' => $existingData['show_company_field'] ?? false,
+                    ])
+                    ->add('show_checkbox_consent', CheckboxType::class, [
+                        'label' => 'Show Consent Checkbox',
+                        'required' => false,
+                        'data' => $existingData['show_checkbox_consent'] ?? false,
+                    ])
+                    ->add('redirect_url_after_submit', TextType::class, [
+                        'label' => 'Redirect URL After Submit',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['redirect_url_after_submit'] ?? ''),
+                        'attr' => ['placeholder' => '/thank-you'],
+                    ])
+                    ->add('store_submissions', CheckboxType::class, [
+                        'label' => 'Store Submissions',
+                        'required' => false,
+                        'data' => $existingData['store_submissions'] ?? true,
+                    ])
+
+                    // ========== LAYOUT TAB ==========
+                    ->add('form_layout', ChoiceType::class, [
+                        'label' => 'Form Layout',
+                        'required' => false,
+                        'choices' => [
+                            'Centered' => 'centered',
+                            'Full Width' => 'full_width',
+                            'Split with Image' => 'split_with_image',
+                            'Split with Text' => 'split_with_text',
+                        ],
+                        'data' => $existingData['form_layout'] ?? 'centered',
+                        'placeholder' => 'Select layout',
+                    ])
+                    ->add('form_width', ChoiceType::class, [
+                        'label' => 'Form Width',
+                        'required' => false,
+                        'choices' => [
+                            'Narrow' => 'narrow',
+                            'Medium' => 'medium',
+                            'Wide' => 'wide',
+                            'Full Width' => 'full',
+                        ],
+                        'data' => $existingData['form_width'] ?? 'medium',
+                        'placeholder' => 'Select width',
+                    ])
+                    ->add('form_alignment', ChoiceType::class, [
+                        'label' => 'Form Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Left' => 'left',
+                            'Center' => 'center',
+                            'Right' => 'right',
+                        ],
+                        'data' => $existingData['form_alignment'] ?? 'center',
+                        'placeholder' => 'Select alignment',
+                    ])
+                    ->add('show_icon_above_title', CheckboxType::class, [
+                        'label' => 'Show Icon Above Title',
+                        'required' => false,
+                        'data' => $existingData['show_icon_above_title'] ?? false,
+                    ])
+
+                    // ========== MEDIA TAB ==========
+                    ->add('side_image_url', TextType::class, [
+                        'label' => 'Side Image URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['side_image_url'] ?? ''),
+                    ])
+                    ->add('image_alt_text', TextType::class, [
+                        'label' => 'Image Alt Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['image_alt_text'] ?? ''),
+                    ])
+                    ->add('show_image', CheckboxType::class, [
+                        'label' => 'Show Image',
+                        'required' => false,
+                        'data' => $existingData['show_image'] ?? false,
+                    ])
+
+                    // ========== STYLE TAB ==========
+                    ->add('section_background_color', ColorType::class, [
+                        'label' => 'Section Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['section_background_color'] ?? $existingData['backgroundColor'] ?? ''),
+                    ])
+                    ->add('form_card_background_color', ColorType::class, [
+                        'label' => 'Form Card Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_card_background_color'] ?? ''),
+                    ])
+                    ->add('title_color', ColorType::class, [
+                        'label' => 'Title Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['title_color'] ?? $existingData['titleColor'] ?? ''),
+                    ])
+                    ->add('subtitle_color', ColorType::class, [
+                        'label' => 'Subtitle Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['subtitle_color'] ?? $existingData['subtitleColor'] ?? ''),
+                    ])
+                    ->add('label_color', ColorType::class, [
+                        'label' => 'Label Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['label_color'] ?? ''),
+                    ])
+                    ->add('input_background_color', ColorType::class, [
+                        'label' => 'Input Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['input_background_color'] ?? ''),
+                    ])
+                    ->add('input_text_color', ColorType::class, [
+                        'label' => 'Input Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['input_text_color'] ?? ''),
+                    ])
+                    ->add('input_border_color', ColorType::class, [
+                        'label' => 'Input Border Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['input_border_color'] ?? ''),
+                    ])
+                    ->add('input_border_radius', TextType::class, [
+                        'label' => 'Input Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['input_border_radius'] ?? ''),
+                    ])
+                    ->add('button_background_color', ColorType::class, [
+                        'label' => 'Button Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_background_color'] ?? $existingData['buttonBackgroundColor'] ?? ''),
+                    ])
+                    ->add('button_text_color', ColorType::class, [
+                        'label' => 'Button Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_text_color'] ?? $existingData['buttonTextColor'] ?? ''),
+                    ])
+                    ->add('button_border_color', ColorType::class, [
+                        'label' => 'Button Border Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_border_color'] ?? $existingData['buttonBorderColor'] ?? ''),
+                    ])
+                    ->add('button_border_radius', TextType::class, [
+                        'label' => 'Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_border_radius'] ?? $existingData['buttonBorderRadius'] ?? ''),
+                    ])
+                    ->add('padding_top', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_top'] ?? $existingData['paddingTop'] ?? '60'),
+                    ])
+                    ->add('padding_bottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_bottom'] ?? $existingData['paddingBottom'] ?? '60'),
+                    ])
+                    ->add('margin_top', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['margin_top'] ?? $existingData['marginTop'] ?? ''),
+                    ])
+                    ->add('margin_bottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['margin_bottom'] ?? $existingData['marginBottom'] ?? ''),
+                    ])
+                    ->add('box_shadow', CheckboxType::class, [
+                        'label' => 'Show Box Shadow',
+                        'required' => false,
+                        'data' => $existingData['box_shadow'] ?? false,
                     ]);
                 break;
 
@@ -799,16 +1285,30 @@ class SectionDataType extends AbstractType
                 break;
 
             case 'footer':
+                // Content Tab Fields
                 $builder
-                    ->add('text', TextareaType::class, [
-                        'label' => 'Footer Text',
-                        'required' => true,
-                        'data' => $this->ensureString($existingData['text'] ?? ''),
-                    ])
-                    ->add('links', TextareaType::class, [
-                        'label' => 'Links (Label|/url per line)',
+                    ->add('company_name', TextType::class, [
+                        'label' => 'Company Name',
                         'required' => false,
-                        'data' => $this->ensureString($existingData['links'] ?? ''),
+                        'data' => $this->ensureString($existingData['company_name'] ?? ''),
+                    ])
+                    ->add('company_description', TextareaType::class, [
+                        'label' => 'Company Description',
+                        'required' => false,
+                        'attr' => ['rows' => 3],
+                        'data' => $this->ensureString($existingData['company_description'] ?? ''),
+                    ])
+                    ->add('useful_links', TextareaType::class, [
+                        'label' => 'Useful Links (Label|/url per line)',
+                        'required' => false,
+                        'attr' => ['rows' => 4, 'placeholder' => 'Home|/\nAbout|/about\nContact|/contact'],
+                        'data' => $this->ensureString($existingData['useful_links'] ?? ''),
+                    ])
+                    ->add('address', TextareaType::class, [
+                        'label' => 'Address',
+                        'required' => false,
+                        'attr' => ['rows' => 2],
+                        'data' => $this->ensureString($existingData['address'] ?? ''),
                     ])
                     ->add('phone', TextType::class, [
                         'label' => 'Phone',
@@ -819,6 +1319,179 @@ class SectionDataType extends AbstractType
                         'label' => 'Email',
                         'required' => false,
                         'data' => $this->ensureString($existingData['email'] ?? ''),
+                    ])
+                    ->add('copyright_text', TextType::class, [
+                        'label' => 'Copyright Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['copyright_text'] ?? ''),
+                    ])
+                    ->add('ctaText', TextType::class, [
+                        'label' => 'CTA Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['ctaText'] ?? ''),
+                    ])
+                    ->add('ctaUrl', TextType::class, [
+                        'label' => 'CTA URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['ctaUrl'] ?? ''),
+                    ]);
+                
+                // Style Tab Fields
+                $builder
+                    ->add('background_color', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['background_color'] ?? '#1a1a2e'),
+                    ])
+                    ->add('text_color', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['text_color'] ?? '#ffffff'),
+                    ])
+                    ->add('heading_color', ColorType::class, [
+                        'label' => 'Heading Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['heading_color'] ?? '#ffffff'),
+                    ])
+                    ->add('link_color', ColorType::class, [
+                        'label' => 'Link Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['link_color'] ?? '#b8b8b8'),
+                    ])
+                    ->add('link_hover_color', ColorType::class, [
+                        'label' => 'Link Hover Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['link_hover_color'] ?? '#4a90e2'),
+                    ])
+                    ->add('border_top_color', ColorType::class, [
+                        'label' => 'Border Top Color',
+                        'required' => false,
+                        'attr' => ['class' => 'color-picker-input'],
+                        'data' => $this->ensureString($existingData['border_top_color'] ?? '#333333'),
+                    ])
+                    ->add('padding_top', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_top'] ?? '60'),
+                    ])
+                    ->add('padding_bottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_bottom'] ?? '40'),
+                    ])
+                    ->add('margin_top', TextType::class, [
+                        'label' => 'Margin Top (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['margin_top'] ?? '0'),
+                    ])
+                    ->add('margin_bottom', TextType::class, [
+                        'label' => 'Margin Bottom (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['margin_bottom'] ?? '0'),
+                    ])
+                    ->add('title_font_size', TextType::class, [
+                        'label' => 'Title Font Size (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['title_font_size'] ?? '18'),
+                    ])
+                    ->add('text_font_size', TextType::class, [
+                        'label' => 'Text Font Size (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['text_font_size'] ?? '14'),
+                    ])
+                    ->add('link_font_size', TextType::class, [
+                        'label' => 'Link Font Size (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['link_font_size'] ?? '14'),
+                    ])
+                    ->add('text_alignment', ChoiceType::class, [
+                        'label' => 'Text Alignment',
+                        'required' => false,
+                        'choices' => [
+                            'Left' => 'left',
+                            'Center' => 'center',
+                            'Right' => 'right',
+                        ],
+                        'data' => $existingData['text_alignment'] ?? 'left',
+                    ])
+                    ->add('column_gap', TextType::class, [
+                        'label' => 'Column Gap (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['column_gap'] ?? '30'),
+                    ])
+                    ->add('columns_count', ChoiceType::class, [
+                        'label' => 'Columns Count',
+                        'required' => false,
+                        'choices' => [
+                            '2 Columns' => 2,
+                            '3 Columns' => 3,
+                            '4 Columns' => 4,
+                        ],
+                        'data' => isset($existingData['columns_count']) ? (int) $existingData['columns_count'] : 3,
+                    ])
+                    ->add('border_radius', TextType::class, [
+                        'label' => 'Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['border_radius'] ?? '8'),
+                    ])
+                    ->add('box_shadow', ChoiceType::class, [
+                        'label' => 'Box Shadow',
+                        'required' => false,
+                        'choices' => [
+                            'None' => 'none',
+                            'Small' => '0 2px 4px rgba(0,0,0,0.1)',
+                            'Medium' => '0 4px 8px rgba(0,0,0,0.15)',
+                            'Large' => '0 8px 16px rgba(0,0,0,0.2)',
+                        ],
+                        'data' => $existingData['box_shadow'] ?? 'none',
+                    ]);
+                
+                // Layout Tab Fields
+                $builder
+                    ->add('container_width', ChoiceType::class, [
+                        'label' => 'Container Width',
+                        'required' => false,
+                        'choices' => [
+                            'Full Width' => '100%',
+                            'Large (1140px)' => '1140px',
+                            'Medium (960px)' => '960px',
+                            'Small (720px)' => '720px',
+                        ],
+                        'data' => $existingData['container_width'] ?? '1140px',
+                    ])
+                    ->add('layout_type', ChoiceType::class, [
+                        'label' => 'Layout Type',
+                        'required' => false,
+                        'choices' => [
+                            'Classic (3 columns)' => 'classic',
+                            'Modern (4 columns)' => 'modern',
+                            'Simple (2 columns)' => 'simple',
+                            'Minimal (1 column)' => 'minimal',
+                        ],
+                        'data' => $existingData['layout_type'] ?? 'classic',
+                    ])
+                    ->add('stack_on_mobile', ChoiceType::class, [
+                        'label' => 'Stack on Mobile',
+                        'required' => false,
+                        'choices' => [
+                            'Yes - Stack vertically' => true,
+                            'No - Keep inline' => false,
+                        ],
+                        'data' => isset($existingData['stack_on_mobile']) ? (bool) $existingData['stack_on_mobile'] : true,
+                    ])
+                    ->add('show_divider', ChoiceType::class, [
+                        'label' => 'Show Divider',
+                        'required' => false,
+                        'choices' => [
+                            'Yes' => true,
+                            'No' => false,
+                        ],
+                        'data' => isset($existingData['show_divider']) ? (bool) $existingData['show_divider'] : true,
                     ]);
                 break;
         }

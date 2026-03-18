@@ -3,6 +3,13 @@
 {% block title %}{{ page.metaTitle }}{% endblock %}
 
 {% block body %}
+{% if app.user and is_granted('ROLE_ADMIN') %}
+<div class="container mt-2">
+    <div class="d-flex justify-content-end">
+        {% include 'admin/partials/_back_button.html.twig' with {'fallback_url': path('app_site_show', {'id': page.site.id})} %}
+    </div>
+</div>
+{% endif %}
 <main class="main-content">
     {# Render each section #}
     {% for section in page.sections %}

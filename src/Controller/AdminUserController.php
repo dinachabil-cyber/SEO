@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -37,8 +39,15 @@ class AdminUserController extends AbstractController
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder($user)
-            ->add('name')
-            ->add('roles')
+            ->add('name', TextType::class)
+            ->add('roles', ChoiceType::class, [
+                'choices' => [
+                    'Admin' => 'ROLE_ADMIN',
+                    'User' => 'ROLE_USER',
+                ],
+                'multiple' => true,
+                'expanded' => true,
+            ])
             ->getForm();
 
         $form->handleRequest($request);

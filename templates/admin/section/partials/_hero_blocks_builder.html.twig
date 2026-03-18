@@ -1,0 +1,854 @@
+{# Hero Blocks Builder Template #}
+{# This template provides the UI for managing hero content blocks dynamically #}
+
+<div class="hero-blocks-builder" data-builder="hero-blocks">
+    <div class="builder-header d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">
+            <i class="bi bi-layers me-2"></i>Content Blocks
+        </h6>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" id="addBlockDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                <i class="bi bi-plus-circle me-1"></i> Add Block
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="addBlockDropdown">
+                {% for type, label in block_types %}
+                    <li>
+                        <a class="dropdown-item js-add-block" href="#" data-type="{{ type }}">
+                            {{ label }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    {# Hidden input to store the blocks JSON data #}
+    <input type="hidden" name="page_section[blocks_json]" id="hero_blocks_json" value="{{ blocks_json|default('[]') }}">
+
+    {# Blocks Container #}
+    <div id="hero-blocks-container" class="blocks-container">
+        {# Blocks will be rendered here dynamically #}
+    </div>
+
+    {# Empty State #}
+    <div id="hero-blocks-empty" class="text-center py-4 {% if blocks and blocks|length > 0 %}d-none{% endif %}">
+        <div class="text-muted">
+            <i class="bi bi-grid-3x3-gap display-4"></i>
+            <p class="mt-2">No content blocks yet</p>
+            <p class="small">Click "Add Block" to start building your hero section</p>
+        </div>
+    </div>
+
+    {# Block Configuration Templates #}
+    <template id="hero-block-template-title">
+        <div class="block-card card mb-3" data-block-type="title">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-primary">Title</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label">Title Text</label>
+                            <input type="text" class="form-control block-field" name="blocks[__INDEX__][text]" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">HTML Tag</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][tag]">
+                                <option value="h1">H1</option>
+                                <option value="h2" selected>H2</option>
+                                <option value="h3">H3</option>
+                                <option value="h4">H4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Alignment</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][alignment]">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][color]" value="#000000">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Size</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][size]">
+                                <option value="small">Small</option>
+                                <option value="medium">Medium</option>
+                                <option value="large" selected>Large</option>
+                                <option value="xlarge">X-Large</option>
+                                <option value="display">Display</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="title_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="title_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="title">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-subtitle">
+        <div class="block-card card mb-3" data-block-type="subtitle">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-info">Subtitle</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Subtitle Content</label>
+                    <textarea class="form-control block-field" name="blocks[__INDEX__][content]" rows="2"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Alignment</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][alignment]">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][color]" value="#666666">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="subtitle_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="subtitle_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="subtitle">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-text">
+        <div class="block-card card mb-3" data-block-type="text">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-secondary">Text</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Text Content</label>
+                    <textarea class="form-control block-field" name="blocks[__INDEX__][content]" rows="4"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Alignment</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][alignment]">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][color]" value="#333333">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="text_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="text_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="text">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-badge">
+        <div class="block-card card mb-3" data-block-type="badge">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-warning text-dark">Badge</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Badge Text</label>
+                    <input type="text" class="form-control block-field" name="blocks[__INDEX__][text]" value="">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Background Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][background_color]" value="#007bff">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Text Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][text_color]" value="#ffffff">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="badge_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="badge_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="badge">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-image">
+        <div class="block-card card mb-3" data-block-type="image">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-dark">Image</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Image URL</label>
+                    <input type="text" class="form-control block-field" name="blocks[__INDEX__][image_url]" value="" placeholder="/images/hero-image.jpg">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Alt Text</label>
+                    <input type="text" class="form-control block-field" name="blocks[__INDEX__][alt_text]" value="" placeholder="Image description">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Position</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][position]">
+                                <option value="left">Left</option>
+                                <option value="right" selected>Right</option>
+                                <option value="center">Center</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Border Radius (px)</label>
+                            <input type="number" class="form-control block-field" name="blocks[__INDEX__][border_radius]" value="0">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][shadow]" id="image_shadow__INDEX__">
+                                <label class="form-check-label" for="image_shadow__INDEX__">Show Shadow</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="image_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="image_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="image">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-button">
+        <div class="block-card card mb-3" data-block-type="button">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-primary">Button</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Button Text</label>
+                            <input type="text" class="form-control block-field" name="blocks[__INDEX__][text]" value="Learn More">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Button URL</label>
+                            <input type="text" class="form-control block-field" name="blocks[__INDEX__][url]" value="#">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Style</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][style]">
+                                <option value="primary" selected>Primary</option>
+                                <option value="secondary">Secondary</option>
+                                <option value="outline">Outline</option>
+                                <option value="ghost">Ghost</option>
+                                <option value="danger">Danger</option>
+                                <option value="success">Success</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Size</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][size]">
+                                <option value="sm">Small</option>
+                                <option value="md" selected>Medium</option>
+                                <option value="lg">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Border Radius</label>
+                            <input type="number" class="form-control block-field" name="blocks[__INDEX__][border_radius]" value="4">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Colors (override style)</label>
+                            <div class="d-flex gap-2">
+                                <input type="color" class="form-control form-control-color block-field" name="blocks[__INDEX__][background_color]" title="Background" value="">
+                                <input type="color" class="form-control form-control-color block-field" name="blocks[__INDEX__][text_color]" title="Text" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Border Color</label>
+                    <input type="color" class="form-control block-field" name="blocks[__INDEX__][border_color]" value="">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="button_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="button_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="button">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-secondary_button">
+        <div class="block-card card mb-3" data-block-type="secondary_button">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-outline-primary">Secondary Button</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Button Text</label>
+                            <input type="text" class="form-control block-field" name="blocks[__INDEX__][text]" value="Learn More">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Button URL</label>
+                            <input type="text" class="form-control block-field" name="blocks[__INDEX__][url]" value="#">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Style</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][style]">
+                                <option value="primary">Primary</option>
+                                <option value="secondary">Secondary</option>
+                                <option value="outline" selected>Outline</option>
+                                <option value="ghost">Ghost</option>
+                                <option value="danger">Danger</option>
+                                <option value="success">Success</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Size</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][size]">
+                                <option value="sm">Small</option>
+                                <option value="md" selected>Medium</option>
+                                <option value="lg">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Border Radius</label>
+                            <input type="number" class="form-control block-field" name="blocks[__INDEX__][border_radius]" value="4">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Colors</label>
+                            <div class="d-flex gap-2">
+                                <input type="color" class="form-control form-control-color block-field" name="blocks[__INDEX__][background_color]" title="Background" value="">
+                                <input type="color" class="form-control form-control-color block-field" name="blocks[__INDEX__][text_color]" title="Text" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Border Color</label>
+                    <input type="color" class="form-control block-field" name="blocks[__INDEX__][border_color]" value="">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="secondary_button_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="secondary_button_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="secondary_button">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-form">
+        <div class="block-card card mb-3" data-block-type="form">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-success">Form (Optional)</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="alert alert-info small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Embed a form within your hero section. Use this for simple lead capture.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Form ID / Key</label>
+                    <input type="text" class="form-control block-field" name="blocks[__INDEX__][form_id]" value="" placeholder="e.g., contact-form-001">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Layout Mode</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][layout_mode]">
+                                <option value="stacked" selected>Stacked</option>
+                                <option value="inline">Inline</option>
+                                <option value="card">Card</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Card Background</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][card_background_color]" value="#ffffff">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="form_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="form_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="form">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-block-template-icon">
+        <div class="block-card card mb-3" data-block-type="icon">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="block-type-badge badge bg-purple">Icon</span>
+                <div class="block-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleBlockConfig(this)">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroBlock(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body block-config" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Icon Name (Bootstrap Icons)</label>
+                    <input type="text" class="form-control block-field" name="blocks[__INDEX__][icon_name]" value="" placeholder="e.g., bi-star, bi-envelope">
+                    <small class="text-muted">Use Bootstrap Icons class names: <a href="https://icons.getbootstrap.com/" target="_blank">Browse Icons</a></small>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Icon Size</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][icon_size]">
+                                <option value="sm">Small</option>
+                                <option value="md" selected>Medium</option>
+                                <option value="lg">Large</option>
+                                <option value="xlarge">X-Large</option>
+                                <option value="2x">2X</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Icon Color</label>
+                            <input type="color" class="form-control block-field" name="blocks[__INDEX__][icon_color]" value="#007bff">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Alignment</label>
+                            <select class="form-select block-field" name="blocks[__INDEX__][alignment]">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input block-field" name="blocks[__INDEX__][enabled]" id="icon_enabled__INDEX__" checked>
+                    <label class="form-check-label" for="icon_enabled__INDEX__">Enable this block</label>
+                </div>
+                <input type="hidden" class="block-field" name="blocks[__INDEX__][type]" value="icon">
+            </div>
+        </div>
+    </template>
+</div>
+
+<script>
+    // Hero Blocks Builder JavaScript
+    console.log('Hero Blocks Builder script loaded');
+    let heroBlocks = [];
+    let blockCounter = 0;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOMContentLoaded fired');
+        
+        // Initialize blocks array
+        const existingDataEl = document.getElementById('hero_blocks_json');
+        if (!existingDataEl) {
+            console.error('ERROR: hero_blocks_json hidden input not found!');
+            return;
+        }
+        const existingData = existingDataEl.value;
+        console.log('Existing blocks data:', existingData);
+        try {
+            const parsed = JSON.parse(existingData);
+            heroBlocks = Array.isArray(parsed) ? parsed : [];
+        } catch(e) {
+            console.error('Error parsing existing blocks:', e);
+            heroBlocks = [];
+        }
+        renderHeroBlocks();
+        
+        // Listen for Bootstrap dropdown show event
+        document.addEventListener('shown.bs.dropdown', function(e) {
+            const menu = e.target.nextElementSibling;
+            if (menu && menu.classList.contains('dropdown-menu')) {
+                console.log('Dropdown menu shown');
+                // Use event delegation on the menu
+                menu.addEventListener('click', function(event) {
+                    const item = event.target.closest('.js-add-block');
+                    if (item) {
+                        event.preventDefault();
+                        const type = item.getAttribute('data-type');
+                        console.log('Menu click on type:', type);
+                        addHeroBlock(type);
+                    }
+                }, { once: true });
+            }
+        });
+    });
+
+    function addHeroBlock(type) {
+        console.log('Add Block function called, type:', type);
+        try {
+            const block = {
+                type: type,
+                enabled: true,
+                id: 'block_' + (++blockCounter)
+            };
+
+            // Add default values based on type
+            switch(type) {
+                case 'title':
+                    block.text = 'Your Title Here';
+                    block.tag = 'h1';
+                    block.alignment = 'center';
+                    block.color = '#000000';
+                    block.size = 'large';
+                    break;
+                case 'subtitle':
+                    block.content = 'Your subtitle text';
+                    block.alignment = 'center';
+                    block.color = '#666666';
+                    break;
+                case 'text':
+                    block.content = 'Your description text';
+                    block.alignment = 'center';
+                    block.color = '#333333';
+                    break;
+                case 'badge':
+                    block.text = 'New';
+                    block.background_color = '#007bff';
+                    block.text_color = '#ffffff';
+                    break;
+                case 'image':
+                    block.image_url = '';
+                    block.alt_text = '';
+                    block.position = 'right';
+                    block.border_radius = '0';
+                    block.shadow = false;
+                    break;
+                case 'button':
+                    block.text = 'Learn More';
+                    block.url = '#';
+                    block.style = 'primary';
+                    block.size = 'md';
+                    block.border_radius = '4';
+                    break;
+                case 'secondary_button':
+                    block.text = 'Learn More';
+                    block.url = '#';
+                    block.style = 'outline';
+                    block.size = 'md';
+                    block.border_radius = '4';
+                    break;
+                case 'form':
+                    block.form_id = '';
+                    block.layout_mode = 'stacked';
+                    block.card_background_color = '#ffffff';
+                    break;
+                case 'icon':
+                    block.icon_name = 'bi-star';
+                    block.icon_size = 'md';
+                    block.icon_color = '#007bff';
+                    block.alignment = 'center';
+                    break;
+            }
+
+            heroBlocks.push(block);
+            console.log('Block added, heroBlocks:', heroBlocks);
+            renderHeroBlocks();
+            updateBlocksJson();
+            console.log('JSON updated:', document.getElementById('hero_blocks_json').value);
+        } catch (error) {
+            console.error('Error adding hero block:', error);
+        }
+    }
+
+    function removeHeroBlock(btn) {
+        console.log('Remove block clicked');
+        const card = btn.closest('.block-card');
+        if (!card) {
+            console.error('Card not found!');
+            return;
+        }
+        const index = parseInt(card.dataset.index);
+        console.log('Removing block at index:', index);
+        heroBlocks.splice(index, 1);
+        renderHeroBlocks();
+        updateBlocksJson();
+    }
+
+    function toggleBlockConfig(btn) {
+        console.log('Toggle config clicked');
+        const card = btn.closest('.block-card');
+        if (!card) {
+            console.error('Card not found!');
+            return;
+        }
+        const config = card.querySelector('.block-config');
+        if (!config) {
+            console.error('Config not found!');
+            return;
+        }
+        config.style.display = config.style.display === 'none' ? 'block' : 'none';
+        console.log('Config toggled, display:', config.style.display);
+    }
+
+    function renderHeroBlocks() {
+        console.log('Rendering hero blocks, count:', heroBlocks.length);
+        const container = document.getElementById('hero-blocks-container');
+        const emptyState = document.getElementById('hero-blocks-empty');
+
+        if (!container) {
+            console.error('Container not found!');
+            return;
+        }
+
+        container.innerHTML = '';
+
+        if (heroBlocks.length === 0) {
+            emptyState.classList.remove('d-none');
+            return;
+        }
+
+        emptyState.classList.add('d-none');
+
+        heroBlocks.forEach(function(block, index) {
+            const templateId = 'hero-block-template-' + block.type;
+            const template = document.getElementById(templateId);
+
+            if (!template) {
+                console.error('Template not found for type:', block.type);
+                return;
+            }
+
+            let html = template.innerHTML.replace(/__INDEX__/g, index);
+
+            // Set values from block data
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            // Set field values
+            Object.keys(block).forEach(function(key) {
+                if (key === 'type' || key === 'id') return;
+
+                const field = tempDiv.querySelector('[name$="[' + key + ']"]');
+                if (field) {
+                    if (field.type === 'checkbox') {
+                        field.checked = block[key];
+                    } else {
+                        field.value = block[key];
+                    }
+                } else {
+                    console.log('Field not found for key:', key);
+                }
+            });
+
+            const card = tempDiv.querySelector('.block-card');
+            card.dataset.index = index;
+            container.appendChild(card);
+        });
+        console.log('Rendering complete');
+    }
+
+    function updateBlocksJson() {
+        // Collect current values from the DOM
+        const container = document.getElementById('hero-blocks-container');
+        const cards = container.querySelectorAll('.block-card');
+
+        cards.forEach(function(card, index) {
+            const fields = card.querySelectorAll('.block-field');
+            fields.forEach(function(field) {
+                const name = field.name.match(/blocks\[(\d+)\]\[(\w+)\]/);
+                if (name) {
+                    const fieldIndex = parseInt(name[1]);
+                    const fieldName = name[2];
+
+                    if (heroBlocks[fieldIndex]) {
+                        if (field.type === 'checkbox') {
+                            heroBlocks[fieldIndex][fieldName] = field.checked;
+                        } else {
+                            heroBlocks[fieldIndex][fieldName] = field.value;
+                        }
+                    }
+                }
+            });
+        });
+
+        document.getElementById('hero_blocks_json').value = JSON.stringify(heroBlocks);
+    }
+
+    // Save blocks when form is submitted
+    document.addEventListener('submit', function(e) {
+        updateBlocksJson();
+    });
+
+    // Update blocks on input change
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('block-field')) {
+            updateBlocksJson();
+        }
+    });
+
+    // Re-render on input change to keep index in sync
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('block-field')) {
+            // Debounce the update
+            clearTimeout(window.heroBlocksUpdateTimeout);
+            window.heroBlocksUpdateTimeout = setTimeout(updateBlocksJson, 300);
+        }
+    });
+</script>
+
+<style>
+    .hero-blocks-builder .block-card {
+        transition: all 0.2s ease;
+    }
+    .hero-blocks-builder .block-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .hero-blocks-builder .block-type-badge {
+        font-size: 0.75rem;
+    }
+    .hero-blocks-builder .block-actions {
+        display: flex;
+        gap: 0.25rem;
+    }
+    .hero-blocks-builder .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+</style>

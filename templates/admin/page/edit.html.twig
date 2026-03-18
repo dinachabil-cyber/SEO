@@ -6,19 +6,9 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Edit Page: {{ page.h1 }}</h1>
-        <a href="javascript:history.back()" class="btn btn-secondary">
-            ← Back
-        </a>
+        {% include 'admin/partials/_back_button.html.twig' %}
     </div>
 
-    {% for flashType, flashMessages in app.flashes %}
-        {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ flashType }} alert-dismissible fade show" role="alert">
-                {{ flashMessage }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endfor %}
 
     <div class="card">
         <div class="card-header">

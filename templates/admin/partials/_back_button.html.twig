@@ -1,0 +1,19 @@
+{# 
+    Reusable Back Button Component
+    Use this component to add a consistent back button across all admin pages.
+    
+    Usage:
+        {% include 'admin/partials/_back_button.html.twig' %}
+        
+    Optional parameters:
+        - class: additional CSS classes (default: 'btn-secondary')
+        - icon: Bootstrap icon class (default: 'bi-arrow-left')
+        - back_url: URL to redirect to (default: dashboard)
+ #}
+{% set button_class = class|default('btn-secondary') %}
+{% set button_icon = icon|default('bi-arrow-left') %}
+{% set back_url = back_url|default(path('app_dashboard')) %}
+
+<a href="{{ back_url }}" class="btn {{ button_class }}">
+    <i class="bi {{ button_icon }}"></i> Back
+</a>

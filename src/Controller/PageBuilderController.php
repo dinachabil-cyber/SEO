@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/admin/site/{siteId}/page/{pageId}')]
+#[Route('/admin/site/{siteId}/page/{pageId}', requirements: ['siteId' => '\d+', 'pageId' => '\d+'])]
 class PageBuilderController extends AbstractController
 {
     #[Route('/builder', name: 'app_page_builder', methods: ['GET'])]
@@ -69,7 +69,7 @@ class PageBuilderController extends AbstractController
         ]);
     }
 
-    #[Route('/section/{sectionId}/edit', name: 'app_section_edit', methods: ['GET', 'POST'])]
+    #[Route('/section/{sectionId}/edit', name: 'app_section_edit', methods: ['GET', 'POST'], requirements: ['sectionId' => '\d+'])]
     public function edit(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);
@@ -110,7 +110,7 @@ class PageBuilderController extends AbstractController
         ]);
     }
 
-    #[Route('/section/{sectionId}/delete', name: 'app_section_delete', methods: ['POST'])]
+    #[Route('/section/{sectionId}/delete', name: 'app_section_delete', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
     public function delete(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);
@@ -144,7 +144,7 @@ class PageBuilderController extends AbstractController
         ]));
     }
 
-    #[Route('/section/{sectionId}/up', name: 'app_section_up', methods: ['POST'])]
+    #[Route('/section/{sectionId}/up', name: 'app_section_up', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
     public function up(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);
@@ -181,7 +181,7 @@ class PageBuilderController extends AbstractController
         ]));
     }
 
-    #[Route('/section/{sectionId}/down', name: 'app_section_down', methods: ['POST'])]
+    #[Route('/section/{sectionId}/down', name: 'app_section_down', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
     public function down(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);

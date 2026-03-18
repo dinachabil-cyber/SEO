@@ -1,23 +1,23 @@
-<section class="hero {% if data.backgroundColor is defined or (data.style is defined and data.style.backgroundColor is defined) %}custom-bg{% endif %}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px; {% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px; {% endif %}{% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px; {% endif %}{% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px; {% endif %}{% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px; {% endif %}"{% endif %}>
+<section class="hero {% if data.background_color is defined or (data.style is defined and data.style.background_color is defined) %}custom-bg{% endif %}" {% if data.background_color is defined %}style="background-color: {{ data.background_color }}; {% if data.padding_top is defined %}padding-top: {{ data.padding_top }}px; {% endif %}{% if data.padding_bottom is defined %}padding-bottom: {{ data.padding_bottom }}px; {% endif %}{% if data.margin_top is defined %}margin-top: {{ data.margin_top }}px; {% endif %}{% if data.margin_bottom is defined %}margin-bottom: {{ data.margin_bottom }}px; {% endif %}{% elseif data.style is defined and data.style.background_color is defined %}style="background-color: {{ data.style.background_color }}; {% if data.style.padding_top is defined %}padding-top: {{ data.style.padding_top }}px; {% endif %}{% if data.style.padding_bottom is defined %}padding-bottom: {{ data.style.padding_bottom }}px; {% endif %}{% if data.style.margin_top is defined %}margin-top: {{ data.style.margin_top }}px; {% endif %}{% if data.style.margin_bottom is defined %}margin-bottom: {{ data.style.margin_bottom }}px; {% endif %}"{% endif %}>
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <div class="hero-content {% if data.textAlignment is defined %}text-{{ data.textAlignment }}{% elseif data.style is defined and data.style.textAlignment is defined %}text-{{ data.style.textAlignment }}{% endif %}" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>
-                    <h1 class="display-4 mb-4" {% if data.titleColor is defined %}style="color: {{ data.titleColor }}"{% elseif data.style is defined and data.style.titleColor is defined %}style="color: {{ data.style.titleColor }}"{% endif %}>{{ data.title }}</h1>
-                    {% if data.subtitle %}
-                        <p class="lead mb-4" {% if data.subtitleColor is defined %}style="color: {{ data.subtitleColor }}"{% elseif data.style is defined and data.style.subtitleColor is defined %}style="color: {{ data.style.subtitleColor }}"{% endif %}>{{ data.subtitle }}</p>
+                <div class="hero-content {% if data.text_alignment is defined %}text-{{ data.text_alignment }}{% elseif data.style is defined and data.style.text_alignment is defined %}text-{{ data.style.text_alignment }}{% endif %}" {% if data.hero_text_color is defined %}style="color: {{ data.hero_text_color }}"{% elseif data.style is defined and data.style.hero_text_color is defined %}style="color: {{ data.style.hero_text_color }}"{% endif %}>
+                    {% if data.hero_title is defined and data.hero_title %}<h1 class="display-4 mb-4" {% if data.title_color is defined %}style="color: {{ data.title_color }}"{% elseif data.style is defined and data.style.title_color is defined %}style="color: {{ data.style.title_color }}"{% endif %}>{{ data.hero_title }}</h1>{% endif %}
+                    {% if data.hero_subtitle is defined and data.hero_subtitle %}
+                        <p class="lead mb-4" {% if data.subtitle_color is defined %}style="color: {{ data.subtitle_color }}"{% elseif data.style is defined and data.style.subtitle_color is defined %}style="color: {{ data.style.subtitle_color }}"{% endif %}>{{ data.hero_subtitle }}</p>
                     {% endif %}
-                    {% if data.ctaText and data.ctaUrl %}
-                        <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle is defined %}{{ data.buttonStyle }}{% elseif data.style is defined and data.style.buttonStyle is defined %}{{ data.style.buttonStyle }}{% else %}primary{% endif %} btn-lg" {% if data.buttonBackgroundColor is defined %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor is defined %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius is defined %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}" {% elseif data.style is defined and data.style.buttonBackgroundColor is defined %}style="background-color: {{ data.style.buttonBackgroundColor }}; {% if data.style.buttonTextColor is defined %}color: {{ data.style.buttonTextColor }}; {% endif %}{% if data.style.buttonBorderColor is defined %}border-color: {{ data.style.buttonBorderColor }}; {% endif %}{% if data.style.buttonBorderRadius is defined %}border-radius: {{ data.style.buttonBorderRadius }}px; {% endif %}"{% endif %}>
-                            {{ data.ctaText }}
+                    {% if data.primary_button_text is defined and data.primary_button_text and data.primary_button_url is defined and data.primary_button_url %}
+                        <a href="{{ data.primary_button_url }}" class="btn btn-{% if data.primary_button_style is defined %}{{ data.primary_button_style }}{% elseif data.style is defined and data.style.primary_button_style is defined %}{{ data.style.primary_button_style }}{% else %}primary{% endif %} btn-lg" {% if data.primary_button_background_color is defined %}style="background-color: {{ data.primary_button_background_color }}; {% if data.primary_button_text_color is defined %}color: {{ data.primary_button_text_color }}; {% endif %}{% if data.primary_button_border_color is defined %}border-color: {{ data.primary_button_border_color }}; {% endif %}{% if data.primary_button_border_radius is defined %}border-radius: {{ data.primary_button_border_radius }}px; {% endif %}{% elseif data.style is defined and data.style.primary_button_background_color is defined %}style="background-color: {{ data.style.primary_button_background_color }}; {% if data.style.primary_button_text_color is defined %}color: {{ data.style.primary_button_text_color }}; {% endif %}{% if data.style.primary_button_border_color is defined %}border-color: {{ data.style.primary_button_border_color }}; {% endif %}{% if data.style.primary_button_border_radius is defined %}border-radius: {{ data.style.primary_button_border_radius }}px; {% endif %}"{% endif %}>
+                            {{ data.primary_button_text }}
                         </a>
                     {% endif %}
                 </div>
             </div>
-            {% if data.imageUrl %}
+            {% if data.hero_image_url is defined and data.hero_image_url %}
                 <div class="col-lg-6">
                     <div class="hero-media">
-                        <img src="{{ data.imageUrl }}" alt="{{ data.title }}">
+                        <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}">
                     </div>
                 </div>
             {% endif %}
@@ -25,7 +25,7 @@
     </div>
 </section>
 
-{% if data.showForm %}
+{% if data.show_form is defined and data.show_form %}
 <section class="section-sm bg-light">
     <div class="container">
         <div class="row justify-content-center">

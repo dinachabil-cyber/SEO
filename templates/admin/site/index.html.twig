@@ -94,7 +94,7 @@
                                 <tr>
                                     <td>
                                         {% if site.domain %}
-                                            <a href="{{ site.domain }}" target="_blank">{{ site.domain }}</a>
+                                        <a href="{{ path('app_site_show', {'id': site.id}) }}">{{ site.domain }}</a>
                                         {% else %}
                                             <span class="text-muted">No domain</span>
                                         {% endif %}
@@ -163,7 +163,7 @@
                                             <i class="bi bi-pencil"></i> Edit
                                         </a>
                                         {% if site.domain %}
-                                            <a href="{{ site.domain }}" target="_blank" class="btn btn-sm btn-outline-success" title="Open Site">
+                                            <a href="https://{{ site.domain }}" target="_blank" class="btn btn-sm btn-outline-success" title="Open Site">
                                                 <i class="bi bi-box-arrow-up-right"></i> Open
                                             </a>
                                         {% endif %}

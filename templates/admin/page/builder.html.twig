@@ -9,16 +9,17 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Page Builder - {{ page.metaTitle }}</h3>
+                        <h3 class="card-title mb-0">Page Builder - {{ page.metaTitle }}</h3>
                         <div class="d-flex gap-2">
-                            <a href="javascript:history.back()" class="btn btn-secondary">
-                                ← Back
-                            </a>
+                            {% include 'admin/partials/_back_button.html.twig' with {'back_url': path('app_site_show', {'id': page.site.id})} %}
                             <a href="{{ path('app_page_edit', {site: page.site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-pencil-square me-1"></i> Page Settings
                             </a>
+                            <a href="{{ path('app_front_page', {slug: page.slug}) }}" target="_blank" class="btn btn-outline-info">
+                                <i class="bi bi-eye me-1"></i> Preview
+                            </a>
                             <a href="{{ path('app_site_show', {id: page.site.id}) }}" class="btn btn-outline-dark">
-                                <i class="bi bi-arrow-left me-1"></i> Back to Site
+                                <i class="bi bi-building me-1"></i> Site
                             </a>
                         </div>
                     </div>
@@ -147,11 +148,27 @@
                                                 <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
                                             {% endif %}
                                         {% elseif section.type == 'hero' %}
-                                            <p><strong>Title:</strong> {{ data.title ?? '' }}</p>
-                                            {% if data.subtitle %}
-                                                <p><strong>Subtitle:</strong> {{ data.subtitle ?? '' }}</p>
+                                            {% if data.hero_title %}
+                                                <p><strong>Title:</strong> {{ data.hero_title }}</p>
                                             {% endif %}
-                                            <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
+                                            {% if data.hero_subtitle %}
+                                                <p><strong>Subtitle:</strong> {{ data.hero_subtitle }}</p>
+                                            {% endif %}
+                                            {% if data.badge_text %}
+                                                <p><strong>Badge:</strong> {{ data.badge_text }}</p>
+                                            {% endif %}
+                                            {% if data.description %}
+                                                <p><strong>Description:</strong> {{ data.description }}</p>
+                                            {% endif %}
+                                            {% if data.primary_button_text %}
+                                                <p><strong>Primary Button:</strong> {{ data.primary_button_text }} ({{ data.primary_button_url ?? '#' }})</p>
+                                            {% endif %}
+                                            {% if data.secondary_button_text %}
+                                                <p><strong>Secondary Button:</strong> {{ data.secondary_button_text }} ({{ data.secondary_button_url ?? '#' }})</p>
+                                            {% endif %}
+                                            {% if data.blocks is defined and data.blocks|length > 0 %}
+                                                <p><strong>Blocks:</strong> {{ data.blocks|length }} block(s) configured</p>
+                                            {% endif %}
                                         {% elseif section.type == 'hero_split' %}
                                             <p><strong>Hero Title:</strong> {{ data.title ?? '' }}</p>
                                             {% if data.imageUrl is defined and data.imageUrl %}
@@ -179,8 +196,16 @@
                                             {% endif %}
                                             <p><strong>Items:</strong> {{ (data.items ?? [])|length }} FAQ item(s)</p>
                                         {% elseif section.type == 'form' %}
-                                            <p><strong>Title:</strong> {{ data.title ?? '' }}</p>
-                                            <p><strong>Fields:</strong> {{ (data.fields ?? [])|join(', ') }}</p>
+                                            {% if data.form_title %}
+                                                <p><strong>Form Title:</strong> {{ data.form_title }}</p>
+                                            {% endif %}
+                                            {% if data.section_title %}
+                                                <p><strong>Section Title:</strong> {{ data.section_title }}</p>
+                                            {% endif %}
+                                            <p><strong>Fields:</strong> {{ (data.form_fields ?? [])|length }} field(s) configured</p>
+                                            {% if data.form_layout %}
+                                                <p><strong>Layout:</strong> {{ data.form_layout }}</p>
+                                            {% endif %}
                                         {% elseif section.type == 'cta' %}
                                             <p><strong>Title:</strong> {{ data.title ?? '' }}</p>
                                             <p><strong>Button:</strong> {{ data.buttonText ?? '' }} ({{ data.buttonUrl ?? '' }})</p>

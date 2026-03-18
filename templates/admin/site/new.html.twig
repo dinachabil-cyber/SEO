@@ -4,16 +4,12 @@
 
 {% block body %}
 <div class="container">
-    <h1 class="mb-4">Create New Site</h1>
-
-    {% for flashType, flashMessages in app.flashes %}
-        {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ flashType }} alert-dismissible fade show" role="alert">
-                {{ flashMessage }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endfor %}
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="mb-0">Create New Site</h1>
+        <span class="ms-auto">
+            {% include 'admin/partials/_back_button.html.twig' %}
+        </span>
+    </div>
 
     <div class="row">
         <div class="col-12">
@@ -171,9 +167,7 @@
             <!-- Form Actions -->
             <div class="card">
                 <div class="card-body d-flex justify-content-end gap-3">
-                    <a href="{{ path('app_site_index') }}" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i> Back to List
-                    </a>
+                    {% include 'admin/partials/_back_button.html.twig' %}
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="bi bi-save me-2"></i> Create Site
                     </button>

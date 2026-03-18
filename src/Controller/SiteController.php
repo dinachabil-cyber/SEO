@@ -90,7 +90,7 @@ class SiteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_site_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_site_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, SiteRepository $siteRepository): Response
     {
         $site = $siteRepository->findWithPagesAndSections($id);
@@ -120,7 +120,7 @@ class SiteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_site_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_site_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Site $site, EntityManagerInterface $entityManager): Response
     {
         // Check if user has access to this site
@@ -154,7 +154,7 @@ class SiteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_site_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_site_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Site $site, EntityManagerInterface $entityManager): Response
     {
         // Check if user has access to this site

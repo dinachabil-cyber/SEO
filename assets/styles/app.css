@@ -383,3 +383,41 @@ body{
   from{opacity:0;transform:translateY(6px);}
   to{opacity:1;transform:translateY(0);}
 }
+
+
+/* ADMIN BACK BUTTON */
+
+.admin-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    transition: all .2s ease;
+    background: #6b7280;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.admin-back-btn:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: white;
+}
+
+.admin-back-btn:active {
+    transform: translateY(0);
+}
+
+.admin-back-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.admin-back-btn i {
+    font-size: 1rem;
+}

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/admin/site/{site}/page')]
+#[Route('/admin/site/{site}/page', requirements: ['site' => '\d+'])]
 class PageController extends AbstractController
 {
     #[Route('/new', name: 'app_page_new', methods: ['GET', 'POST'])]
@@ -41,7 +41,7 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/{pageId}/edit', name: 'app_page_edit', methods: ['GET', 'POST'])]
+    #[Route('/{pageId}/edit', name: 'app_page_edit', methods: ['GET', 'POST'], requirements: ['pageId' => '\d+'])]
     public function edit(Request $request, Site $site, int $pageId, PageRepository $pageRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);
@@ -69,7 +69,7 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/{pageId}/delete', name: 'app_page_delete', methods: ['POST'])]
+    #[Route('/{pageId}/delete', name: 'app_page_delete', methods: ['POST'], requirements: ['pageId' => '\d+'])]
     public function delete(Request $request, Site $site, int $pageId, PageRepository $pageRepository, EntityManagerInterface $entityManager): Response
     {
         $page = $pageRepository->find($pageId);

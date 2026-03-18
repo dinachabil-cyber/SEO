@@ -17,63 +17,99 @@ app_site_show:
     path: /admin/site/{id}
     controller: 'App\Controller\SiteController::show'
     methods: ['GET']
+    requirements:
+        id: '\d+'
 
 app_site_edit:
     path: /admin/site/{id}/edit
     controller: 'App\Controller\SiteController::edit'
     methods: ['GET', 'POST']
+    requirements:
+        id: '\d+'
 
 app_site_delete:
     path: /admin/site/{id}/delete
     controller: 'App\Controller\SiteController::delete'
     methods: ['POST']
+    requirements:
+        id: '\d+'
 
 # Page routes
 app_page_new:
     path: /admin/site/{site}/page/new
     controller: 'App\Controller\PageController::new'
     methods: ['GET', 'POST']
+    requirements:
+        site: '\d+'
 
 app_page_edit:
     path: /admin/site/{site}/page/{pageId}/edit
     controller: 'App\Controller\PageController::edit'
     methods: ['GET', 'POST']
+    requirements:
+        site: '\d+'
+        pageId: '\d+'
 
 app_page_delete:
     path: /admin/site/{site}/page/{pageId}/delete
     controller: 'App\Controller\PageController::delete'
     methods: ['POST']
+    requirements:
+        site: '\d+'
+        pageId: '\d+'
 
 # Page Builder routes
 app_page_builder:
     path: /admin/site/{siteId}/page/{pageId}/builder
     controller: 'App\Controller\PageBuilderController::index'
     methods: ['GET']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
 
 app_section_new:
     path: /admin/site/{siteId}/page/{pageId}/section/new
     controller: 'App\Controller\PageBuilderController::new'
     methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
 
 app_section_edit:
     path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/edit
     controller: 'App\Controller\PageBuilderController::edit'
     methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
 
 app_section_delete:
     path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/delete
     controller: 'App\Controller\PageBuilderController::delete'
     methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
 
 app_section_up:
     path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/up
     controller: 'App\Controller\PageBuilderController::up'
     methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
 
 app_section_down:
     path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/down
     controller: 'App\Controller\PageBuilderController::down'
     methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
 
 # Security routes
 app_login:
