@@ -144,7 +144,7 @@
                                         {% set data = section.effectiveData %}
                                         {% if section.type == 'header' %}
                                             <p><strong>Logo Text:</strong> {{ data.logoText ?? '' }}</p>
-                                            {% if data.ctaText is defined and data.ctaUrl is defined %}
+                                            {% if data.ctaText|default('') != '' and data.ctaUrl|default('') != '' %}
                                                 <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
                                             {% endif %}
                                         {% elseif section.type == 'hero' %}
@@ -216,6 +216,9 @@
                                             {% endif %}
                                             {% if data.email %}
                                                 <p><strong>Email:</strong> {{ data.email ?? '' }}</p>
+                                            {% endif %}
+                                            {% if data.ctaText|default('') != '' %}
+                                                <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
                                             {% endif %}
                                         {% endif %}
                                     </div>

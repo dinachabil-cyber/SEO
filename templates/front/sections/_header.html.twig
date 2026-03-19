@@ -2,9 +2,9 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="brand" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>
-                {% if data.logoText is defined %}
+                {% if data.logoText|default('') != '' %}
                     {{ data.logoText }}
-                {% elseif data.brandText is defined %}
+                {% elseif data.brandText|default('') != '' %}
                     {{ data.brandText }}
                 {% else %}
                     {{ 'Brand' }}
@@ -40,17 +40,11 @@
                 {% endif %}
             </nav>
             
-            {% if not app.user %}
-                <!-- Login button for unauthenticated users -->
-                {% if data.ctaText is defined and data.ctaUrl is defined %}
-                     <a href="{{ data.ctaUrl }}" class="btn btn-{% if data.buttonStyle is defined %}{{ data.buttonStyle }}{% elseif data.style is defined and data.style.buttonStyle is defined %}{{ data.style.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor is defined %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined %}color: {{ data.buttonTextColor }}; {% endif %}{% if data.buttonBorderColor is defined %}border-color: {{ data.buttonBorderColor }}; {% endif %}{% if data.buttonBorderRadius is defined %}border-radius: {{ data.buttonBorderRadius }}px; {% endif %}" {% elseif data.style is defined and data.style.buttonBackgroundColor is defined %}style="background-color: {{ data.style.buttonBackgroundColor }}; {% if data.style.buttonTextColor is defined %}color: {{ data.style.buttonTextColor }}; {% endif %}{% if data.style.buttonBorderColor is defined %}border-color: {{ data.style.buttonBorderColor }}; {% endif %}{% if data.style.buttonBorderRadius is defined %}border-radius: {{ data.style.buttonBorderRadius }}px; {% endif %}"{% endif %}>
-                        {{ data.ctaText }}
-                    </a>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="btn btn-primary">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
-                    </a>
-                {% endif %}
+            {# CTA Text - display as text, not a link #}
+            {% if data.ctaText|default('') != '' %}
+                <span class="header-cta-text" {% if data.buttonTextColor is defined %}style="color: {{ data.buttonTextColor }}"{% elseif data.style is defined and data.style.buttonTextColor is defined %}style="color: {{ data.style.buttonTextColor }}"{% endif %}>
+                    {{ data.ctaText }}
+                </span>
             {% endif %}
         </div>
     </div>

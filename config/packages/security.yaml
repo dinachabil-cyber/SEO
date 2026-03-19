@@ -22,8 +22,9 @@ security:
                 username_parameter: _username
                 password_parameter: _password
                 enable_csrf: true
-                default_target_path: app_site_index
-                always_use_default_target_path: true
+                default_target_path: app_dashboard
+                always_use_default_target_path: false
+                use_referer: true
 
             logout:
                 path: app_logout

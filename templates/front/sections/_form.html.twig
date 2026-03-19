@@ -1,8 +1,8 @@
 <section class="section bg-white">
     <div class="container">
-        {% if data.title %}
+        {% if data.section_title %}
             <div class="text-center mb-5">
-                <h2>{{ data.title }}</h2>
+                <h2>{{ data.section_title }}</h2>
             </div>
         {% endif %}
         
@@ -10,38 +10,38 @@
             <div class="col-md-8 col-lg-6">
                 <div class="lead-form">
                     <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
-                        {{ csrf_token('contact_form') }}
-                        {% if 'name' in data.fields %}
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
+                        {% if 'name' in data.form_fields %}
                             <div class="mb-3">
                                 <input type="text" class="form-control" name="name" placeholder="Your Name" required>
                             </div>
                         {% endif %}
                         
-                        {% if 'email' in data.fields %}
+                        {% if 'email' in data.form_fields %}
                             <div class="mb-3">
                                 <input type="email" class="form-control" name="email" placeholder="Your Email" required>
                             </div>
                         {% endif %}
                         
-                        {% if 'phone' in data.fields %}
+                        {% if 'phone' in data.form_fields %}
                             <div class="mb-3">
                                 <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
                             </div>
                         {% endif %}
                         
-                        {% if 'message' in data.fields %}
+                        {% if 'message' in data.form_fields %}
                             <div class="mb-3">
                                 <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
                             </div>
                         {% endif %}
                         
                         <button type="submit" class="btn btn-primary w-100">
-                            {{ data.submitText }}
+                            {{ data.submit_button_text|default('Submit') }}
                         </button>
                         
-                        {% if data.successMessage %}
+                        {% if data.success_message %}
                             <div id="successMessage" class="alert alert-success mt-3 d-none">
-                                {{ data.successMessage }}
+                                {{ data.success_message }}
                             </div>
                         {% endif %}
                     </form>

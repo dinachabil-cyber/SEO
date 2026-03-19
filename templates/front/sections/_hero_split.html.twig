@@ -2,14 +2,14 @@
     <div class="container">
         <div class="row align-items-center">
             {% if (data.layout_type is defined and data.layout_type == 'image-left' or data.layout is defined and data.layout == 'image-left') and data.hero_image_url is defined and data.hero_image_url %}
-                <div class="col-lg-6">
+                <div class="col-lg-6 mt-4 mt-lg-0">
                     <div class="hero-media">
-                        <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}">
+                        <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
                     </div>
                 </div>
             {% endif %}
             
-            <div class="col-lg-6">
+            <div class="col-lg-6 {% if (data.layout_type is defined and data.layout_type == 'image-left' or data.layout is defined and data.layout == 'image-left') %}mt-4 mt-lg-0{% endif %}">
                 <div class="hero-content" {% if data.hero_text_color is defined %}style="color: {{ data.hero_text_color }}"{% elseif data.style is defined and data.style.hero_text_color is defined %}style="color: {{ data.style.hero_text_color }}"{% endif %}>
                     <h1 class="display-4 mb-4" {% if data.title_color is defined %}style="color: {{ data.title_color }}"{% elseif data.style is defined and data.style.title_color is defined %}style="color: {{ data.style.title_color }}"{% endif %}>{{ data.hero_title is defined ? data.hero_title : '' }}</h1>
                     {% if data.hero_subtitle is defined and data.hero_subtitle %}
@@ -24,31 +24,32 @@
             </div>
             
             {% if (data.layout_type is defined and data.layout_type == 'text-left' or data.layout is defined and data.layout == 'text-left') and data.hero_image_url is defined and data.hero_image_url %}
-                <div class="col-lg-6">
+                <div class="col-lg-6 mt-4 mt-lg-0">
                     <div class="hero-media">
-                        <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}">
+                        <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
                     </div>
                 </div>
             {% endif %}
         </div>
         
         {% if data.form_title is defined and data.form_title %}
-            <div class="row justify-content-center mt-8">
+            <div class="row justify-content-center mt-5">
                 <div class="col-md-8 col-lg-6">
                     <div class="lead-form">
                         <h3 class="lead-form-title mb-4">{{ data.form_title }}</h3>
                         <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
                             <div class="mb-3">
-                                <input type="text" class="form-control" placeholder="Your Name" required>
+                                <input type="text" class="form-control" name="name" placeholder="Your Name" required>
                             </div>
                             <div class="mb-3">
-                                <input type="email" class="form-control" placeholder="Your Email" required>
+                                <input type="email" class="form-control" name="email" placeholder="Your Email" required>
                             </div>
                             <div class="mb-3">
-                                <input type="tel" class="form-control" placeholder="Your Phone">
+                                <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
                             </div>
                             <div class="mb-3">
-                                <textarea class="form-control" rows="4" placeholder="Your Message" required></textarea>
+                                <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Send Message</button>
                         </form>

@@ -8,12 +8,11 @@
     Optional parameters:
         - class: additional CSS classes (default: 'btn-secondary')
         - icon: Bootstrap icon class (default: 'bi-arrow-left')
-        - back_url: URL to redirect to (default: dashboard)
+        - back_url: URL to redirect to (default: previous page using JavaScript)
  #}
 {% set button_class = class|default('btn-secondary') %}
 {% set button_icon = icon|default('bi-arrow-left') %}
-{% set back_url = back_url|default(path('app_dashboard')) %}
 
-<a href="{{ back_url }}" class="btn {{ button_class }}">
+<a href="javascript:void(0)" onclick="if (document.referrer && document.referrer.indexOf(window.location.host) > -1) { history.back(); } else { window.location.href = '{{ back_url|default("/admin/site") }}'; }" class="btn {{ button_class }}">
     <i class="bi {{ button_icon }}"></i> Back
 </a>

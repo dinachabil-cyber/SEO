@@ -6,19 +6,16 @@
         <h6 class="mb-0">
             <i class="bi bi-layers me-2"></i>Content Blocks
         </h6>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" id="addBlockDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+        <div class="d-flex align-items-center gap-2">
+            <select id="add-block-select" class="form-select form-select-sm" style="width: auto;">
+                <option value="">Select block type...</option>
+                {% for type, label in block_types %}
+                    <option value="{{ type }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-sm btn-primary" onclick="handleAddBlock()">
                 <i class="bi bi-plus-circle me-1"></i> Add Block
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="addBlockDropdown">
-                {% for type, label in block_types %}
-                    <li>
-                        <a class="dropdown-item js-add-block" href="#" data-type="{{ type }}">
-                            {{ label }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
         </div>
     </div>
 
@@ -598,27 +595,48 @@
         }
         renderHeroBlocks();
         
-        // Listen for Bootstrap dropdown show event
-        document.addEventListener('shown.bs.dropdown', function(e) {
-            const menu = e.target.nextElementSibling;
-            if (menu && menu.classList.contains('dropdown-menu')) {
-                console.log('Dropdown menu shown');
-                // Use event delegation on the menu
-                menu.addEventListener('click', function(event) {
-                    const item = event.target.closest('.js-add-block');
-                    if (item) {
-                        event.preventDefault();
-                        const type = item.getAttribute('data-type');
-                        console.log('Menu click on type:', type);
-                        addHeroBlock(type);
+        // Use event delegation for add block buttons
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('.js-add-block-btn');
+            if (button) {
+                event.preventDefault();
+                event.stopPropagation();
+                const type = button.getAttribute('data-type');
+                console.log('Add Block button clicked, type:', type);
+                addHeroBlock(type);
+                // Close dropdown
+                const dropdown = document.getElementById('addBlockDropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                    dropdown.setAttribute('aria-expanded', 'false');
+                    const menu = dropdown.nextElementSibling;
+                    if (menu && menu.classList.contains('dropdown-menu')) {
+                        menu.classList.remove('show');
                     }
-                }, { once: true });
+                }
             }
         });
     });
 
+    
+    function handleAddBlock() {
+        const select = document.getElementById('add-block-select');
+        const type = select.value;
+        if (!type) {
+            alert('Please select a block type');
+            return;
+        }
+        addHeroBlock(type);
+        // Reset select
+        select.value = '';
+    }
+
     function addHeroBlock(type) {
         console.log('Add Block function called, type:', type);
+        if (!type) {
+            console.error('No block type specified');
+            return;
+        }
         try {
             const block = {
                 type: type,

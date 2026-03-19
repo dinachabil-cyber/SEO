@@ -6,19 +6,16 @@
         <h6 class="mb-0">
             <i class="bi bi-ui-checks-grid me-2"></i>Form Fields
         </h6>
-        <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="d-flex align-items-center gap-2">
+            <select id="add-field-select" class="form-select form-select-sm" style="width: auto;">
+                <option value="">Select field type...</option>
+                {% for type, label in field_types %}
+                    <option value="{{ type }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-sm btn-primary" onclick="handleAddField()">
                 <i class="bi bi-plus-circle me-1"></i> Add Field
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                {% for type, label in field_types %}
-                    <li>
-                        <a class="dropdown-item" href="#" data-field-type="{{ type }}" onclick="addFormField('{{ type }}'); return false;">
-                            {{ label }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
         </div>
     </div>
 
@@ -800,17 +797,59 @@ Option 2</textarea>
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const existingData = document.getElementById('form_fields_json').value;
+        console.log('Form Fields Builder: DOMContentLoaded fired');
+        const existingDataEl = document.getElementById('form_fields_json');
+        if (!existingDataEl) {
+            console.error('ERROR: form_fields_json hidden input not found!');
+            return;
+        }
+        const existingData = existingDataEl.value;
         try {
             formFields = JSON.parse(existingData) || [];
+            console.log('Form Fields loaded:', formFields);
         } catch(e) {
+            console.error('Error parsing existing form fields:', e);
             formFields = [];
         }
         renderFormFields();
+        
+        // Use event delegation for add field buttons
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('.js-add-field-btn');
+            if (button) {
+                event.preventDefault();
+                event.stopPropagation();
+                const type = button.getAttribute('data-type');
+                console.log('Add Field button clicked, type:', type);
+                addFormField(type);
+                // Close dropdown - find the toggle button
+                const toggleBtn = button.closest('.btn-group').querySelector('.dropdown-toggle');
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('show');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                    const menu = toggleBtn.nextElementSibling;
+                    if (menu && menu.classList.contains('dropdown-menu')) {
+                        menu.classList.remove('show');
+                    }
+                }
+            }
+        });
     });
 
+    function handleAddField() {
+        const select = document.getElementById('add-field-select');
+        const type = select.value;
+        if (!type) {
+            alert('Please select a field type');
+            return;
+        }
+        addFormField(type);
+        // Reset select
+        select.value = '';
+    }
+
     function addFormField(type) {
-        const field = {
+        console.log('Add Field function called, type:', type);
             type: type,
             enabled: true,
             id: 'field_' + (++fieldCounter)

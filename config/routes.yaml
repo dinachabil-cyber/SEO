@@ -138,12 +138,17 @@ app_home:
     controller: 'App\Controller\HomeController::index'
     methods: ['GET']
 
+app_contact:
+    path: '/contact'
+    controller: 'App\Controller\FrontController::contact'
+    methods: ['POST']
+
 app_front_page:
     path: '/{slug}'
     controller: 'App\Controller\FrontController::index'
     methods: ['GET']
     requirements:
-        slug: '^(?!login$|logout$|register$|admin/).*'
+        slug: '^(?!login$|logout$|register$|admin|password-reset).*'
 
 # Admin User Management Routes
 admin_user_index:

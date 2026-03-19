@@ -61,9 +61,15 @@
         {% if app.user %}
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                 <div class="container">
+                    {% if is_granted('ROLE_ADMIN') %}
                     <a class="navbar-brand" href="{{ path('app_site_index') }}">
                         <i class="bi bi-building"></i> Admin Dashboard
                     </a>
+                    {% else %}
+                    <a class="navbar-brand" href="{{ path('app_dashboard') }}">
+                        <i class="bi bi-building"></i> Dashboard
+                    </a>
+                    {% endif %}
                     <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 {% if is_granted('ROLE_ADMIN') %}
