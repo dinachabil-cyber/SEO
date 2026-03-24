@@ -6,7 +6,7 @@
 {% if app.user and is_granted('ROLE_ADMIN') %}
 <div class="container mt-2">
     <div class="d-flex justify-content-end">
-        {% include 'admin/partials/_back_button.html.twig' with {'back_url': path('app_site_show', {'id': page.site.id})} %}
+        {% include 'admin/partials/_back_button.html.twig' with {'back_url': path('app_page_builder', {'siteId': page.site.id, 'pageId': page.id}), 'use_history': false} %}
     </div>
 </div>
 {% endif %}
@@ -21,6 +21,8 @@
             {% include 'front/sections/_hero.html.twig' with {data: data} %}
         {% elseif section.type == 'hero_split' %}
             {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
+        {% elseif section.type == 'hero_quote' %}
+            {% include 'front/sections/_hero_quote.html.twig' with {data: data} %}
         {% elseif section.type == 'body' %}
             {% include 'front/sections/_body.html.twig' with {data: data} %}
         {% elseif section.type == 'image' %}

@@ -19,8 +19,12 @@
         </div>
     </div>
 
-    {# Hidden input to store the blocks JSON data #}
-    <input type="hidden" name="page_section[blocks_json]" id="hero_blocks_json" value="{{ blocks_json|default('[]') }}">
+    {# Hidden input to store the blocks JSON data - use Symfony form field #}
+    {% if blocks_json_form is defined %}
+        {{ form_widget(blocks_json_form, {'attr': {'id': 'hero_blocks_json', 'class': 'hero-blocks-json'}}) }}
+    {% else %}
+        <input type="hidden" name="page_section[blocks_json]" id="hero_blocks_json" value="{{ blocks_json|default('[]') }}">
+    {% endif %}
 
     {# Blocks Container #}
     <div id="hero-blocks-container" class="blocks-container">

@@ -1,0 +1,81 @@
+<section class="hero-quote" style="background-color: {{ data.background_color|default('#f8f9fa') }}; padding-top: {{ data.padding_top|default(80) }}px; padding-bottom: {{ data.padding_bottom|default(80) }}px;">
+    <div class="container">
+        <div class="row align-items-center">
+            {# Left Side - Image #}
+            {% if data.left_image is defined and data.left_image %}
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="hero-quote-image">
+                        <img src="{{ data.left_image }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid rounded">
+                    </div>
+                </div>
+            {% endif %}
+            
+            {# Right Side - Form Card #}
+            <div class="{% if data.left_image is defined and data.left_image %}col-lg-6{% else %}col-lg-8 mx-auto{% endif %}">
+                <div class="hero-quote-card" style="background-color: {{ data.form_card_background|default('#ffffff') }}; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                    {# Top Text / Badge #}
+                    {% if data.top_text is defined and data.top_text %}
+                        <span class="badge mb-3" style="background-color: {{ data.button_background_color|default('#007bff') }}; color: {{ data.button_text_color|default('#ffffff') }}; padding: 8px 16px; font-size: 14px;">
+                            {{ data.top_text }}
+                        </span>
+                    {% endif %}
+                    
+                    {# Title #}
+                    {% if data.hero_title is defined and data.hero_title %}
+                        <h2 class="mb-3" style="color: {{ data.title_color|default('#212529') }}; font-size: 32px; font-weight: 700;">
+                            {{ data.hero_title }}
+                        </h2>
+                    {% endif %}
+                    
+                    {# Subtitle #}
+                    {% if data.hero_subtitle is defined and data.hero_subtitle %}
+                        <p class="mb-4" style="color: {{ data.text_color|default('#212529') }}; font-size: 16px; line-height: 1.6;">
+                            {{ data.hero_subtitle }}
+                        </p>
+                    {% endif %}
+                    
+                    {# Form #}
+                    <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
+                        
+                        {# Form Title #}
+                        {% if data.form_title is defined and data.form_title %}
+                            <h5 class="mb-3" style="color: {{ data.title_color|default('#212529') }};">{{ data.form_title }}</h5>
+                        {% endif %}
+                        
+                        {# Form Description #}
+                        {% if data.form_description is defined and data.form_description %}
+                            <p class="small mb-3" style="color: {{ data.text_color|default('#6c757d') }};">{{ data.form_description }}</p>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="Your Name" required style="padding: 12px 16px; border-radius: 8px;">
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="email" placeholder="Your Email" required style="padding: 12px 16px; border-radius: 8px;">
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" class="form-control" name="phone" placeholder="Phone Number" style="padding: 12px 16px; border-radius: 8px;">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" name="message" rows="3" placeholder="Your Message" style="padding: 12px 16px; border-radius: 8px;"></textarea>
+                        </div>
+                        <button type="submit" class="btn w-100" style="background-color: {{ data.button_background_color|default('#007bff') }}; color: {{ data.button_text_color|default('#ffffff') }}; padding: 14px 24px; font-size: 16px; font-weight: 600; border-radius: 8px; border: none;">
+                            {{ data.button_text|default('Get Quote') }}
+                        </button>
+                    </form>
+                    
+                    {# Phone Number #}
+                    {% if data.phone_number is defined and data.phone_number %}
+                        <div class="mt-4 text-center">
+                            <p class="mb-1" style="color: {{ data.text_color|default('#6c757d') }}; font-size: 14px;">Or call us at:</p>
+                            <a href="tel:{{ data.phone_number }}" style="color: {{ data.button_background_color|default('#007bff') }}; font-size: 18px; font-weight: 600; text-decoration: none;">
+                                {{ data.phone_number }}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

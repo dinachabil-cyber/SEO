@@ -1,20 +1,135 @@
-<section class="hero {% if data.background_color is defined or (data.style is defined and data.style.background_color is defined) %}custom-bg{% endif %}" {% if data.background_color is defined %}style="background-color: {{ data.background_color }}; {% if data.padding_top is defined %}padding-top: {{ data.padding_top }}px; {% endif %}{% if data.padding_bottom is defined %}padding-bottom: {{ data.padding_bottom }}px; {% endif %}{% if data.margin_top is defined %}margin-top: {{ data.margin_top }}px; {% endif %}{% if data.margin_bottom is defined %}margin-bottom: {{ data.margin_bottom }}px; {% endif %}{% elseif data.style is defined and data.style.background_color is defined %}style="background-color: {{ data.style.background_color }}; {% if data.style.padding_top is defined %}padding-top: {{ data.style.padding_top }}px; {% endif %}{% if data.style.padding_bottom is defined %}padding-bottom: {{ data.style.padding_bottom }}px; {% endif %}{% if data.style.margin_top is defined %}margin-top: {{ data.style.margin_top }}px; {% endif %}{% if data.style.margin_bottom is defined %}margin-bottom: {{ data.style.margin_bottom }}px; {% endif %}"{% endif %}>
+{# Initialize blocks - safely handle any data type #}
+{% set blocks = [] %}
+{% if data.blocks is defined and data.blocks is iterable %}
+    {% set blocks = data.blocks %}
+{% endif %}
+
+{# Build style attribute - simple approach #}
+{% set hero_style = '' %}
+{% if data.background_color is defined and data.background_color %}
+    {% set hero_style = hero_style ~ 'background-color: ' ~ data.background_color ~ ';' %}
+{% elseif data.style is defined and data.style.background_color is defined %}
+    {% set hero_style = hero_style ~ 'background-color: ' ~ data.style.background_color ~ ';' %}
+{% endif %}
+{% if data.padding_top is defined and data.padding_top %}
+    {% set hero_style = hero_style ~ 'padding-top: ' ~ data.padding_top ~ 'px;' %}
+{% endif %}
+{% if data.padding_bottom is defined and data.padding_bottom %}
+    {% set hero_style = hero_style ~ 'padding-bottom: ' ~ data.padding_bottom ~ 'px;' %}
+{% endif %}
+{% if data.margin_top is defined and data.margin_top %}
+    {% set hero_style = hero_style ~ 'margin-top: ' ~ data.margin_top ~ 'px;' %}
+{% endif %}
+{% if data.margin_bottom is defined and data.margin_bottom %}
+    {% set hero_style = hero_style ~ 'margin-bottom: ' ~ data.margin_bottom ~ 'px;' %}
+{% endif %}
+
+{# Build text style #}
+{% set text_style = '' %}
+{% if data.hero_text_color is defined and data.hero_text_color %}
+    {% set text_style = text_style ~ 'color: ' ~ data.hero_text_color ~ ';' %}
+{% elseif data.style is defined and data.style.hero_text_color is defined %}
+    {% set text_style = text_style ~ 'color: ' ~ data.style.hero_text_color ~ ';' %}
+{% endif %}
+
+{# Determine text alignment class #}
+{% set text_align_class = '' %}
+{% if data.text_alignment is defined and data.text_alignment %}
+    {% set text_align_class = 'text-' ~ data.text_alignment %}
+{% elseif data.style is defined and data.style.text_alignment is defined %}
+    {% set text_align_class = 'text-' ~ data.style.text_alignment %}
+{% endif %}
+
+{# Determine hero custom-bg class #}
+{% set hero_class = 'hero' %}
+{% if data.background_color is defined or (data.style is defined and data.style.background_color is defined) %}
+    {% set hero_class = hero_class ~ ' custom-bg' %}
+{% endif %}
+
+<section class="{{ hero_class }}"{% if hero_style %} style="{{ hero_style }}"{% endif %}>
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <div class="hero-content {% if data.text_alignment is defined %}text-{{ data.text_alignment }}{% elseif data.style is defined and data.style.text_alignment is defined %}text-{{ data.style.text_alignment }}{% endif %}" {% if data.hero_text_color is defined %}style="color: {{ data.hero_text_color }}"{% elseif data.style is defined and data.style.hero_text_color is defined %}style="color: {{ data.style.hero_text_color }}"{% endif %}>
-                    {% if data.hero_title is defined and data.hero_title %}<h1 class="display-4 mb-4" {% if data.title_color is defined %}style="color: {{ data.title_color }}"{% elseif data.style is defined and data.style.title_color is defined %}style="color: {{ data.style.title_color }}"{% endif %}>{{ data.hero_title }}</h1>{% endif %}
-                    {% if data.hero_subtitle is defined and data.hero_subtitle %}
-                        <p class="lead mb-4" {% if data.subtitle_color is defined %}style="color: {{ data.subtitle_color }}"{% elseif data.style is defined and data.style.subtitle_color is defined %}style="color: {{ data.style.subtitle_color }}"{% endif %}>{{ data.hero_subtitle }}</p>
+                <div class="hero-content {{ text_align_class }}"{% if text_style %} style="{{ text_style }}"{% endif %}>
+                    {# ===== NEW FIELDS: top_text badge ===== #}
+                    {% if data.top_text is defined and data.top_text %}
+                        <span class="badge bg-primary mb-3" style="display: inline-block;">{{ data.top_text }}</span>
                     {% endif %}
-                    {% if data.primary_button_text is defined and data.primary_button_text and data.primary_button_url is defined and data.primary_button_url %}
-                        <a href="{{ data.primary_button_url }}" class="btn btn-{% if data.primary_button_style is defined %}{{ data.primary_button_style }}{% elseif data.style is defined and data.style.primary_button_style is defined %}{{ data.style.primary_button_style }}{% else %}primary{% endif %} btn-lg" {% if data.primary_button_background_color is defined %}style="background-color: {{ data.primary_button_background_color }}; {% if data.primary_button_text_color is defined %}color: {{ data.primary_button_text_color }}; {% endif %}{% if data.primary_button_border_color is defined %}border-color: {{ data.primary_button_border_color }}; {% endif %}{% if data.primary_button_border_radius is defined %}border-radius: {{ data.primary_button_border_radius }}px; {% endif %}{% elseif data.style is defined and data.style.primary_button_background_color is defined %}style="background-color: {{ data.style.primary_button_background_color }}; {% if data.style.primary_button_text_color is defined %}color: {{ data.style.primary_button_text_color }}; {% endif %}{% if data.style.primary_button_border_color is defined %}border-color: {{ data.style.primary_button_border_color }}; {% endif %}{% if data.style.primary_button_border_radius is defined %}border-radius: {{ data.style.primary_button_border_radius }}px; {% endif %}"{% endif %}>
-                            {{ data.primary_button_text }}
-                        </a>
+
+                    {# Render dynamic blocks if they exist and are properly structured #}
+                    {% if blocks is iterable and blocks|length > 0 %}
+                        {% for block in blocks %}
+                            {# Only render if block is an object with type attribute #}
+                            {% if block is iterable and block.type is defined %}
+                                {% if block.enabled is not defined or block.enabled %}
+                                    {# Title Block #}
+                                    {% if block.type == 'title' %}
+                                        <{{ block.tag|default('h1') }} class="display-4 mb-4" style="{% if block.color %}color: {{ block.color }}; {% endif %}{% if block.alignment %}text-align: {{ block.alignment }};{% endif %}">{{ block.text|default('Title') }}</{{ block.tag|default('h1') }}>
+                                    {# Subtitle Block #}
+                                    {% elseif block.type == 'subtitle' %}
+                                        <p class="lead mb-4" style="{% if block.color %}color: {{ block.color }}; {% endif %}{% if block.alignment %}text-align: {{ block.alignment }};{% endif %}">{{ block.content|default('') }}</p>
+                                    {# Text Block #}
+                                    {% elseif block.type == 'text' %}
+                                        <p class="mb-4" style="{% if block.color %}color: {{ block.color }}; {% endif %}{% if block.alignment %}text-align: {{ block.alignment }};{% endif %}">{{ block.content|default('') }}</p>
+                                    {# Badge Block #}
+                                    {% elseif block.type == 'badge' %}
+                                        <span class="badge mb-4" style="display: inline-block; background-color: {{ block.background_color|default('#007bff') }}; color: {{ block.text_color|default('#ffffff') }}; padding: 0.5em 1em; border-radius: 0.25em;">{{ block.text|default('Badge') }}</span>
+                                    {# Button Block #}
+                                    {% elseif block.type == 'button' %}
+                                        <a href="{{ block.url|default('#') }}" class="btn btn-{{ block.style|default('primary') }} btn-lg mb-4" style="{% if block.background_color %}background-color: {{ block.background_color }}; {% endif %}{% if block.text_color %}color: {{ block.text_color }}; {% endif %}{% if block.border_color %}border-color: {{ block.border_color }}; {% endif %}{% if block.border_radius %}border-radius: {{ block.border_radius }}px; {% endif %}">{{ block.text|default('Button') }}</a>
+                                    {# Secondary Button Block #}
+                                    {% elseif block.type == 'secondary_button' %}
+                                        <a href="{{ block.url|default('#') }}" class="btn btn-outline-{{ block.style|default('secondary') }} btn-lg mb-4" style="{% if block.border_radius %}border-radius: {{ block.border_radius }}px; {% endif %}">{{ block.text|default('Learn More') }}</a>
+                                    {# Icon Block #}
+                                    {% elseif block.type == 'icon' %}
+                                        <i class="{{ block.icon_name|default('bi-star') }}" style="{% if block.icon_size %}font-size: {{ block.icon_size }}; {% endif %}{% if block.icon_color %}color: {{ block.icon_color }}; {% endif %}{% if block.alignment %}text-align: {{ block.alignment }}; display: block;{% endif %}"></i>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {# Legacy fields for backward compatibility #}
+                        {% if data.hero_title is defined and data.hero_title %}<h1 class="display-4 mb-4" {% if data.title_color is defined %}style="color: {{ data.title_color }}"{% elseif data.style is defined and data.style.title_color is defined %}style="color: {{ data.style.title_color }}"{% endif %}>{{ data.hero_title }}</h1>{% endif %}
+                        {% if data.hero_subtitle is defined and data.hero_subtitle %}
+                            <p class="lead mb-4" {% if data.subtitle_color is defined %}style="color: {{ data.subtitle_color }}"{% elseif data.style is defined and data.style.subtitle_color is defined %}style="color: {{ data.style.subtitle_color }}"{% endif %}>{{ data.hero_subtitle }}</p>
+                        {% endif %}
+                        {% if data.primary_button_text is defined and data.primary_button_text and data.primary_button_url is defined and data.primary_button_url %}
+                            <a href="{{ data.primary_button_url }}" class="btn btn-{% if data.primary_button_style is defined %}{{ data.primary_button_style }}{% elseif data.style is defined and data.style.primary_button_style is defined %}{{ data.style.primary_button_style }}{% else %}primary{% endif %} btn-lg" {% if data.primary_button_background_color is defined %}style="background-color: {{ data.primary_button_background_color }}; {% if data.primary_button_text_color is defined %}color: {{ data.primary_button_text_color }}; {% endif %}{% if data.primary_button_border_color is defined %}border-color: {{ data.primary_button_border_color }}; {% endif %}{% if data.primary_button_border_radius is defined %}border-radius: {{ data.primary_button_border_radius }}px; {% endif %}{% elseif data.style is defined and data.style.primary_button_background_color is defined %}style="background-color: {{ data.style.primary_button_background_color }}; {% if data.style.primary_button_text_color is defined %}color: {{ data.style.primary_button_text_color }}; {% endif %}{% if data.style.primary_button_border_color is defined %}border-color: {{ data.style.primary_button_border_color }}; {% endif %}{% if data.style.primary_button_border_radius is defined %}border-radius: {{ data.style.primary_button_border_radius }}px; {% endif %}"{% endif %}>
+                                {{ data.primary_button_text }}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# ===== NEW FIELDS: phone_number ===== #}
+                    {% if data.phone_number is defined and data.phone_number %}
+                        <div class="hero-phone mt-3">
+                            <a href="tel:{{ data.phone_number }}" class="text-decoration-none" style="{% if data.subtitle_color is defined %}color: {{ data.subtitle_color }}{% endif %}">
+                                <i class="bi bi-telephone me-2"></i>{{ data.phone_number }}
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-            {% if data.hero_image_url is defined and data.hero_image_url %}
+
+            {# ===== NEW FIELDS: left_image for split layouts ===== #}
+            {% if data.left_image is defined and data.left_image %}
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="hero-media">
+                        <img src="{{ data.left_image }}" alt="{{ data.image_alt_text|default('') }}" class="img-fluid">
+                    </div>
+                </div>
+            {# Render Image Block if exists in blocks #}
+            {% elseif blocks is iterable and blocks|length > 0 %}
+                {% for block in blocks %}
+                    {% if block is iterable and block.type is defined and block.type == 'image' and (block.enabled is not defined or block.enabled) %}
+                        <div class="col-lg-6 mt-4 mt-lg-0">
+                            <div class="hero-media">
+                                <img src="{{ block.image_url|default('') }}" alt="{{ block.alt_text|default('') }}" class="img-fluid" style="{% if block.border_radius %}border-radius: {{ block.border_radius }}px;{% endif %}{% if block.shadow %}box-shadow: 0 4px 12px rgba(0,0,0,0.15);{% endif %}">
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% elseif data.hero_image_url is defined and data.hero_image_url %}
                 <div class="col-lg-6 mt-4 mt-lg-0">
                     <div class="hero-media">
                         <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
@@ -25,13 +140,25 @@
     </div>
 </section>
 
+{# ===== NEW FIELDS: show_form with form_title and form_subtitle ===== #}
 {% if data.show_form is defined and data.show_form %}
 <section class="section-sm bg-light">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="lead-form">
-                    <h3 class="lead-form-title mb-4">Get in Touch</h3>
+                    {# form_title field #}
+                    {% if data.form_title is defined and data.form_title %}
+                        <h3 class="lead-form-title mb-2">{{ data.form_title }}</h3>
+                    {% else %}
+                        <h3 class="lead-form-title mb-4">Get in Touch</h3>
+                    {% endif %}
+                    
+                    {# form_subtitle field #}
+                    {% if data.form_subtitle is defined and data.form_subtitle %}
+                        <p class="mb-4 text-muted">{{ data.form_subtitle }}</p>
+                    {% endif %}
+                    
                     <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
                         <div class="mb-3">

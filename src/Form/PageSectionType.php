@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Config\HeroFieldsConfig;
 use App\Entity\PageSection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -42,6 +43,7 @@ class PageSectionType extends AbstractType
                 'label' => false,
                 'required' => false,
                 'mapped' => false,
+                'data' => [], // Will be populated in PRE_SET_DATA for form type
             ])
         ;
 
@@ -57,6 +59,28 @@ class PageSectionType extends AbstractType
                     $existingData = [];
                 }
                 $this->addDynamicFields($form, $section->getType(), $existingData);
+                
+                // Set blocks_json data for hero type sections
+                if ($section->getType() === 'hero' && $form->has('blocks_json')) {
+                    $existingBlocks = $existingData['blocks'] ?? [];
+                    // Handle case where blocks is already a string (corrupted data from previous saves)
+                    if (is_string($existingBlocks)) {
+                        $decoded = json_decode($existingBlocks, true);
+                        $existingBlocks = is_array($decoded) ? $decoded : [];
+                    }
+                    $form->get('blocks_json')->setData(json_encode($existingBlocks));
+                }
+                
+                // Set form_fields_json data for form type sections
+                if ($section->getType() === 'form' && $form->has('form_fields_json')) {
+                    $existingFormFields = $existingData['form_fields'] ?? [];
+                    // Handle case where form_fields is already a string (corrupted data from previous saves)
+                    if (is_string($existingFormFields)) {
+                        $decoded = json_decode($existingFormFields, true);
+                        $existingFormFields = is_array($decoded) ? $decoded : [];
+                    }
+                    $form->get('form_fields_json')->setData(json_encode($existingFormFields));
+                }
             }
         });
 
@@ -81,7 +105,11 @@ class PageSectionType extends AbstractType
 
             // Get the JSON data from hidden fields
             $blocksJson = $form->get('blocks_json')->getData();
-            $formFieldsJson = $form->get('form_fields_json')->getData();
+            // Get form fields JSON directly from hidden field
+            $formFieldsJson = null;
+            if ($form->has('form_fields_json')) {
+                $formFieldsJson = $form->get('form_fields_json')->getData();
+            }
 
             if ($data instanceof PageSection) {
                 $sectionData = $data->getData();
@@ -392,7 +420,9 @@ class SectionDataType extends AbstractType
                         'data' => $existingData['blocks'] ?? [],
                     ])
 
-                    // ========== CONTENT TAB (Legacy - for backward compatibility) ==========
+                    // ========== CONTENT TAB ==========
+                    // HeroFieldsConfig is the single source of truth for field definitions
+                    // See src/Config/HeroFieldsConfig.php for all field definitions
                     ->add('hero_title', TextType::class, [
                         'label' => 'Hero Title',
                         'required' => true,
@@ -402,6 +432,7 @@ class SectionDataType extends AbstractType
                         'label' => 'Hero Subtitle',
                         'required' => false,
                         'data' => $this->ensureString($existingData['hero_subtitle'] ?? $existingData['subtitle'] ?? ''),
+                        'attr' => ['rows' => 2],
                     ])
                     ->add('badge_text', TextType::class, [
                         'label' => 'Badge Text',
@@ -412,7 +443,46 @@ class SectionDataType extends AbstractType
                         'label' => 'Description',
                         'required' => false,
                         'data' => $this->ensureString($existingData['description'] ?? ''),
+                        'attr' => ['rows' => 3],
                     ])
+                    
+                    // ===== NEW FIELDS (defined in HeroFieldsConfig.php) =====
+                    ->add('top_text', TextType::class, [
+                        'label' => 'Top Text / Badge',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['top_text'] ?? ''),
+                        'attr' => ['placeholder' => 'e.g., Welcome to our site'],
+                    ])
+                    ->add('phone_number', TextType::class, [
+                        'label' => 'Phone Number',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['phone_number'] ?? ''),
+                        'attr' => ['placeholder' => '+1 234 567 8900'],
+                    ])
+                    ->add('show_form', CheckboxType::class, [
+                        'label' => 'Show Contact Form',
+                        'required' => false,
+                        'data' => $existingData['show_form'] ?? false,
+                    ])
+                    ->add('form_title', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_title'] ?? ''),
+                    ])
+                    ->add('form_subtitle', TextareaType::class, [
+                        'label' => 'Form Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_subtitle'] ?? ''),
+                        'attr' => ['rows' => 2],
+                    ])
+                    ->add('left_image', TextType::class, [
+                        'label' => 'Left Image URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['left_image'] ?? ''),
+                        'attr' => ['placeholder' => '/images/left-image.jpg'],
+                    ])
+                    
+                    // Primary button
                     ->add('primary_button_text', TextType::class, [
                         'label' => 'Primary Button Text',
                         'required' => false,
@@ -423,6 +493,8 @@ class SectionDataType extends AbstractType
                         'required' => false,
                         'data' => $this->ensureString($existingData['primary_button_url'] ?? $existingData['ctaUrl'] ?? ''),
                     ])
+                    
+                    // Secondary button
                     ->add('secondary_button_text', TextType::class, [
                         'label' => 'Secondary Button Text',
                         'required' => false,
@@ -690,6 +762,97 @@ class SectionDataType extends AbstractType
                     ]);
                 break;
 
+            case 'hero_quote':
+                $builder
+                    // ========== CONTENT TAB ==========
+                    ->add('top_text', TextType::class, [
+                        'label' => 'Top Text / Badge',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['top_text'] ?? ''),
+                    ])
+                    ->add('hero_title', TextType::class, [
+                        'label' => 'Hero Title',
+                        'required' => true,
+                        'data' => $this->ensureString($existingData['hero_title'] ?? ''),
+                    ])
+                    ->add('hero_subtitle', TextareaType::class, [
+                        'label' => 'Hero Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['hero_subtitle'] ?? ''),
+                    ])
+                    ->add('phone_number', TextType::class, [
+                        'label' => 'Phone Number',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['phone_number'] ?? ''),
+                    ])
+                    ->add('left_image', TextType::class, [
+                        'label' => 'Left Image URL',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['left_image'] ?? ''),
+                    ])
+                    
+                    // ========== FORM TAB ==========
+                    ->add('form_title', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_title'] ?? ''),
+                    ])
+                    ->add('form_description', TextareaType::class, [
+                        'label' => 'Form Description',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_description'] ?? ''),
+                    ])
+                    ->add('button_text', TextType::class, [
+                        'label' => 'CTA Button Text',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_text'] ?? 'Get Quote'),
+                    ])
+                    
+                    // ========== STYLE TAB ==========
+                    ->add('background_color', ColorType::class, [
+                        'label' => 'Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['background_color'] ?? '#f8f9fa'),
+                    ])
+                    ->add('text_color', ColorType::class, [
+                        'label' => 'Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['text_color'] ?? '#212529'),
+                    ])
+                    ->add('title_color', ColorType::class, [
+                        'label' => 'Title Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['title_color'] ?? '#212529'),
+                    ])
+                    ->add('form_card_background', ColorType::class, [
+                        'label' => 'Form Card Background',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['form_card_background'] ?? '#ffffff'),
+                    ])
+                    ->add('button_background_color', ColorType::class, [
+                        'label' => 'Button Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_background_color'] ?? '#007bff'),
+                    ])
+                    ->add('button_text_color', ColorType::class, [
+                        'label' => 'Button Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['button_text_color'] ?? '#ffffff'),
+                    ])
+                    
+                    // ========== LAYOUT TAB ==========
+                    ->add('padding_top', TextType::class, [
+                        'label' => 'Padding Top (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_top'] ?? '80'),
+                    ])
+                    ->add('padding_bottom', TextType::class, [
+                        'label' => 'Padding Bottom (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($existingData['padding_bottom'] ?? '80'),
+                    ]);
+                break;
+
             case 'body':
                 $builder
                     ->add('content', TextareaType::class, [
@@ -909,9 +1072,11 @@ class SectionDataType extends AbstractType
                     ->add('form_fields', FormFieldsType::class, [
                         'label' => false,
                         'data' => $existingData['form_fields'] ?? [],
-                    ])
+                    ]);
 
-                    // ========== CONTENT TAB (Legacy) ==========
+
+                // ========== CONTENT TAB (Legacy) ==========
+                $builder
                     ->add('section_title', TextType::class, [
                         'label' => 'Section Title',
                         'required' => false,

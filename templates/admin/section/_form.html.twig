@@ -69,7 +69,8 @@
                 <div class="tab-pane fade show active" id="hero-blocks" role="tabpanel" aria-labelledby="blocks-tab">
                     {% include 'admin/section/partials/_hero_blocks_builder.html.twig' with {
                         blocks: dataForm.blocks.vars.data,
-                        blocks_json: dataForm.blocks.blocks_json.vars.value|default('[]'),
+                        blocks_json: form.blocks_json.vars.value|default('[]'),
+                        blocks_json_form: form.blocks_json,
                         block_types: {
                             'title': 'Title',
                             'subtitle': 'Subtitle',
@@ -362,8 +363,8 @@
                 {# Fields Tab (Dynamic Builder) #}
                 <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="fields-tab">
                     {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
-                        fields: dataForm.form_fields.vars.data,
-                        fields_json: dataForm.form_fields.vars.value ? dataForm.form_fields.vars.value|json_encode : '[]',
+                        fields: dataForm.form_fields.vars.fields,
+                        fields_json: dataForm.form_fields_json.vars.value ?: '[]',
                         field_types: {
                             'text': 'Text Input',
                             'email': 'Email',
@@ -586,6 +587,44 @@
                     {{ form_row(dataForm.buttonBorderColor) }}
                     {{ form_row(dataForm.buttonBorderRadius) }}
                     {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
+        
+        {% elseif form.vars.value.type == 'hero_quote' %}
+            <ul class="nav nav-tabs" id="heroQuoteTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-content" type="button" role="tab" aria-controls="heroQuote-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-form" type="button" role="tab" aria-controls="heroQuote-form" aria-selected="false">Form</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-style" type="button" role="tab" aria-controls="heroQuote-style" aria-selected="false">Style</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="heroQuoteTabsContent">
+                <div class="tab-pane fade show active" id="heroQuote-content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.top_text) }}
+                    {{ form_row(dataForm.hero_title) }}
+                    {{ form_row(dataForm.hero_subtitle) }}
+                    {{ form_row(dataForm.phone_number) }}
+                    {{ form_row(dataForm.left_image) }}
+                </div>
+                <div class="tab-pane fade" id="heroQuote-form" role="tabpanel" aria-labelledby="form-tab">
+                    {{ form_row(dataForm.form_title) }}
+                    {{ form_row(dataForm.form_description) }}
+                    {{ form_row(dataForm.button_text) }}
+                </div>
+                <div class="tab-pane fade" id="heroQuote-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.background_color) }}
+                    {{ form_row(dataForm.text_color) }}
+                    {{ form_row(dataForm.title_color) }}
+                    {{ form_row(dataForm.form_card_background) }}
+                    {{ form_row(dataForm.button_background_color) }}
+                    {{ form_row(dataForm.button_text_color) }}
+                    <hr>
+                    {{ form_row(dataForm.padding_top) }}
+                    {{ form_row(dataForm.padding_bottom) }}
                 </div>
             </div>
             

@@ -13,14 +13,17 @@
                     <option value="{{ type }}">{{ label }}</option>
                 {% endfor %}
             </select>
-            <button type="button" class="btn btn-sm btn-primary" onclick="handleAddField()">
+            <button type="button" class="btn btn-sm btn-primary" id="add-field-btn" onclick="handleAddField()">
                 <i class="bi bi-plus-circle me-1"></i> Add Field
+            </button>
+            <button type="button" class="btn btn-sm btn-warning" onclick="console.log('Test button clicked'); alert('Test button works!')">
+                Test
             </button>
         </div>
     </div>
 
     {# Hidden input to store the fields JSON data #}
-    <input type="hidden" name="page_section[form_fields_json]" id="form_fields_json" value="{{ fields_json|default('[]') }}">
+    <input type="hidden" id="form_fields_json" name="form_fields_json" data-form-fields-json value="{{ fields_json|default('[]') }}">
 
     {# Fields Container #}
     <div id="form-fields-container" class="fields-container">
@@ -798,20 +801,34 @@ Option 2</textarea>
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Form Fields Builder: DOMContentLoaded fired');
-        const existingDataEl = document.getElementById('form_fields_json');
+        const existingDataEl = document.querySelector('[data-form-fields-json]');
         if (!existingDataEl) {
             console.error('ERROR: form_fields_json hidden input not found!');
             return;
         }
         const existingData = existingDataEl.value;
         try {
-            formFields = JSON.parse(existingData) || [];
+            const parsed = JSON.parse(existingData);
+            // Ensure formFields is always an array
+            formFields = Array.isArray(parsed) ? parsed : [];
             console.log('Form Fields loaded:', formFields);
         } catch(e) {
             console.error('Error parsing existing form fields:', e);
             formFields = [];
         }
         renderFormFields();
+        
+        // Add event listener directly to the button
+        const addFieldBtn = document.getElementById('add-field-btn');
+        if (addFieldBtn) {
+            addFieldBtn.addEventListener('click', function(e) {
+                console.log('Add Field button clicked via event listener');
+                handleAddField();
+            });
+            console.log('Event listener added to add-field-btn');
+        } else {
+            console.error('Add Field button not found!');
+        }
         
         // Use event delegation for add field buttons
         document.addEventListener('click', function(event) {
@@ -837,8 +854,15 @@ Option 2</textarea>
     });
 
     function handleAddField() {
+        console.log('handleAddField called');
         const select = document.getElementById('add-field-select');
+        if (!select) {
+            console.error('Select element not found!');
+            alert('Error: Select element not found');
+            return;
+        }
         const type = select.value;
+        console.log('Selected type:', type);
         if (!type) {
             alert('Please select a field type');
             return;
@@ -850,6 +874,8 @@ Option 2</textarea>
 
     function addFormField(type) {
         console.log('Add Field function called, type:', type);
+        console.log('Current formFields:', formFields);
+        const field = {
             type: type,
             enabled: true,
             id: 'field_' + (++fieldCounter)
@@ -945,12 +971,18 @@ Option 2</textarea>
     }
 
     function renderFormFields() {
+        console.log('renderFormFields called, formFields length:', formFields ? formFields.length : 'formFields is undefined');
         const container = document.getElementById('form-fields-container');
         const emptyState = document.getElementById('form-fields-empty');
 
+        if (!container) {
+            console.error('Container not found!');
+            return;
+        }
+
         container.innerHTML = '';
 
-        if (formFields.length === 0) {
+        if (!formFields || formFields.length === 0) {
             emptyState.classList.remove('d-none');
             return;
         }
@@ -1013,7 +1045,7 @@ Option 2</textarea>
             });
         });
 
-        document.getElementById('form_fields_json').value = JSON.stringify(formFields);
+        document.querySelector('[data-form-fields-json]').value = JSON.stringify(formFields);
     }
 
     // Save fields when form is submitted
