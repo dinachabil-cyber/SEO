@@ -1,5 +1,11 @@
 {{ form_row(form.type) }}
 
+{# Explicitly render hidden fields for form_fields_json and hero_form_fields_json so they have correct names and can be updated by JavaScript #}
+<style>#page_section_form_fields_json, #page_section_hero_form_fields_json, #page_section_hero_fields { display: none; }</style>
+{{ form_widget(form.form_fields_json) }}
+{{ form_widget(form.hero_form_fields_json) }}
+{{ form_widget(form.hero_fields) }}
+
 {% if form.data is defined %}
     <div class="section-data-fields">
         {% set dataForm = form.data %}
@@ -44,8 +50,8 @@
         {% elseif form.vars.value.type == 'hero' %}
             <ul class="nav nav-tabs" id="heroSectionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="blocks-tab" data-bs-toggle="tab" data-bs-target="#hero-blocks" type="button" role="tab" aria-controls="hero-blocks" aria-selected="true">
-                        <i class="bi bi-layers me-1"></i>Blocks
+                    <button class="nav-link active" id="fields-tab" data-bs-toggle="tab" data-bs-target="#hero-fields" type="button" role="tab" aria-controls="hero-fields" aria-selected="true">
+                        <i class="bi bi-ui-checks me-1"></i>Form Fields
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -65,27 +71,30 @@
                 </li>
             </ul>
             <div class="tab-content p-3 border border-top-0" id="heroSectionTabsContent">
-                {# Blocks Tab (Dynamic Builder) #}
-                <div class="tab-pane fade show active" id="hero-blocks" role="tabpanel" aria-labelledby="blocks-tab">
-                    {% include 'admin/section/partials/_hero_blocks_builder.html.twig' with {
-                        blocks: dataForm.blocks.vars.data,
-                        blocks_json: form.blocks_json.vars.value|default('[]'),
-                        blocks_json_form: form.blocks_json,
-                        block_types: {
-                            'title': 'Title',
-                            'subtitle': 'Subtitle',
-                            'text': 'Text',
-                            'badge': 'Badge',
-                            'image': 'Image',
-                            'button': 'Button',
-                            'secondary_button': 'Secondary Button',
-                            'form': 'Form (Optional)',
-                            'icon': 'Icon'
+                {# Form Fields Tab (Field-Based System) #}
+                <div class="tab-pane fade show active" id="hero-fields" role="tabpanel" aria-labelledby="fields-tab">
+                    {% set heroFormFieldsJson = form.hero_form_fields_json.vars.value|default('') %}
+                    {% if heroFormFieldsJson is empty or heroFormFieldsJson is iterable %}{% set heroFormFieldsJson = '[]' %}{% endif %}
+                    {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
+                        fields: [],
+                        hero_form_fields_json: heroFormFieldsJson,
+                        field_types: {
+                            'text': 'Text Input',
+                            'textarea': 'Text Area',
+                            'select': 'Dropdown',
+                            'checkbox': 'Checkbox',
+                            'image': 'Image URL',
+                            'url': 'URL',
+                            'color': 'Color',
+                            'number': 'Number',
+                            'email': 'Email',
+                            'tel': 'Phone',
+                            'date': 'Date'
                         }
                     } %}
                 </div>
                 
-                {# Content Tab (Legacy) #}
+                {# Content Tab #}
                 <div class="tab-pane fade" id="hero-content" role="tabpanel" aria-labelledby="content-tab">
                     <div class="row">
                         <div class="col-md-6">
@@ -362,9 +371,11 @@
                 
                 {# Fields Tab (Dynamic Builder) #}
                 <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="fields-tab">
+                    {% set formFieldsJsonValue = form.form_fields_json.vars.value|default('') %}
+                    {% if formFieldsJsonValue is empty or formFieldsJsonValue is iterable %}{% set formFieldsJsonValue = '[]' %}{% endif %}
                     {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
-                        fields: dataForm.form_fields.vars.fields,
-                        fields_json: dataForm.form_fields_json.vars.value ?: '[]',
+                        fields: [],
+                        form_fields_json: formFieldsJsonValue,
                         field_types: {
                             'text': 'Text Input',
                             'email': 'Email',
@@ -525,7 +536,7 @@
             </ul>
             <div class="tab-content p-3 border border-top-0" id="ctaSectionTabsContent">
                 <div class="tab-pane fade show active" id="cta-content" role="tabpanel" aria-labelledby="content-tab">
-                    {{ form_row(dataForm.title) }}
+                    
                     {{ form_row(dataForm.text) }}
                     {{ form_row(dataForm.buttonText) }}
                     {{ form_row(dataForm.buttonUrl) }}
@@ -549,8 +560,8 @@
                 </div>
             </div>
             
-        {% elseif form.vars.value.type == 'hero_split' %}
-            <ul class="nav nav-tabs" id="heroSplitTabs" role="tablist">
+        {% elseif form.vars.value.type == 'footer' %}
+            <ul class="nav nav-tabs" id="footerSectionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-content" type="button" role="tab" aria-controls="heroSplit-content" aria-selected="true">Content</button>
                 </li>
@@ -562,35 +573,11 @@
                 </li>
             </ul>
             <div class="tab-content p-3 border border-top-0" id="heroSplitTabsContent">
-                <div class="tab-pane fade show active" id="heroSplit-content" role="tabpanel" aria-labelledby="content-tab">
-                    {{ form_row(dataForm.title) }}
-                    {{ form_row(dataForm.subtitle) }}
-                    {{ form_row(dataForm.imageUrl) }}
-                    {{ form_row(dataForm.formTitle) }}
-                    {{ form_row(dataForm.layout) }}
-                    {{ form_row(dataForm.ctaText) }}
-                    {{ form_row(dataForm.ctaUrl) }}
-                </div>
-                <div class="tab-pane fade" id="heroSplit-style" role="tabpanel" aria-labelledby="style-tab">
-                    {{ form_row(dataForm.backgroundColor) }}
-                    {{ form_row(dataForm.textColor) }}
-                    {{ form_row(dataForm.titleColor) }}
-                    {{ form_row(dataForm.subtitleColor) }}
-                    {{ form_row(dataForm.paddingTop) }}
-                    {{ form_row(dataForm.paddingBottom) }}
-                    {{ form_row(dataForm.marginTop) }}
-                    {{ form_row(dataForm.marginBottom) }}
-                </div>
-                <div class="tab-pane fade" id="heroSplit-buttons" role="tabpanel" aria-labelledby="buttons-tab">
-                    {{ form_row(dataForm.buttonBackgroundColor) }}
-                    {{ form_row(dataForm.buttonTextColor) }}
-                    {{ form_row(dataForm.buttonBorderColor) }}
-                    {{ form_row(dataForm.buttonBorderRadius) }}
-                    {{ form_row(dataForm.buttonStyle) }}
-                </div>
+              
+                
             </div>
         
-        {% elseif form.vars.value.type == 'hero_quote' %}
+        {% elseif form.vars.value.type == 'footer' %}
             <ul class="nav nav-tabs" id="heroQuoteTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-content" type="button" role="tab" aria-controls="heroQuote-content" aria-selected="true">Content</button>

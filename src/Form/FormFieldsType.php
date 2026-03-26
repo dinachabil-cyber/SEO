@@ -3,14 +3,19 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Dynamic collection type for form fields using JSON data
+ * Standalone Form section field builder type.
+ * 
+ * This type is used for the 'form' section type to pass field configuration
+ * to the Twig template. The actual data persistence happens via the 
+ * top-level form_fields_json hidden field in PageSectionType.
+ * 
+ * This type does NOT create any hidden fields - it's purely a view-level
+ * type that passes data to the template for rendering.
  */
 class FormFieldsType extends AbstractType
 {
@@ -27,18 +32,9 @@ class FormFieldsType extends AbstractType
         'hidden' => 'Hidden Field',
     ];
 
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder->add('fields_json', HiddenType::class, [
-            'label' => false,
-            'required' => false,
-            'mapped' => false,
-            'data' => json_encode($options['data'] ?? []),
-        ]);
-    }
-
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
+        // Pass fields data to the template
         $view->vars['fields'] = $options['data'] ?? [];
         $view->vars['field_types'] = self::FIELD_TYPES;
     }

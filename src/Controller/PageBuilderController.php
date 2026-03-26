@@ -102,6 +102,14 @@ class PageBuilderController extends AbstractController
             ]));
         }
 
+        // Debug helper for 422 cases: surface form errors to the UI
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $errors = (string) $form->getErrors(true, false);
+            if ($errors) {
+                $this->addFlash('error', $errors);
+            }
+        }
+
         return $this->render('admin/section/edit.html.twig', [
             'section' => $section,
             'page' => $page,

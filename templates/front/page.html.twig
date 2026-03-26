@@ -19,10 +19,6 @@
             {% include 'front/sections/_header.html.twig' with {data: data} %}
         {% elseif section.type == 'hero' %}
             {% include 'front/sections/_hero.html.twig' with {data: data} %}
-        {% elseif section.type == 'hero_split' %}
-            {% include 'front/sections/_hero_split.html.twig' with {data: data} %}
-        {% elseif section.type == 'hero_quote' %}
-            {% include 'front/sections/_hero_quote.html.twig' with {data: data} %}
         {% elseif section.type == 'body' %}
             {% include 'front/sections/_body.html.twig' with {data: data} %}
         {% elseif section.type == 'image' %}

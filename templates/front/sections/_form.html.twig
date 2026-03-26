@@ -13,7 +13,7 @@
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
                         
                         {# Check if there are dynamic form fields saved in the section #}
-                        {% set form_fields = data.form_fields|default(data.fields)|default([]) %}
+                        {% set form_fields = data.form_fields|default([]) %}
                         
                         {% if form_fields|length > 0 %}
                             {# Render dynamic fields #}

@@ -13,22 +13,19 @@
                     <option value="{{ type }}">{{ label }}</option>
                 {% endfor %}
             </select>
-            <button type="button" class="btn btn-sm btn-primary" id="add-field-btn" onclick="handleAddField()">
-                <i class="bi bi-plus-circle me-1"></i> Add Field
-            </button>
-            <button type="button" class="btn btn-sm btn-warning" onclick="console.log('Test button clicked'); alert('Test button works!')">
-                Test
+
+            <button type="button" class="btn btn-sm btn-primary" id="add-field-btn">
+                <i class="bi bi-plus-circle me-1"></i>
+                Add Field
             </button>
         </div>
     </div>
 
-    {# Hidden input to store the fields JSON data #}
-    <input type="hidden" id="form_fields_json" name="form_fields_json" data-form-fields-json value="{{ fields_json|default('[]') }}">
+    {# Fallback hidden input used only to load initial JSON (no name to avoid submitting twice) #}
+    <input type="hidden" id="form_fields_json_fallback" value="{{ form_fields_json|default('[]') }}">
 
     {# Fields Container #}
-    <div id="form-fields-container" class="fields-container">
-        {# Fields will be rendered here dynamically #}
-    </div>
+    <div id="form-fields-container" class="fields-container"></div>
 
     {# Empty State #}
     <div id="form-fields-empty" class="text-center py-4 {% if fields and fields|length > 0 %}d-none{% endif %}">
@@ -39,7 +36,8 @@
         </div>
     </div>
 
-    {# Field Configuration Templates #}
+    {# ===================== TEMPLATES ===================== #}
+
     <template id="form-field-template-text">
         <div class="field-card card mb-3" data-field-type="text">
             <div class="card-header d-flex justify-content-between align-items-center bg-light">
@@ -68,6 +66,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -82,6 +81,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -110,14 +110,17 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="" placeholder="Text shown below the field">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="text_enabled__INDEX__" checked>
                     <label class="form-check-label" for="text_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="text">
             </div>
         </div>
@@ -151,6 +154,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -165,6 +169,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -191,14 +196,17 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="email_enabled__INDEX__" checked>
                     <label class="form-check-label" for="email_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="email">
             </div>
         </div>
@@ -222,16 +230,17 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Field Label *</label>
-                            <input type="text" class="form-control field-field" name="form_fields[__INDEX__][label]" value="Phone Number" required>
+                            <input type="text" class="form-control field-field" name="form_fields[__INDEX__][label]" value="" required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Field Name *</label>
-                            <input type="text" class="form-control field-field" name="form_fields[__INDEX__][name]" value="phone" required>
+                            <input type="text" class="form-control field-field" name="form_fields[__INDEX__][name]" value="" required>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -246,6 +255,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -272,14 +282,17 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="tel_enabled__INDEX__" checked>
                     <label class="form-check-label" for="tel_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="tel">
             </div>
         </div>
@@ -313,6 +326,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -333,6 +347,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -359,14 +374,17 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="textarea_enabled__INDEX__" checked>
                     <label class="form-check-label" for="textarea_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="textarea">
             </div>
         </div>
@@ -400,12 +418,14 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Options (one per line) *</label>
                     <textarea class="form-control field-field" name="form_fields[__INDEX__][options]" rows="4" required>Option 1
 Option 2
 Option 3</textarea>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -432,14 +452,17 @@ Option 3</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="select_enabled__INDEX__" checked>
                     <label class="form-check-label" for="select_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="select">
             </div>
         </div>
@@ -473,12 +496,14 @@ Option 3</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Options (one per line) *</label>
                     <textarea class="form-control field-field" name="form_fields[__INDEX__][options]" rows="4" required>Option 1
 Option 2
 Option 3</textarea>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -496,18 +521,22 @@ Option 3</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][required]" id="radio_required__INDEX__">
                     <label class="form-check-label" for="radio_required__INDEX__">Required</label>
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="radio_enabled__INDEX__" checked>
                     <label class="form-check-label" for="radio_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="radio">
             </div>
         </div>
@@ -541,12 +570,14 @@ Option 3</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Options (one per line - for checkbox group)</label>
                     <textarea class="form-control field-field" name="form_fields[__INDEX__][options]" rows="3">Option 1
 Option 2</textarea>
                     <small class="text-muted">Leave empty for single checkbox, add options for checkbox group</small>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -564,18 +595,22 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][required]" id="checkbox_required__INDEX__">
                     <label class="form-check-label" for="checkbox_required__INDEX__">Required</label>
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="checkbox_enabled__INDEX__" checked>
                     <label class="form-check-label" for="checkbox_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="checkbox">
             </div>
         </div>
@@ -609,6 +644,7 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-3">
                         <div class="mb-3">
@@ -638,6 +674,7 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -655,14 +692,17 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="number_enabled__INDEX__" checked>
                     <label class="form-check-label" for="number_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="number">
             </div>
         </div>
@@ -696,6 +736,7 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -710,6 +751,7 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -736,14 +778,17 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Help Text</label>
                     <input type="text" class="form-control field-field" name="form_fields[__INDEX__][help_text]" value="">
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="date_enabled__INDEX__" checked>
                     <label class="form-check-label" for="date_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="date">
             </div>
         </div>
@@ -767,6 +812,7 @@ Option 2</textarea>
                     <i class="bi bi-info-circle me-1"></i>
                     Hidden fields are not visible to users but are submitted with the form.
                 </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -781,10 +827,12 @@ Option 2</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input field-field" name="form_fields[__INDEX__][enabled]" id="hidden_enabled__INDEX__" checked>
                     <label class="form-check-label" for="hidden_enabled__INDEX__">Enable this field</label>
                 </div>
+
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][type]" value="hidden">
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][label]" value="">
                 <input type="hidden" class="field-field" name="form_fields[__INDEX__][width]" value="full">
@@ -794,298 +842,345 @@ Option 2</textarea>
 </div>
 
 <script>
-    // Form Fields Builder JavaScript
-    let formFields = [];
-    let fieldCounter = 0;
+let formFields = [];
+let fieldCounter = 0;
+let formFieldsBuilderInitialized = false;
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Form Fields Builder: DOMContentLoaded fired');
-        const existingDataEl = document.querySelector('[data-form-fields-json]');
-        if (!existingDataEl) {
-            console.error('ERROR: form_fields_json hidden input not found!');
+function initFormFieldsBuilder() {
+    const wrapper = document.querySelector('.form-fields-builder[data-builder="form-fields"]');
+    if (!wrapper) {
+        console.warn('form fields builder wrapper not found');
+        return;
+    }
+
+    // avoid double init
+    if (wrapper.dataset.initialized === '1') {
+        console.log('Form fields builder already initialized');
+        return;
+    }
+    wrapper.dataset.initialized = '1';
+
+    console.log('initFormFieldsBuilder');
+
+    const fallbackInput = document.getElementById('form_fields_json_fallback');
+    const symfonyInput = document.getElementById('page_section_form_fields_json');
+    const addBtn = document.getElementById('add-field-btn');
+
+    console.log('fallbackInput:', fallbackInput ? 'found' : 'NOT FOUND');
+    console.log('symfonyInput:', symfonyInput ? 'found' : 'NOT FOUND');
+    console.log('addBtn:', addBtn ? 'found' : 'NOT FOUND');
+
+    if (!fallbackInput) {
+        console.error('fallback input not found');
+        return;
+    }
+
+    console.log('fallbackInput value:', fallbackInput.value);
+
+    try {
+        const parsed = JSON.parse(fallbackInput.value || '[]');
+        formFields = Array.isArray(parsed) ? parsed : [];
+        console.log('Parsed formFields:', formFields);
+    } catch (e) {
+        console.error('JSON parse error', e);
+        formFields = [];
+    }
+
+    fieldCounter = formFields.length;
+    console.log('fieldCounter:', fieldCounter);
+
+    if (symfonyInput) {
+        symfonyInput.value = JSON.stringify(formFields);
+        console.log('Set symfonyInput value:', symfonyInput.value);
+    }
+
+    renderFormFields();
+
+    if (addBtn) {
+        addBtn.addEventListener('click', handleAddField);
+        console.log('add-field-btn connected');
+    } else {
+        console.error('add-field-btn not found');
+    }
+}
+
+function handleAddField() {
+    const select = document.getElementById('add-field-select');
+    if (!select) {
+        console.error('select not found');
+        return;
+    }
+
+    const type = select.value;
+    if (!type) {
+        alert('Please select a field type');
+        return;
+    }
+
+    addFormField(type);
+    select.value = '';
+}
+
+function addFormField(type) {
+    console.log('addFormField', type);
+
+    const field = {
+        type: type,
+        enabled: true,
+        id: 'field_' + (++fieldCounter)
+    };
+    
+    console.log('Created field object:', field);
+
+    switch (type) {
+        case 'text':
+            field.label = 'Text Field';
+            field.name = 'text_field_' + fieldCounter;
+            field.placeholder = '';
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'email':
+            field.label = 'Email Address';
+            field.name = 'email_' + fieldCounter;
+            field.placeholder = 'your@email.com';
+            field.required = true;
+            field.width = 'full';
+            break;
+        case 'tel':
+            field.label = 'Phone Number';
+            field.name = 'phone_' + fieldCounter;
+            field.placeholder = '+1 (555) 123-4567';
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'textarea':
+            field.label = 'Message';
+            field.name = 'message_' + fieldCounter;
+            field.placeholder = 'Your message...';
+            field.rows = '4';
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'select':
+            field.label = 'Select Option';
+            field.name = 'select_option_' + fieldCounter;
+            field.options = "Option 1\nOption 2\nOption 3";
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'radio':
+            field.label = 'Choose One';
+            field.name = 'radio_option_' + fieldCounter;
+            field.options = "Option 1\nOption 2\nOption 3";
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'checkbox':
+            field.label = 'I agree';
+            field.name = 'consent_' + fieldCounter;
+            field.options = '';
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'number':
+            field.label = 'Number';
+            field.name = 'number_field_' + fieldCounter;
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'date':
+            field.label = 'Date';
+            field.name = 'date_field_' + fieldCounter;
+            field.required = false;
+            field.width = 'full';
+            break;
+        case 'hidden':
+            field.label = '';
+            field.name = 'hidden_field_' + fieldCounter;
+            field.default_value = '';
+            field.width = 'full';
+            break;
+    }
+
+    formFields.push(field);
+    renderFormFields();
+    updateFieldsJson();
+}
+
+function removeFormField(btn) {
+    const card = btn.closest('.field-card');
+    if (!card) return;
+
+    const index = parseInt(card.dataset.index, 10);
+    if (isNaN(index)) return;
+
+    formFields.splice(index, 1);
+    renderFormFields();
+    updateFieldsJson();
+}
+
+function toggleFieldConfig(btn) {
+    const card = btn.closest('.field-card');
+    if (!card) return;
+
+    const config = card.querySelector('.field-config');
+    if (!config) return;
+
+    config.style.display = config.style.display === 'none' ? 'block' : 'none';
+}
+
+function renderFormFields() {
+    console.log('renderFormFields called, formFields:', formFields);
+    const container = document.getElementById('form-fields-container');
+    const emptyState = document.getElementById('form-fields-empty');
+
+    if (!container) {
+        console.error('form-fields-container not found');
+        return;
+    }
+
+    container.innerHTML = '';
+
+    if (!Array.isArray(formFields) || formFields.length === 0) {
+        console.log('No form fields to render, showing empty state');
+        if (emptyState) emptyState.classList.remove('d-none');
+        return;
+    }
+
+    console.log('Rendering', formFields.length, 'fields');
+    if (emptyState) emptyState.classList.add('d-none');
+
+    formFields.forEach(function(field, index) {
+        const template = document.getElementById('form-field-template-' + field.type);
+        if (!template) {
+            console.warn('template not found for type:', field.type);
             return;
         }
-        const existingData = existingDataEl.value;
-        try {
-            const parsed = JSON.parse(existingData);
-            // Ensure formFields is always an array
-            formFields = Array.isArray(parsed) ? parsed : [];
-            console.log('Form Fields loaded:', formFields);
-        } catch(e) {
-            console.error('Error parsing existing form fields:', e);
-            formFields = [];
-        }
-        renderFormFields();
-        
-        // Add event listener directly to the button
-        const addFieldBtn = document.getElementById('add-field-btn');
-        if (addFieldBtn) {
-            addFieldBtn.addEventListener('click', function(e) {
-                console.log('Add Field button clicked via event listener');
-                handleAddField();
-            });
-            console.log('Event listener added to add-field-btn');
-        } else {
-            console.error('Add Field button not found!');
-        }
-        
-        // Use event delegation for add field buttons
-        document.addEventListener('click', function(event) {
-            const button = event.target.closest('.js-add-field-btn');
-            if (button) {
-                event.preventDefault();
-                event.stopPropagation();
-                const type = button.getAttribute('data-type');
-                console.log('Add Field button clicked, type:', type);
-                addFormField(type);
-                // Close dropdown - find the toggle button
-                const toggleBtn = button.closest('.btn-group').querySelector('.dropdown-toggle');
-                if (toggleBtn) {
-                    toggleBtn.classList.remove('show');
-                    toggleBtn.setAttribute('aria-expanded', 'false');
-                    const menu = toggleBtn.nextElementSibling;
-                    if (menu && menu.classList.contains('dropdown-menu')) {
-                        menu.classList.remove('show');
-                    }
-                }
+
+        const html = template.innerHTML.replace(/__INDEX__/g, index);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        const card = tempDiv.querySelector('.field-card');
+        if (!card) return;
+
+        card.dataset.index = index;
+
+        const inputs = tempDiv.querySelectorAll('.field-field');
+        inputs.forEach(function(input) {
+            const match = input.name.match(/\[\d+\]\[(.+?)\]$/);
+            if (!match) return;
+
+            const key = match[1];
+            if (!(key in field)) return;
+
+            if (input.type === 'checkbox') {
+                input.checked = !!field[key];
+            } else {
+                input.value = field[key] ?? '';
             }
         });
+
+        container.appendChild(card);
     });
+}
 
-    function handleAddField() {
-        console.log('handleAddField called');
-        const select = document.getElementById('add-field-select');
-        if (!select) {
-            console.error('Select element not found!');
-            alert('Error: Select element not found');
-            return;
-        }
-        const type = select.value;
-        console.log('Selected type:', type);
-        if (!type) {
-            alert('Please select a field type');
-            return;
-        }
-        addFormField(type);
-        // Reset select
-        select.value = '';
-    }
+function updateFieldsJson() {
+    const container = document.getElementById('form-fields-container');
+    const symfonyInput = document.getElementById('page_section_form_fields_json');
+    const fallbackInput = document.getElementById('form_fields_json_fallback');
 
-    function addFormField(type) {
-        console.log('Add Field function called, type:', type);
-        console.log('Current formFields:', formFields);
-        const field = {
-            type: type,
-            enabled: true,
-            id: 'field_' + (++fieldCounter)
-        };
+    if (!container) return;
 
-        // Add default values based on type
-        switch(type) {
-            case 'text':
-                field.label = 'Text Field';
-                field.name = 'text_field';
-                field.placeholder = '';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'email':
-                field.label = 'Email Address';
-                field.name = 'email';
-                field.placeholder = 'your@email.com';
-                field.required = true;
-                field.width = 'full';
-                break;
-            case 'tel':
-                field.label = 'Phone Number';
-                field.name = 'phone';
-                field.placeholder = '+1 (555) 123-4567';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'textarea':
-                field.label = 'Message';
-                field.name = 'message';
-                field.placeholder = 'Your message...';
-                field.rows = '4';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'select':
-                field.label = 'Select Option';
-                field.name = 'select_option';
-                field.options = "Option 1\nOption 2\nOption 3";
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'radio':
-                field.label = 'Choose One';
-                field.name = 'radio_option';
-                field.options = "Option 1\nOption 2\nOption 3";
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'checkbox':
-                field.label = 'I agree';
-                field.name = 'consent';
-                field.options = '';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'number':
-                field.label = 'Number';
-                field.name = 'number_field';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'date':
-                field.label = 'Date';
-                field.name = 'date_field';
-                field.required = false;
-                field.width = 'full';
-                break;
-            case 'hidden':
-                field.name = 'hidden_field';
-                field.default_value = '';
-                break;
-        }
+    const cards = container.querySelectorAll('.field-card');
+    const updatedFields = [];
 
-        formFields.push(field);
-        renderFormFields();
-        updateFieldsJson();
-    }
+    cards.forEach(function(card) {
+        const fieldData = {};
+        const inputs = card.querySelectorAll('.field-field');
 
-    function removeFormField(btn) {
-        const card = btn.closest('.field-card');
-        const index = parseInt(card.dataset.index);
-        formFields.splice(index, 1);
-        renderFormFields();
-        updateFieldsJson();
-    }
+        inputs.forEach(function(input) {
+            const match = input.name.match(/\[\d+\]\[(.+?)\]$/);
+            if (!match) return;
 
-    function toggleFieldConfig(btn) {
-        const card = btn.closest('.field-card');
-        const config = card.querySelector('.field-config');
-        config.style.display = config.style.display === 'none' ? 'block' : 'none';
-    }
+            const key = match[1];
 
-    function renderFormFields() {
-        console.log('renderFormFields called, formFields length:', formFields ? formFields.length : 'formFields is undefined');
-        const container = document.getElementById('form-fields-container');
-        const emptyState = document.getElementById('form-fields-empty');
-
-        if (!container) {
-            console.error('Container not found!');
-            return;
-        }
-
-        container.innerHTML = '';
-
-        if (!formFields || formFields.length === 0) {
-            emptyState.classList.remove('d-none');
-            return;
-        }
-
-        emptyState.classList.add('d-none');
-
-        formFields.forEach(function(field, index) {
-            const templateId = 'form-field-template-' + field.type;
-            const template = document.getElementById(templateId);
-
-            if (template) {
-                let html = template.innerHTML.replace(/__INDEX__/g, index);
-
-                // Set values from field data
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-
-                // Set field values
-                Object.keys(field).forEach(function(key) {
-                    if (key === 'type' || key === 'id') return;
-
-                    const fieldEl = tempDiv.querySelector('[name$="[' + key + ']"]');
-                    if (fieldEl) {
-                        if (fieldEl.type === 'checkbox') {
-                            fieldEl.checked = field[key];
-                        } else {
-                            fieldEl.value = field[key];
-                        }
-                    }
-                });
-
-                const card = tempDiv.querySelector('.field-card');
-                card.dataset.index = index;
-                container.appendChild(card);
+            if (input.type === 'checkbox') {
+                fieldData[key] = input.checked;
+            } else {
+                fieldData[key] = input.value;
             }
         });
+
+        if (!fieldData.type) {
+            fieldData.type = card.dataset.fieldType || 'text';
+        }
+
+        updatedFields.push(fieldData);
+    });
+
+    formFields = updatedFields;
+    const json = JSON.stringify(formFields);
+
+    if (symfonyInput) {
+        symfonyInput.value = json;
     }
 
-    function updateFieldsJson() {
-        // Collect current values from the DOM
-        const container = document.getElementById('form-fields-container');
-        const cards = container.querySelectorAll('.field-card');
-
-        cards.forEach(function(card, index) {
-            const fields = card.querySelectorAll('.field-field');
-            fields.forEach(function(field) {
-                const name = field.name.match(/form_fields\[(\d+)\]\[(\w+)\]/);
-                if (name) {
-                    const fieldIndex = parseInt(name[1]);
-                    const fieldName = name[2];
-
-                    if (formFields[fieldIndex]) {
-                        if (field.type === 'checkbox') {
-                            formFields[fieldIndex][fieldName] = field.checked;
-                        } else {
-                            formFields[fieldIndex][fieldName] = field.value;
-                        }
-                    }
-                }
-            });
-        });
-
-        document.querySelector('[data-form-fields-json]').value = JSON.stringify(formFields);
+    if (fallbackInput) {
+        fallbackInput.value = json;
     }
 
-    // Save fields when form is submitted
-    document.addEventListener('submit', function(e) {
+    console.log('Saved JSON:', json);
+}
+
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('field-field')) {
         updateFieldsJson();
-    });
+    }
+});
 
-    // Update fields on input change
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('field-field')) {
-            updateFieldsJson();
-        }
-    });
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('field-field')) {
+        updateFieldsJson();
+    }
+});
 
-    // Re-render on input change to keep index in sync
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('field-field')) {
-            // Debounce the update
-            clearTimeout(window.formFieldsUpdateTimeout);
-            window.formFieldsUpdateTimeout = setTimeout(updateFieldsJson, 300);
-        }
-    });
+document.addEventListener('submit', function() {
+    updateFieldsJson();
+});
+
+// init for normal load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFormFieldsBuilder);
+} else {
+    initFormFieldsBuilder();
+}
+
+// init for turbo navigation if present
+document.addEventListener('turbo:load', function() {
+    const wrapper = document.querySelector('.form-fields-builder[data-builder="form-fields"]');
+    if (wrapper) {
+        wrapper.dataset.initialized = '0';
+    }
+    initFormFieldsBuilder();
+});
 </script>
-
 <style>
-    .form-fields-builder .field-card {
-        transition: all 0.2s ease;
-    }
-    .form-fields-builder .field-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .form-fields-builder .field-type-badge {
-        font-size: 0.75rem;
-    }
-    .form-fields-builder .field-actions {
-        display: flex;
-        gap: 0.25rem;
-    }
-    .form-fields-builder .dropdown-menu {
-        max-height: 300px;
-        overflow-y: auto;
-    }
+.form-fields-builder .field-card {
+    transition: all 0.2s ease;
+}
+
+.form-fields-builder .field-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-fields-builder .field-type-badge {
+    font-size: 0.75rem;
+}
+
+.form-fields-builder .field-actions {
+    display: flex;
+    gap: 0.25rem;
+}
 </style>

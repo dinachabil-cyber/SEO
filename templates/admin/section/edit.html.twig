@@ -23,7 +23,7 @@
                         </div>
                     {% endif %}
 
-                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false'}}) }}
+                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false', onsubmit: 'updateHeroFieldsJson(); updateFieldsJson(); return true;'}}) }}
                     
                     {% include 'admin/section/_form.html.twig' %}
                     
@@ -31,7 +31,7 @@
                         <a href="{{ path('app_page_builder', {siteId: site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
                             Cancel
                         </a>
-                        <a href="{{ path('app_front_page', {slug: page.slug}) }}" target="_blank" class="btn btn-outline-info">
+                        <a href="{{ path('app_front_page', {slug: page.slug}) }}" class="btn btn-outline-info">
                             <i class="bi bi-eye me-1"></i> Preview
                         </a>
                         <button type="submit" class="btn btn-primary">

@@ -15,7 +15,7 @@
                             <a href="{{ path('app_page_edit', {site: page.site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-pencil-square me-1"></i> Page Settings
                             </a>
-                            <a href="{{ path('app_front_page', {slug: page.slug}) }}" target="_blank" class="btn btn-outline-info">
+                            <a href="{{ path('app_front_page', {slug: page.slug}) }}" class="btn btn-outline-info">
                                 <i class="bi bi-eye me-1"></i> Preview
                             </a>
                             <a href="{{ path('app_site_show', {id: page.site.id}) }}" class="btn btn-outline-dark">
@@ -168,17 +168,6 @@
                                             {% endif %}
                                             {% if data.blocks is defined and data.blocks|length > 0 %}
                                                 <p><strong>Blocks:</strong> {{ data.blocks|length }} block(s) configured</p>
-                                            {% endif %}
-                                        {% elseif section.type == 'hero_split' %}
-                                            <p><strong>Hero Title:</strong> {{ data.title ?? '' }}</p>
-                                            {% if data.imageUrl is defined and data.imageUrl %}
-                                                <p><strong>Image:</strong> {{ data.imageUrl ?? '' }}</p>
-                                            {% endif %}
-                                            {% if data.formTitle is defined and data.formTitle %}
-                                                <p><strong>Form Title:</strong> {{ data.formTitle ?? '' }}</p>
-                                            {% endif %}
-                                            {% if data.layout is defined and data.layout %}
-                                                <p><strong>Layout:</strong> {{ data.layout ?? '' }}</p>
                                             {% endif %}
                                         {% elseif section.type == 'body' %}
                                             <p><strong>Content:</strong> {{ (data.content ?? data.html ?? '')|striptags|slice(0, 100) }}...</p>

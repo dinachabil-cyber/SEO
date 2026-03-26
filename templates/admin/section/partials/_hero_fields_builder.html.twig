@@ -1,0 +1,839 @@
+{# Hero Fields Builder Template #}
+{# This template provides the UI for managing hero content fields dynamically #}
+{# Replaces the block-based approach with a simple field builder #}
+
+<div class="hero-fields-builder" data-builder="hero-fields">
+    <div class="builder-header d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">
+            <i class="bi bi-ui-checks me-2"></i>Form Fields
+        </h6>
+        <div class="d-flex align-items-center gap-2">
+            <select id="add-field-type-select" class="form-select form-select-sm" style="width: auto;">
+                <option value="">Select field type...</option>
+                {% for type, label in field_types %}
+                    <option value="{{ type }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-sm btn-primary" onclick="handleAddHeroField()">
+                <i class="bi bi-plus-circle me-1"></i> Add Form Field
+            </button>
+        </div>
+    </div>
+
+    {# Hidden fallback input to load initial JSON (no name to avoid duplicate POST of the same field) #}
+    <input type="hidden" id="hero_form_fields_fallback" data-hero-form-fields-json value="{{ hero_form_fields_json|default('[]') }}">
+    {# Fields Container #}
+    <div id="hero-fields-container" class="fields-container">
+        {# Fields will be rendered here dynamically #}
+    </div>
+
+    {# Empty State #}
+    <div id="hero-fields-empty" class="text-center py-4 {% if fields and fields|length > 0 %}d-none{% endif %}">
+        <div class="text-muted">
+            <i class="bi bi-ui-checks-grid display-4"></i>
+            <p class="mt-2">No form fields yet</p>
+            <p class="small">Click "Add Form Field" to start defining hero content fields</p>
+        </div>
+    </div>
+
+    {# Field Configuration Templates for each type #}
+    <template id="hero-field-template-text">
+        <div class="field-card card mb-3" data-field-type="text">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-info">Text Input</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Hero Title">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., hero_title">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][default_value]" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content" selected>Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Placeholder</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][placeholder]" value="" placeholder="Optional placeholder text">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="text">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-textarea">
+        <div class="field-card card mb-3" data-field-type="textarea">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-secondary">Text Area</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Hero Subtitle">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., hero_subtitle">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <textarea class="form-control field-field" name="fields[__INDEX__][default_value]" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content" selected>Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Placeholder</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][placeholder]" value="" placeholder="Optional placeholder text">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="textarea">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-select">
+        <div class="field-card card mb-3" data-field-type="select">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-warning text-dark">Dropdown</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Layout Type">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., layout_type">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Options (one per line) *</label>
+                    <textarea class="form-control field-field" name="fields[__INDEX__][options]" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][default_value]" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content" selected>Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="select">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-checkbox">
+        <div class="field-card card mb-3" data-field-type="checkbox">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-success">Checkbox</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Show Image">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., show_image">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][default_value]">
+                                <option value="">Unchecked</option>
+                                <option value="1">Checked</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content" selected>Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="checkbox">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-image">
+        <div class="field-card card mb-3" data-field-type="image">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-dark">Image URL</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Hero Image">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., hero_image_url">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value (URL)</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][default_value]" value="" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content">Content</option>
+                                <option value="media" selected>Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="image">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-url">
+        <div class="field-card card mb-3" data-field-type="url">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-primary">URL</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Button URL">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., primary_button_url">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][default_value]" value="" placeholder="https://example.com">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content">Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons" selected>Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Placeholder</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][placeholder]" value="" placeholder="https://...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="url">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-color">
+        <div class="field-card card mb-3" data-field-type="color">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge" style="background-color: #ff6b6b;">Color</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Title Color">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., title_color">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value (Hex)</label>
+                            <input type="color" class="form-control field-field" name="fields[__INDEX__][default_value]" value="#000000">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content">Content</option>
+                                <option value="media">Media</option>
+                                <option value="style" selected>Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="color">
+            </div>
+        </div>
+    </template>
+
+    <template id="hero-field-template-number">
+        <div class="field-card card mb-3" data-field-type="number">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-info">Number</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Padding Top">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., padding_top">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <input type="number" class="form-control field-field" name="fields[__INDEX__][default_value]" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content">Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout" selected>Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Placeholder</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][placeholder]" value="" placeholder="e.g., 20">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="number">
+            </div>
+        </div>
+    </template>
+
+    {# Generic fallback template for other types (email, tel, date) #}
+    <template id="hero-field-template-generic">
+        <div class="field-card card mb-3" data-field-type="__TYPE__">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <span class="field-type-badge badge bg-secondary">__TYPE_LABEL__</span>
+                <div class="field-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="toggleFieldConfig(this)" title="Configure">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHeroField(this)" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body field-config" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Label *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="Field label">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Field Name (Key) *</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="field_name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Default Value</label>
+                            <input type="text" class="form-control field-field" name="fields[__INDEX__][default_value]" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Category/Tab</label>
+                            <select class="form-select field-field" name="fields[__INDEX__][category]">
+                                <option value="content" selected>Content</option>
+                                <option value="media">Media</option>
+                                <option value="style">Style</option>
+                                <option value="buttons">Buttons</option>
+                                <option value="layout">Layout</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Placeholder</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][placeholder]" value="" placeholder="Optional placeholder">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Help Text</label>
+                    <input type="text" class="form-control field-field" name="fields[__INDEX__][help_text]" value="" placeholder="Optional description">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
+                    <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
+                </div>
+                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="__TYPE__">
+            </div>
+        </div>
+    </template>
+</div>
+
+<script>
+// Hero Fields Builder JavaScript
+let heroFieldIndex = 0;
+
+function handleAddHeroField() {
+    const select = document.getElementById('add-field-type-select');
+    const fieldType = select.value;
+    
+    if (!fieldType) {
+        alert('Please select a field type');
+        return;
+    }
+    
+    addHeroField(fieldType);
+    select.value = '';
+}
+
+function addHeroField(fieldType) {
+    const container = document.getElementById('hero-fields-container');
+    const template = document.getElementById('hero-field-template-' + fieldType);
+    
+    if (!template) {
+        // Use generic template for unknown types
+        const genericTemplate = document.getElementById('hero-field-template-generic');
+        const clone = genericTemplate.cloneNode(true);
+        clone.innerHTML = clone.innerHTML.replace(/__TYPE__/g, fieldType).replace(/__TYPE_LABEL__/g, fieldType.charAt(0).toUpperCase() + fieldType.slice(1));
+        clone.id = '';
+        clone.style.display = 'block';
+        
+        // Update indices
+        clone.innerHTML = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
+        container.appendChild(clone);
+    } else {
+        const clone = template.cloneNode(true);
+        clone.id = '';
+        clone.style.display = 'block';
+        
+        // Update indices
+        const html = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
+        clone.innerHTML = html;
+        container.appendChild(clone);
+    }
+    
+    heroFieldIndex++;
+    updateHeroFieldsEmptyState();
+    updateHeroFieldsJson();
+}
+
+function removeHeroField(button) {
+    const card = button.closest('.field-card');
+    card.remove();
+    updateHeroFieldsEmptyState();
+    updateHeroFieldsJson();
+}
+
+function toggleFieldConfig(button) {
+    const card = button.closest('.field-card');
+    const config = card.querySelector('.field-config');
+    if (config.style.display === 'none') {
+        config.style.display = 'block';
+    } else {
+        config.style.display = 'none';
+    }
+}
+
+function updateHeroFieldsEmptyState() {
+    const container = document.getElementById('hero-fields-container');
+    const emptyState = document.getElementById('hero-fields-empty');
+    const fields = container.querySelectorAll('.field-card');
+    
+    if (fields.length > 0) {
+        emptyState.classList.add('d-none');
+    } else {
+        emptyState.classList.remove('d-none');
+    }
+}
+
+function updateHeroFieldsJson() {
+    console.log('updateHeroFieldsJson called');
+    const container = document.getElementById('hero-fields-container');
+    const fields = container.querySelectorAll('.field-card');
+    const fieldsData = [];
+    
+    fields.forEach(function(fieldCard, index) {
+        const fieldData = {
+            type: fieldCard.querySelector('input[name*="[type]"]')?.value || 'text',
+            label: fieldCard.querySelector('input[name*="[label]"]')?.value || '',
+            name: fieldCard.querySelector('input[name*="[name]"]')?.value || '',
+            default_value: fieldCard.querySelector('input[name*="[default_value]"]')?.value || '',
+            category: fieldCard.querySelector('select[name*="[category]"]')?.value || 'content',
+            placeholder: fieldCard.querySelector('input[name*="[placeholder]"]')?.value || '',
+            help_text: fieldCard.querySelector('input[name*="[help_text]"]')?.value || '',
+            options: fieldCard.querySelector('textarea[name*="[options]"]')?.value || '',
+            enabled: fieldCard.querySelector('input[name*="[enabled]"]')?.checked || false
+        };
+        fieldsData.push(fieldData);
+    });
+    
+    // Update the Symfony-rendered hidden input (id: page_section_hero_form_fields_json)
+    const symfonyInput = document.getElementById('page_section_hero_form_fields_json');
+    console.log('Symfony hero_form_fields_json input:', symfonyInput);
+    if (symfonyInput) {
+        symfonyInput.value = JSON.stringify(fieldsData);
+        console.log('Updated Symfony hero_form_fields_json value to:', symfonyInput.value);
+    } else {
+        console.log('ERROR: Symfony hero_form_fields_json input not found, trying deprecated hero_fields');
+        // Fallback to deprecated hero_fields for backward compatibility
+        const deprecatedInput = document.getElementById('page_section_hero_fields');
+        if (deprecatedInput) {
+            deprecatedInput.value = JSON.stringify(fieldsData);
+            console.log('Updated deprecated hero_fields value to:', deprecatedInput.value);
+        }
+    }
+    
+    // Also update the fallback input
+    const fallbackInput = document.getElementById('hero_form_fields_fallback');
+    console.log('Fallback hero_form_fields input:', fallbackInput);
+    if (fallbackInput) {
+        fallbackInput.value = JSON.stringify(fieldsData);
+        console.log('Updated fallback hero_form_fields value to:', fallbackInput.value);
+    } else {
+        // Fallback to deprecated fallback input
+        const deprecatedFallback = document.getElementById('hero_fields_fallback');
+        if (deprecatedFallback) {
+            deprecatedFallback.value = JSON.stringify(fieldsData);
+        }
+    }
+}
+
+// Initialize - load existing fields
+document.addEventListener('DOMContentLoaded', function() {
+    // Try new hero_form_fields_json field first, then fallback to deprecated hero_fields
+    const jsonInput = document.getElementById('page_section_hero_form_fields_json');
+    console.log('Symfony hero_form_fields_json input element:', jsonInput);
+    console.log('hero_form_fields_json input value:', jsonInput ? jsonInput.value : 'not found');
+    
+    // If new field not found, try deprecated hero_fields
+    let initialValue = jsonInput && jsonInput.value ? jsonInput.value : null;
+    
+    // Also check fallback inputs
+    const fallbackInput = document.getElementById('hero_form_fields_fallback');
+    console.log('Fallback hero_form_fields input element:', fallbackInput);
+    console.log('Fallback value:', fallbackInput ? fallbackInput.value : 'not found');
+    
+    // Try fallback if main input is empty
+    if ((!initialValue || initialValue === '[]') && fallbackInput && fallbackInput.value) {
+        initialValue = fallbackInput.value;
+    }
+    
+    // Final fallback to deprecated hero_fields
+    if ((!initialValue || initialValue === '[]')) {
+        const deprecatedInput = document.getElementById('page_section_hero_fields');
+        const deprecatedFallback = document.getElementById('hero_fields_fallback');
+        if (deprecatedInput && deprecatedInput.value) {
+            initialValue = deprecatedInput.value;
+        } else if (deprecatedFallback && deprecatedFallback.value) {
+            initialValue = deprecatedFallback.value;
+        }
+    }
+    
+    if (initialValue) {
+        try {
+            const parsed = JSON.parse(initialValue);
+            console.log('Parsed hero fields:', parsed);
+            // Ensure fields is always an array
+            const fields = Array.isArray(parsed) ? parsed : [];
+            console.log('Loading hero fields, count:', fields.length);
+            const container = document.getElementById('hero-fields-container');
+            
+            fields.forEach(function(field) {
+                const fieldType = field.type || 'text';
+                const template = document.getElementById('hero-field-template-' + fieldType);
+                
+                if (template) {
+                    const clone = template.cloneNode(true);
+                    clone.id = '';
+                    clone.style.display = 'block';
+                    
+                    // Set values
+                    let html = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
+                    html = html.replace(/name="fields\[__INDEX__\]\[label\]" value="/, 'name="fields[' + heroFieldIndex + '][label]" value="' + (field.label || ''));
+                    html = html.replace(/name="fields\[__INDEX__\]\[name\]" value="/, 'name="fields[' + heroFieldIndex + '][name]" value="' + (field.name || ''));
+                    html = html.replace(/name="fields\[__INDEX__\]\[default_value\]"(?: value="[^"]*")?>/, 'name="fields[' + heroFieldIndex + '][default_value]" value="' + (field.default_value || '') + '">');
+                    html = html.replace(/name="fields\[__INDEX__\]\[placeholder\]" value="/, 'name="fields[' + heroFieldIndex + '][placeholder]" value="' + (field.placeholder || ''));
+                    html = html.replace(/name="fields\[__INDEX__\]\[help_text\]" value="/, 'name="fields[' + heroFieldIndex + '][help_text]" value="' + (field.help_text || ''));
+                    
+                    // Set category select
+                    if (field.category) {
+                        html = html.replace(/value="content">/, 'value="' + field.category + '">');
+                    }
+                    
+                    // Set enabled checkbox
+                    if (field.enabled === false) {
+                        html = html.replace(/name="fields\[__INDEX__\]\[enabled\]" value="1" checked/, 'name="fields[' + heroFieldIndex + '][enabled]" value="1"');
+                    }
+                    
+                    clone.innerHTML = html;
+                    container.appendChild(clone);
+                    heroFieldIndex++;
+                }
+            });
+            
+            updateHeroFieldsEmptyState();
+        } catch (e) {
+            console.error('Error parsing hero fields JSON:', e);
+        }
+    }
+    
+    // Add event listeners for real-time updates
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('field-field')) {
+            updateHeroFieldsJson();
+        }
+    });
+    
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('field-field')) {
+            updateHeroFieldsJson();
+        }
+    });
+});
+</script>

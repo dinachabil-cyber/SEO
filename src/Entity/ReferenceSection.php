@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ReferenceSection
 {
     public const ALLOWED_TYPES = [
-        'header', 'hero', 'hero_split', 'body', 'image', 'cards', 'cards_premium', 'faq', 'form', 'cta', 'footer'
+        'header', 'hero', 'body', 'image', 'cards', 'cards_premium', 'faq', 'form', 'cta', 'footer'
     ];
 
     #[ORM\Id]
