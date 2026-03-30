@@ -27,14 +27,14 @@
         {# Fields will be rendered here dynamically #}
     </div>
 
-    {# Empty State #}
-    <div id="hero-fields-empty" class="text-center py-4 {% if fields and fields|length > 0 %}d-none{% endif %}">
-        <div class="text-muted">
-            <i class="bi bi-ui-checks-grid display-4"></i>
-            <p class="mt-2">No form fields yet</p>
-            <p class="small">Click "Add Form Field" to start defining hero content fields</p>
-        </div>
-    </div>
+     {# Empty State #}
+     <div id="hero-fields-empty" class="text-center py-4 {% if fields is defined and fields and fields|length > 0 %}d-none{% endif %}">
+         <div class="text-muted">
+             <i class="bi bi-ui-checks-grid display-4"></i>
+             <p class="mt-2">No form fields yet</p>
+             <p class="small">Click "Add Form Field" to start defining hero content fields</p>
+         </div>
+     </div>
 
     {# Field Configuration Templates for each type #}
     <template id="hero-field-template-text">

@@ -27,14 +27,14 @@
     {# Fields Container #}
     <div id="form-fields-container" class="fields-container"></div>
 
-    {# Empty State #}
-    <div id="form-fields-empty" class="text-center py-4 {% if fields and fields|length > 0 %}d-none{% endif %}">
-        <div class="text-muted">
-            <i class="bi bi-input-cursor display-4"></i>
-            <p class="mt-2">No form fields yet</p>
-            <p class="small">Click "Add Field" to start building your form</p>
-        </div>
-    </div>
+     {# Empty State #}
+     <div id="form-fields-empty" class="text-center py-4 {% if fields is defined and fields and fields|length > 0 %}d-none{% endif %}">
+         <div class="text-muted">
+             <i class="bi bi-input-cursor display-4"></i>
+             <p class="mt-2">No form fields yet</p>
+             <p class="small">Click "Add Field" to start building your form</p>
+         </div>
+     </div>
 
     {# ===================== TEMPLATES ===================== #}
 

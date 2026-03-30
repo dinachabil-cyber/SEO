@@ -1,10 +1,6 @@
 {{ form_row(form.type) }}
 
-{# Explicitly render hidden fields for form_fields_json and hero_form_fields_json so they have correct names and can be updated by JavaScript #}
-<style>#page_section_form_fields_json, #page_section_hero_form_fields_json, #page_section_hero_fields { display: none; }</style>
-{{ form_widget(form.form_fields_json) }}
-{{ form_widget(form.hero_form_fields_json) }}
-{{ form_widget(form.hero_fields) }}
+
 
 {% if form.data is defined %}
     <div class="section-data-fields">
@@ -50,12 +46,7 @@
         {% elseif form.vars.value.type == 'hero' %}
             <ul class="nav nav-tabs" id="heroSectionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="fields-tab" data-bs-toggle="tab" data-bs-target="#hero-fields" type="button" role="tab" aria-controls="hero-fields" aria-selected="true">
-                        <i class="bi bi-ui-checks me-1"></i>Form Fields
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#hero-content" type="button" role="tab" aria-controls="hero-content" aria-selected="false">Content</button>
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#hero-content" type="button" role="tab" aria-controls="hero-content" aria-selected="true">Content</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#hero-media" type="button" role="tab" aria-controls="hero-media" aria-selected="false">Media</button>
@@ -69,30 +60,11 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#hero-buttons" type="button" role="tab" aria-controls="hero-buttons" aria-selected="false">Buttons</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-fields-tab" data-bs-toggle="tab" data-bs-target="#hero-form-fields" type="button" role="tab" aria-controls="hero-form-fields" aria-selected="false">Form Fields</button>
+                </li>
             </ul>
             <div class="tab-content p-3 border border-top-0" id="heroSectionTabsContent">
-                {# Form Fields Tab (Field-Based System) #}
-                <div class="tab-pane fade show active" id="hero-fields" role="tabpanel" aria-labelledby="fields-tab">
-                    {% set heroFormFieldsJson = form.hero_form_fields_json.vars.value|default('') %}
-                    {% if heroFormFieldsJson is empty or heroFormFieldsJson is iterable %}{% set heroFormFieldsJson = '[]' %}{% endif %}
-                    {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
-                        fields: [],
-                        hero_form_fields_json: heroFormFieldsJson,
-                        field_types: {
-                            'text': 'Text Input',
-                            'textarea': 'Text Area',
-                            'select': 'Dropdown',
-                            'checkbox': 'Checkbox',
-                            'image': 'Image URL',
-                            'url': 'URL',
-                            'color': 'Color',
-                            'number': 'Number',
-                            'email': 'Email',
-                            'tel': 'Phone',
-                            'date': 'Date'
-                        }
-                    } %}
-                </div>
                 
                 {# Content Tab #}
                 <div class="tab-pane fade" id="hero-content" role="tabpanel" aria-labelledby="content-tab">
@@ -263,6 +235,27 @@
                         </div>
                     </div>
                 </div>
+                {# Form Fields Tab #}
+                <div class="tab-pane fade" id="hero-form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
+                    {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
+                        'fields': form.hero_form_fields_json.vars.value ?? '[]',
+                        'field_types': {
+                            'text': 'Text Input',
+                            'textarea': 'Text Area',
+                            'email': 'Email',
+                            'tel': 'Phone',
+                            'select': 'Dropdown',
+                            'checkbox': 'Checkbox',
+                            'radio': 'Radio Buttons',
+                            'number': 'Number',
+                            'date': 'Date',
+                            'color': 'Color',
+                            'url': 'URL',
+                            'image': 'Image URL',
+                            'hidden': 'Hidden Field'
+                        }
+                    } %}
+                </div>
             </div>
             
         {% elseif form.vars.value.type == 'body' %}
@@ -333,11 +326,6 @@
                     <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#form-content" type="button" role="tab" aria-controls="form-content" aria-selected="true">Content</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="fields-tab" data-bs-toggle="tab" data-bs-target="#form-fields" type="button" role="tab" aria-controls="form-fields" aria-selected="false">
-                        <i class="bi bi-ui-checks-grid me-1"></i>Fields
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#form-settings" type="button" role="tab" aria-controls="form-settings" aria-selected="false">Form Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -348,6 +336,9 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#form-style" type="button" role="tab" aria-controls="form-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-fields-tab" data-bs-toggle="tab" data-bs-target="#form-fields" type="button" role="tab" aria-controls="form-fields" aria-selected="false">Form Fields</button>
                 </li>
             </ul>
             <div class="tab-content p-3 border border-top-0" id="formSectionTabsContent">
@@ -367,28 +358,6 @@
                             {{ form_row(dataForm.success_message) }}
                         </div>
                     </div>
-                </div>
-                
-                {# Fields Tab (Dynamic Builder) #}
-                <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="fields-tab">
-                    {% set formFieldsJsonValue = form.form_fields_json.vars.value|default('') %}
-                    {% if formFieldsJsonValue is empty or formFieldsJsonValue is iterable %}{% set formFieldsJsonValue = '[]' %}{% endif %}
-                    {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
-                        fields: [],
-                        form_fields_json: formFieldsJsonValue,
-                        field_types: {
-                            'text': 'Text Input',
-                            'email': 'Email',
-                            'tel': 'Phone',
-                            'textarea': 'Text Area',
-                            'select': 'Dropdown (Select)',
-                            'radio': 'Radio Buttons',
-                            'checkbox': 'Checkbox',
-                            'number': 'Number',
-                            'date': 'Date',
-                            'hidden': 'Hidden Field'
-                        }
-                    } %}
                 </div>
                 
                 {# Form Settings Tab #}
@@ -519,6 +488,24 @@
                         </div>
                     </div>
                     {{ form_row(dataForm.box_shadow) }}
+                </div>
+                {# Form Fields Tab #}
+                <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
+                    {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
+                        'fields': form.form_fields_json.vars.value ?? '[]',
+                        'field_types': {
+                            'text': 'Text Input',
+                            'email': 'Email',
+                            'tel': 'Phone',
+                            'textarea': 'Text Area',
+                            'select': 'Dropdown',
+                            'radio': 'Radio Buttons',
+                            'checkbox': 'Checkbox',
+                            'number': 'Number',
+                            'date': 'Date',
+                            'hidden': 'Hidden Field'
+                        }
+                    } %}
                 </div>
             </div>
             

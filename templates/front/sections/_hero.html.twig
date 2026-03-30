@@ -1,11 +1,6 @@
-{# Hero Section - Simplified Field-Based Rendering #}
-{# Uses field values directly from data (e.g., data.hero_title, data.primary_button_text) #}
 
-{# Initialize hero_fields - field definitions #}
-{% set hero_fields = [] %}
-{% if data.hero_fields is defined and data.hero_fields is iterable %}
-    {% set hero_fields = data.hero_fields %}
-{% endif %}
+{# Hero Section - Simplified Rendering #}
+{# Uses field values directly from data (e.g., data.hero_title, data.primary_button_text) #}
 
 {# Build style attribute - simple approach #}
 {% set hero_style = '' %}
@@ -49,26 +44,7 @@
     {% set hero_class = hero_class ~ ' custom-bg' %}
 {% endif %}
 
-{# Check if hero_fields exist and has enabled fields - NEW FIELD-BASED SYSTEM #}
-{% set has_hero_fields = hero_fields is iterable and hero_fields|length > 0 %}
 
-{# Helper function to check if field is enabled #}
-{% macro isFieldEnabled(field) %}
-    {% if field.enabled is not defined or field.enabled == true or field.enabled == '1' %}
-        {{ true }}
-    {% else %}
-        {{ false }}
-    {% endif %}
-{% endmacro %}
-
-{# Helper function to get field value by name #}
-{% macro getFieldValue(data, fieldName) %}
-    {% if data[fieldName] is defined %}
-        {{ data[fieldName] }}
-    {% else %}
-        {{ null }}
-    {% endif %}
-{% endmacro %}
 
 <section class="{{ hero_class }}"{% if hero_style %} style="{{ hero_style }}"{% endif %}>
     <div class="container">
@@ -76,70 +52,7 @@
             <div class="col-lg-6">
                 <div class="hero-content {{ text_align_class }}"{% if text_style %} style="{{ text_style }}"{% endif %}>
                     
-                    {# ===== FIELD-BASED RENDERING ===== #}
-                    {% if has_hero_fields %}
-                        {# Render based on field definitions #}
-                        {% for field in hero_fields %}
-                            {% if field.enabled != false %}
-                                {# TEXT FIELD - Title-like #}
-                                {% if field.type == 'text' and field.name == 'hero_title' %}
-                                    {% if attribute(data, field.name) is defined and attribute(data, field.name) %}
-                                        <h1 class="display-4 mb-4" style="{% if attribute(data, 'title_color') is defined %}color: {{ attribute(data, 'title_color') }};{% endif %}">
-                                            {{ attribute(data, field.name) }}
-                                        </h1>
-                                    {% endif %}
-                                
-                                {# TEXT FIELD - Generic text output #}
-                                {% elseif field.type == 'text' %}
-                                    {% if attribute(data, field.name) is defined and attribute(data, field.name) %}
-                                        <p class="mb-3">{{ attribute(data, field.name) }}</p>
-                                    {% endif %}
-                                
-                                {# TEXTAREA FIELD #}
-                                {% elseif field.type == 'textarea' %}
-                                    {% if attribute(data, field.name) is defined and attribute(data, field.name) %}
-                                        <p class="mb-4">{{ attribute(data, field.name) }}</p>
-                                    {% endif %}
-                                
-                                {# COLOR FIELD - skip in content area #}
-                                {% elseif field.type == 'color' %}
-                                    {# Colors handled via style attributes #}
-                                
-                                {# IMAGE FIELD - skip in content area #}
-                                {% elseif field.type == 'image' %}
-                                    {# Images handled in media column #}
-                                
-                                {# URL FIELD - skip in content area #}
-                                {% elseif field.url %}
-                                    {# URLs used for buttons #}
-                                
-                                {# CHECKBOX - use for show/hide logic #}
-                                {% elseif field.type == 'checkbox' %}
-                                    {# Checkboxes control visibility of sections #}
-                                
-                                {# SELECT FIELD - render as appropriate #}
-                                {% elseif field.type == 'select' %}
-                                    {# Select values used for styling/configuration #}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {# Render buttons from field values #}
-                        {% if data.primary_button_text is defined and data.primary_button_text %}
-                            <a href="{{ data.primary_button_url|default('#') }}" class="btn btn-{{ data.primary_button_style|default('primary') }} btn-lg mb-4" 
-                               {% if data.primary_button_background_color is defined %}style="background-color: {{ data.primary_button_background_color }};{% endif %}">
-                                {{ data.primary_button_text }}
-                            </a>
-                        {% endif %}
-                        
-                        {% if data.secondary_button_text is defined and data.secondary_button_text %}
-                            <a href="{{ data.secondary_button_url|default('#') }}" class="btn btn-outline-{{ data.secondary_button_style|default('secondary') }} btn-lg mb-4">
-                                {{ data.secondary_button_text }}
-                            </a>
-                        {% endif %}
-                        
-                    {% else %}
-                        {# ===== LEGACY/DEFAULT FIELDS (fallback) ===== #}
+                    {# ===== LEGACY/DEFAULT FIELDS ===== #}
                         {% if data.top_text is defined and data.top_text %}
                             <span class="badge bg-primary mb-3" style="display: inline-block;">{{ data.top_text }}</span>
                         {% endif %}
@@ -166,8 +79,6 @@
                                 {{ data.primary_button_text }}
                             </a>
                         {% endif %}
-                    {% endif %}
-
                     {# ===== PHONE NUMBER ===== #}
                     {% if data.phone_number is defined and data.phone_number %}
                         <div class="hero-phone mt-3">
@@ -186,23 +97,7 @@
             {% endif %}
             
             {% if show_image %}
-                {# Check for hero image field #}
-                {% set hero_image_field = null %}
-                {% if has_hero_fields %}
-                    {% for field in hero_fields %}
-                        {% if field.type == 'image' and field.name == 'hero_image_url' %}
-                            {% set hero_image_field = field %}
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-                
-                {% if hero_image_field and attribute(data, 'hero_image_url') is defined and attribute(data, 'hero_image_url') %}
-                    <div class="col-lg-6 mt-4 mt-lg-0">
-                        <div class="hero-media">
-                            <img src="{{ attribute(data, 'hero_image_url') }}" alt="{{ data.image_alt_text|default('') }}" class="img-fluid">
-                        </div>
-                    </div>
-                {% elseif data.hero_image_url is defined and data.hero_image_url %}
+                {% if data.hero_image_url is defined and data.hero_image_url %}
                     <div class="col-lg-6 mt-4 mt-lg-0">
                         <div class="hero-media">
                             <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
