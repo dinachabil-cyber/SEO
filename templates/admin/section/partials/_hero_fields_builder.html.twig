@@ -1,3 +1,4 @@
+
 {# Hero Fields Builder Template #}
 {# This template provides the UI for managing hero content fields dynamically #}
 {# Replaces the block-based approach with a simple field builder #}
@@ -55,13 +56,13 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Field Label *</label>
-                            <input type="text" class="form-control field-field" name="fields[__INDEX__][label]" value="" placeholder="e.g., Hero Title">
+                            <input type="text" class="form-control field-field" data-field="label" value="" placeholder="e.g., Hero Title">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Field Name (Key) *</label>
-                            <input type="text" class="form-control field-field" name="fields[__INDEX__][name]" value="" placeholder="e.g., hero_title">
+                            <input type="text" class="form-control field-field" data-field="name" value="" placeholder="e.g., hero_title">
                         </div>
                     </div>
                 </div>
@@ -97,7 +98,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="text">
+                <input type="hidden" class="field-field" data-field="type" value="text">
             </div>
         </div>
     </template>
@@ -134,7 +135,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Default Value</label>
-                            <textarea class="form-control field-field" name="fields[__INDEX__][default_value]" rows="2"></textarea>
+                            <textarea class="form-control field-field" data-field="default_value" rows="2"></textarea>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -162,7 +163,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="textarea">
+                <input type="hidden" class="field-field" data-field="type" value="textarea">
             </div>
         </div>
     </template>
@@ -197,7 +198,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Options (one per line) *</label>
-                    <textarea class="form-control field-field" name="fields[__INDEX__][options]" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                    <textarea class="form-control field-field" data-field="options" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -227,7 +228,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="select">
+                <input type="hidden" class="field-field" data-field="type" value="select">
             </div>
         </div>
     </template>
@@ -264,7 +265,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Default Value</label>
-                            <select class="form-select field-field" name="fields[__INDEX__][default_value]">
+                            <select class="form-select field-field" data-field="default_value">
                                 <option value="">Unchecked</option>
                                 <option value="1">Checked</option>
                             </select>
@@ -291,7 +292,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="checkbox">
+                <input type="hidden" class="field-field" data-field="type" value="checkbox">
             </div>
         </div>
     </template>
@@ -352,7 +353,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="image">
+                <input type="hidden" class="field-field" data-field="type" value="image">
             </div>
         </div>
     </template>
@@ -417,7 +418,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="url">
+                <input type="hidden" class="field-field" data-field="type" value="url">
             </div>
         </div>
     </template>
@@ -454,7 +455,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Default Value (Hex)</label>
-                            <input type="color" class="form-control field-field" name="fields[__INDEX__][default_value]" value="#000000">
+                            <input type="color" class="form-control field-field" data-field="default_value" value="#000000">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -478,7 +479,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="color">
+                <input type="hidden" class="field-field" data-field="type" value="color">
             </div>
         </div>
     </template>
@@ -543,7 +544,7 @@
                     <input type="checkbox" class="form-check-input field-field" name="fields[__INDEX__][enabled]" id="field_enabled___INDEX__" value="1" checked>
                     <label class="form-check-label" for="field_enabled___INDEX__">Enable this field</label>
                 </div>
-                <input type="hidden" class="field-field" name="fields[__INDEX__][type]" value="number">
+                <input type="hidden" class="field-field" data-field="type" value="number">
             </div>
         </div>
     </template>

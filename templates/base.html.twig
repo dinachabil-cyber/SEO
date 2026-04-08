@@ -96,6 +96,11 @@
                         <i class="bi bi-people"></i> Users
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('admin_event_index') }}">
+                        <i class="bi bi-calendar-event"></i> Events
+                    </a>
+                </li>
                 {% endif %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" id="user-menu-toggle" aria-expanded="false">
@@ -118,6 +123,18 @@
         {% endif %}
         
         <div class="container mt-3">
+            {% if app.request.attributes.get('_route') not in ['app_login', 'app_register', 'password_reset_request'] %}
+            <nav class="mb-3">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('calendar_index') }}">
+                            <i class="bi bi-calendar"></i> Calendar
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+            
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
                     {% set alert_type = label == 'error' ? 'danger' : label %}

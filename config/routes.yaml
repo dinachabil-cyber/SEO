@@ -111,6 +111,25 @@ app_section_down:
         pageId: '\d+'
         sectionId: '\d+'
 
+# Calendar Routes
+calendar_index:
+    path: /calendar
+    controller: 'App\Controller\CalendarController::index'
+    methods: ['GET']
+
+calendar_month:
+    path: /calendar/{year}/{month}
+    controller: 'App\Controller\CalendarController::month'
+    methods: ['GET']
+    requirements:
+        year: '\d{4}'
+        month: '\d{1,2}'
+
+calendar_show:
+    path: /calendar/{slug}
+    controller: 'App\Controller\CalendarController::show'
+    methods: ['GET']
+
 # Security routes
 app_login:
     path: /login
@@ -227,3 +246,35 @@ password_reset_status:
     path: /password-reset/status
     controller: 'App\Controller\PasswordResetRequestController::status'
     methods: ['GET']
+
+# Admin Event Routes
+admin_event_index:
+    path: /admin/event
+    controller: 'App\Controller\EventController::index'
+    methods: ['GET']
+
+admin_event_new:
+    path: /admin/event/new
+    controller: 'App\Controller\EventController::new'
+    methods: ['GET', 'POST']
+
+admin_event_edit:
+    path: /admin/event/{id}/edit
+    controller: 'App\Controller\EventController::edit'
+    methods: ['GET', 'POST']
+    requirements:
+        id: '\d+'
+
+admin_event_duplicate:
+    path: /admin/event/{id}/duplicate
+    controller: 'App\Controller\EventController::duplicate'
+    methods: ['GET']
+    requirements:
+        id: '\d+'
+
+admin_event_delete:
+    path: /admin/event/{id}
+    controller: 'App\Controller\EventController::delete'
+    methods: ['POST']
+    requirements:
+        id: '\d+'
