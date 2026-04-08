@@ -278,3 +278,42 @@ admin_event_delete:
     methods: ['POST']
     requirements:
         id: '\d+'
+
+# Reference Section Routes
+app_reference_index:
+    path: /admin/reference
+    controller: 'App\Controller\ReferenceSectionController::index'
+    methods: ['GET']
+
+app_reference_save:
+    path: /admin/reference/save/{siteId}/{pageId}/{sectionId}
+    controller: 'App\Controller\ReferenceSectionController::save'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+app_reference_import:
+    path: /admin/reference/import/{siteId}/{pageId}/{referenceId}
+    controller: 'App\Controller\ReferenceSectionController::import'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        referenceId: '\d+'
+
+app_reference_list:
+    path: /admin/reference/list/{siteId}/{pageId}
+    controller: 'App\Controller\ReferenceSectionController::list'
+    methods: ['GET']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+
+app_reference_delete:
+    path: /admin/reference/{id}/delete
+    controller: 'App\Controller\ReferenceSectionController::delete'
+    methods: ['POST']
+    requirements:
+        id: '\d+'

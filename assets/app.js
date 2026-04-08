@@ -1,6 +1,7 @@
 import './stimulus_bootstrap.js';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import './controllers/color_picker_controller.js';
+window.bootstrap = bootstrap;
 /*
  * Welcome to your app's main JavaScript file!
  *

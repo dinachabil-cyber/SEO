@@ -55,10 +55,10 @@ class PageBuilderController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Section added successfully');
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+            return $this->redirectToRoute('app_page_builder', [
                 'siteId' => $siteId,
                 'pageId' => $pageId,
-            ]));
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/section/new.html.twig', [
@@ -96,10 +96,10 @@ class PageBuilderController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Section updated successfully');
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+            return $this->redirectToRoute('app_page_builder', [
                 'siteId' => $siteId,
                 'pageId' => $pageId,
-            ]));
+            ], Response::HTTP_SEE_OTHER);
         }
 
         // Debug helper for 422 cases: surface form errors to the UI
@@ -138,7 +138,7 @@ class PageBuilderController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
 
-        if ($this->isCsrfTokenValid('delete' . $section->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete_section' . $section->getId(), $request->request->get('_token'))) {
             $entityManager->remove($section);
             $entityManager->flush();
             $this->addFlash('success', 'Section deleted successfully');
@@ -146,10 +146,10 @@ class PageBuilderController extends AbstractController
             $this->addFlash('error', 'Invalid CSRF token');
         }
 
-        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+        return $this->redirectToRoute('app_page_builder', [
             'siteId' => $siteId,
             'pageId' => $pageId,
-        ]));
+        ], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/section/{sectionId}/up', name: 'app_section_up', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
@@ -175,6 +175,14 @@ class PageBuilderController extends AbstractController
         $previousSection = $pageSectionRepository->findPreviousSection($section);
         
         if ($previousSection) {
+            if (!$this->isCsrfTokenValid('move_section' . $section->getId(), $request->request->get('_token'))) {
+                $this->addFlash('error', 'Invalid CSRF token');
+                return $this->redirectToRoute('app_page_builder', [
+                    'siteId' => $siteId,
+                    'pageId' => $pageId,
+                ], Response::HTTP_SEE_OTHER);
+            }
+            
             $tempPosition = $section->getPosition();
             $section->setPosition($previousSection->getPosition());
             $previousSection->setPosition($tempPosition);
@@ -183,10 +191,10 @@ class PageBuilderController extends AbstractController
             $this->addFlash('success', 'Section moved up successfully');
         }
 
-        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+        return $this->redirectToRoute('app_page_builder', [
             'siteId' => $siteId,
             'pageId' => $pageId,
-        ]));
+        ], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/section/{sectionId}/down', name: 'app_section_down', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
@@ -212,6 +220,14 @@ class PageBuilderController extends AbstractController
         $nextSection = $pageSectionRepository->findNextSection($section);
         
         if ($nextSection) {
+            if (!$this->isCsrfTokenValid('move_section' . $section->getId(), $request->request->get('_token'))) {
+                $this->addFlash('error', 'Invalid CSRF token');
+                return $this->redirectToRoute('app_page_builder', [
+                    'siteId' => $siteId,
+                    'pageId' => $pageId,
+                ], Response::HTTP_SEE_OTHER);
+            }
+            
             $tempPosition = $section->getPosition();
             $section->setPosition($nextSection->getPosition());
             $nextSection->setPosition($tempPosition);
@@ -220,9 +236,9 @@ class PageBuilderController extends AbstractController
             $this->addFlash('success', 'Section moved down successfully');
         }
 
-        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_page_builder', [
+        return $this->redirectToRoute('app_page_builder', [
             'siteId' => $siteId,
             'pageId' => $pageId,
-        ]));
+        ], Response::HTTP_SEE_OTHER);
     }
 }
