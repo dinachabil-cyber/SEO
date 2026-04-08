@@ -1,0 +1,26 @@
+{# 
+    Reusable Back Button Component
+    Use this component to add a consistent back button across all admin pages.
+    
+    Usage:
+        {% include 'admin/partials/_back_button.html.twig' %}
+        
+    Optional parameters:
+        - class: additional CSS classes (default: 'btn-secondary')
+        - icon: Bootstrap icon class (default: 'bi-arrow-left')
+        - back_url: URL to redirect to
+        - use_history: whether to use history.back() (default: true)
+ #}
+{% set button_class = class|default('btn-secondary') %}
+{% set button_icon = icon|default('bi-arrow-left') %}
+{% set use_history = use_history|default(true) %}
+
+{% if use_history and back_url is not defined %}
+<a href="javascript:void(0)" onclick="if (document.referrer && document.referrer.indexOf(window.location.host) > -1) { history.back(); } else { window.location.href = '{{ back_url|default("/admin/site") }}'; }" class="btn {{ button_class }}">
+    <i class="bi {{ button_icon }}"></i> Back
+</a>
+{% else %}
+<a href="{{ back_url }}" class="btn {{ button_class }}">
+    <i class="bi {{ button_icon }}"></i> Back
+</a>
+{% endif %}

@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendar - {{ site ? site.companyName : 'Events' }}{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Calendar</h1>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{{ path('calendar_month', {year: month == 1 ? year - 1 : year, month: month == 1 ? 12 : month - 1}) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </a>
+                <h2 class="mb-0">{{ monthName }} {{ year }}</h2>
+                <a href="{{ path('calendar_month', {year: month == 12 ? year + 1 : year, month: month == 12 ? 1 : month + 1}) }}" class="btn btn-outline-secondary">
+                    Next <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0 calendar-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center">Sun</th>
+                                    <th class="text-center">Mon</th>
+                                    <th class="text-center">Tue</th>
+                                    <th class="text-center">Wed</th>
+                                    <th class="text-center">Thu</th>
+                                    <th class="text-center">Fri</th>
+                                    <th class="text-center">Sat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for week in calendarWeeks %}
+                                <tr>
+                                    {% for day in week %}
+                                        <td class="{{ day.isCurrentMonth ? '' : 'text-muted' }} {{ day.isToday ? 'bg-light' : '' }}" style="min-width: 120px; min-height: 100px; vertical-align: top;">
+                                            {% if day.day > 0 %}
+                                                <div class="fw-bold">{{ day.day }}</div>
+                                                {% for event in day.events %}
+                                                    <div class="small">
+                                                        <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="text-decoration-none">
+                                                            <span class="badge bg-primary mb-1 d-block text-start">{{ event.startAt|date('H:i') }} {{ event.title }}</span>
+                                                        </a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h3>Upcoming Events</h3>
+                {% if events|length > 0 %}
+                    <div class="row">
+                        {% for event in events %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="text-decoration-none">{{ event.title }}</a>
+                                        </h5>
+                                        <p class="card-text text-muted small">
+                                            <i class="bi bi-calendar"></i> {{ event.startAt|date('M d, Y H:i') }}
+                                            {% if event.location %}
+                                                <br><i class="bi bi-geo-alt"></i> {{ event.location }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No events found for this month.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

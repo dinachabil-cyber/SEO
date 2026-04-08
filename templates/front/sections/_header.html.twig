@@ -1,0 +1,51 @@
+<header class="site-navbar {% if data.backgroundColor is defined or (data.style is defined and data.style.backgroundColor is defined) %}custom-bg{% endif %}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px; {% endif %}{% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px; {% endif %}{% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px; {% endif %}{% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px; {% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px; {% endif %}{% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px; {% endif %}{% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px; {% endif %}{% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px; {% endif %}"{% endif %}>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="brand" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>
+                {% if data.logoText|default('') != '' %}
+                    {{ data.logoText }}
+                {% elseif data.brandText|default('') != '' %}
+                    {{ data.brandText }}
+                {% else %}
+                    {{ 'Brand' }}
+                {% endif %}
+            </div>
+            
+            <nav class="navbar-nav">
+                {% if data.menu is defined %}
+                    {% for item in data.menu %}
+                        {% if item %}
+                                     <a href="/{{ item.targetSlug }}" class="nav-link" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>{{ item.label }}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% elseif data.menuItems is defined %}
+                    {% set menuItems = data.menuItems %}
+                    {% if menuItems is not iterable %}
+                        {% set menuItems = menuItems|split('\n') %}
+                    {% endif %}
+                    {% if menuItems is iterable %}
+                        {% for item in menuItems %}
+                            {% if item %}
+                                {% if item is not iterable %}
+                                    {% set parts = item|split('|') %}
+                                    {% if parts|length == 2 %}
+                                         <a href="{{ parts[1] }}" class="nav-link" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>{{ parts[0] }}</a>
+                                    {% endif %}
+                                {% elseif item.label is defined and item.targetSlug is defined %}
+                                    <a href="/{{ item.targetSlug }}" class="nav-link" {% if data.textColor is defined %}style="color: {{ data.textColor }}"{% elseif data.style is defined and data.style.textColor is defined %}style="color: {{ data.style.textColor }}"{% endif %}>{{ item.label }}</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+            </nav>
+            
+            {# CTA Text - display as text, not a link #}
+            {% if data.ctaText|default('') != '' %}
+                <span class="header-cta-text" {% if data.buttonTextColor is defined %}style="color: {{ data.buttonTextColor }}"{% elseif data.style is defined and data.style.buttonTextColor is defined %}style="color: {{ data.style.buttonTextColor }}"{% endif %}>
+                    {{ data.ctaText }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</header>

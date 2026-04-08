@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Event - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin_event_index') }}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">New Event</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">New Event</h1>
+
+    {{ form_start(form) }}
+    <div class="card">
+        <div class="card-body">
+            {{ form_widget(form) }}
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Create Event
+            </button>
+            <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

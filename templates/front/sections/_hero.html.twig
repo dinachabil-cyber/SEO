@@ -1,0 +1,215 @@
+
+{# Hero Section - Simplified Rendering #}
+{# Uses field values directly from data (e.g., data.hero_title, data.primary_button_text) #}
+
+{# Build style attribute - simple approach #}
+{% set hero_style = '' %}
+{% if data.background_color is defined and data.background_color %}
+    {% set hero_style = hero_style ~ 'background-color: ' ~ data.background_color ~ ';' %}
+{% elseif data.style is defined and data.style.background_color is defined %}
+    {% set hero_style = hero_style ~ 'background-color: ' ~ data.style.background_color ~ ';' %}
+{% endif %}
+{% if data.padding_top is defined and data.padding_top %}
+    {% set hero_style = hero_style ~ 'padding-top: ' ~ data.padding_top ~ 'px;' %}
+{% endif %}
+{% if data.padding_bottom is defined and data.padding_bottom %}
+    {% set hero_style = hero_style ~ 'padding-bottom: ' ~ data.padding_bottom ~ 'px;' %}
+{% endif %}
+{% if data.margin_top is defined and data.margin_top %}
+    {% set hero_style = hero_style ~ 'margin-top: ' ~ data.margin_top ~ 'px;' %}
+{% endif %}
+{% if data.margin_bottom is defined and data.margin_bottom %}
+    {% set hero_style = hero_style ~ 'margin-bottom: ' ~ data.margin_bottom ~ 'px;' %}
+{% endif %}
+
+{# Build text style #}
+{% set text_style = '' %}
+{% if data.hero_text_color is defined and data.hero_text_color %}
+    {% set text_style = text_style ~ 'color: ' ~ data.hero_text_color ~ ';' %}
+{% elseif data.style is defined and data.style.hero_text_color is defined %}
+    {% set text_style = text_style ~ 'color: ' ~ data.style.hero_text_color ~ ';' %}
+{% endif %}
+
+{# Determine text alignment class #}
+{% set text_align_class = '' %}
+{% if data.text_alignment is defined and data.text_alignment %}
+    {% set text_align_class = 'text-' ~ data.text_alignment %}
+{% elseif data.style is defined and data.style.text_alignment is defined %}
+    {% set text_align_class = 'text-' ~ data.style.text_alignment %}
+{% endif %}
+
+{# Determine hero custom-bg class #}
+{% set hero_class = 'hero' %}
+{% if data.background_color is defined or (data.style is defined and data.style.background_color is defined) %}
+    {% set hero_class = hero_class ~ ' custom-bg' %}
+{% endif %}
+
+
+
+<section class="{{ hero_class }}"{% if hero_style %} style="{{ hero_style }}"{% endif %}>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content {{ text_align_class }}"{% if text_style %} style="{{ text_style }}"{% endif %}>
+                    
+                    {# ===== LEGACY/DEFAULT FIELDS ===== #}
+                        {% if data.top_text is defined and data.top_text %}
+                            <span class="badge bg-primary mb-3" style="display: inline-block;">{{ data.top_text }}</span>
+                        {% endif %}
+                        
+                        {% if data.hero_title is defined and data.hero_title %}
+                            <h1 class="display-4 mb-4" {% if data.title_color is defined %}style="color: {{ data.title_color }}"{% elseif data.style is defined and data.style.title_color is defined %}style="color: {{ data.style.title_color }}"{% endif %}>
+                                {{ data.hero_title }}
+                            </h1>
+                        {% endif %}
+                        
+                        {% if data.hero_subtitle is defined and data.hero_subtitle %}
+                            <p class="lead mb-4" {% if data.subtitle_color is defined %}style="color: {{ data.subtitle_color }}"{% elseif data.style is defined and data.style.subtitle_color is defined %}style="color: {{ data.style.subtitle_color }}"{% endif %}>
+                                {{ data.hero_subtitle }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if data.description is defined and data.description %}
+                            <p class="mb-4">{{ data.description }}</p>
+                        {% endif %}
+                        
+                        {% if data.primary_button_text is defined and data.primary_button_text and data.primary_button_url is defined and data.primary_button_url %}
+                            <a href="{{ data.primary_button_url }}" class="btn btn-{% if data.primary_button_style is defined %}{{ data.primary_button_style }}{% elseif data.style is defined and data.style.primary_button_style is defined %}{{ data.style.primary_button_style }}{% else %}primary{% endif %} btn-lg" 
+                               {% if data.primary_button_background_color is defined %}style="background-color: {{ data.primary_button_background_color }}; {% if data.primary_button_text_color is defined %}color: {{ data.primary_button_text_color }}; {% endif %}{% if data.primary_button_border_color is defined %}border-color: {{ data.primary_button_border_color }}; {% endif %}{% if data.primary_button_border_radius is defined %}border-radius: {{ data.primary_button_border_radius }}px; {% endif %}{% elseif data.style is defined and data.style.primary_button_background_color is defined %}style="background-color: {{ data.style.primary_button_background_color }}; {% if data.style.primary_button_text_color is defined %}color: {{ data.style.primary_button_text_color }}; {% endif %}{% if data.style.primary_button_border_color is defined %}border-color: {{ data.style.primary_button_border_color }}; {% endif %}{% if data.style.primary_button_border_radius is defined %}border-radius: {{ data.style.primary_button_border_radius }}px; {% endif %}"{% endif %}>
+                                {{ data.primary_button_text }}
+                            </a>
+                        {% endif %}
+                    {# ===== PHONE NUMBER ===== #}
+                    {% if data.phone_number is defined and data.phone_number %}
+                        <div class="hero-phone mt-3">
+                            <a href="tel:{{ data.phone_number }}" class="text-decoration-none" style="{% if data.subtitle_color is defined %}color: {{ data.subtitle_color }}{% endif %}">
+                                <i class="bi bi-telephone me-2"></i>{{ data.phone_number }}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# ===== IMAGE/MEDIA COLUMN ===== #}
+            {% set show_image = true %}
+            {% if data.show_image is defined %}
+                {% set show_image = data.show_image %}
+            {% endif %}
+            
+            {% if show_image %}
+                {% if data.hero_image_url is defined and data.hero_image_url %}
+                    <div class="col-lg-6 mt-4 mt-lg-0">
+                        <div class="hero-media">
+                            <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
+                        </div>
+                    </div>
+                {% elseif data.left_image is defined and data.left_image %}
+                    <div class="col-lg-6 mt-4 mt-lg-0">
+                        <div class="hero-media">
+                            <img src="{{ data.left_image }}" alt="{{ data.image_alt_text|default('') }}" class="img-fluid">
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ===== CONTACT FORM SECTION ===== #}
+{% if data.show_form is defined and data.show_form %}
+<section class="section-sm bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="lead-form">
+                    {% if data.form_title is defined and data.form_title %}
+                        <h3 class="lead-form-title mb-2">{{ data.form_title }}</h3>
+                    {% else %}
+                        <h3 class="lead-form-title mb-4">Get in Touch</h3>
+                    {% endif %}
+                    
+                    {% if data.form_subtitle is defined and data.form_subtitle %}
+                        <p class="mb-4 text-muted">{{ data.form_subtitle }}</p>
+                    {% endif %}
+                    
+                    <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
+                        
+                        {# Render dynamic form fields from hero_form_fields #}
+                        {% if data.hero_form_fields is defined and data.hero_form_fields %}
+                            {% for field in data.hero_form_fields %}
+                                {% if field.enabled is not defined or field.enabled %}
+                                    {% set field_width = field.width|default('full') %}
+                                    {% set field_class = 'mb-3' %}
+                                    {% if field_width == 'half' %}
+                                        {% set field_class = field_class ~ ' col-md-6' %}
+                                    {% elseif field_width == 'third' %}
+                                        {% set field_class = field_class ~ ' col-md-4' %}
+                                    {% elseif field_width == 'two-thirds' %}
+                                        {% set field_class = field_class ~ ' col-md-8' %}
+                                    {% endif %}
+                                    
+                                    <div class="{{ field_class }}{% if field.css_class is defined and field.css_class %} {{ field.css_class }}{% endif %}">
+                                        {% if field.type == 'text' or field.type == 'email' or field.type == 'tel' or field.type == 'url' or field.type == 'number' or field.type == 'date' or field.type == 'color' %}
+                                            <input type="{{ field.type }}" class="form-control" name="{{ field.name }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %} {% if field.default_value is defined and field.default_value %}value="{{ field.default_value }}"{% endif %}>
+                                        {% elseif field.type == 'textarea' %}
+                                            <textarea class="form-control" name="{{ field.name }}" rows="{{ field.rows|default(4) }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %}>{% if field.default_value is defined and field.default_value %}{{ field.default_value }}{% endif %}</textarea>
+                                        {% elseif field.type == 'select' %}
+                                            <select class="form-select" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+                                                {% if field.placeholder is defined and field.placeholder %}
+                                                    <option value="">{{ field.placeholder }}</option>
+                                                {% endif %}
+                                                {% if field.options is defined and field.options %}
+                                                    {% for option in field.options %}
+                                                        <option value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}selected{% endif %}>{{ option }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                        {% elseif field.type == 'checkbox' %}
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}" {% if field.default_value is defined and field.default_value %}checked{% endif %}>
+                                                <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                            </div>
+                                        {% elseif field.type == 'radio' %}
+                                            {% if field.options is defined and field.options %}
+                                                {% for option in field.options %}
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}checked{% endif %}>
+                                                        <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% elseif field.type == 'file' %}
+                                            <input type="file" class="form-control" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+                                        {% endif %}
+                                        
+                                        {% if field.help_text is defined and field.help_text %}
+                                            <div class="form-text">{{ field.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {# Fallback to hardcoded fields if no dynamic fields are defined #}
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
+                            </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

@@ -1,0 +1,16 @@
+<section class="image-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="text-center">
+                    {% if data.imageUrl %}
+                    <img src="{{ data.imageUrl }}" alt="{{ data.alt }}" class="img-fluid rounded-3 shadow-sm">
+                    {% endif %}
+                    {% if data.caption %}
+                        <p class="text-muted mt-3">{{ data.caption }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

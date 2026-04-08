@@ -1,0 +1,99 @@
+<section class="section bg-white">
+    <div class="container">
+        {% if data.section_title %}
+            <div class="text-center mb-5">
+                <h2>{{ data.section_title }}</h2>
+            </div>
+        {% endif %}
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="lead-form">
+                    <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
+                        
+                        {# Render dynamic form fields from form_fields #}
+                        {% if data.form_fields is defined and data.form_fields %}
+                            {% for field in data.form_fields %}
+                                {% if field.enabled is not defined or field.enabled %}
+                                    {% set field_width = field.width|default('full') %}
+                                    {% set field_class = 'mb-3' %}
+                                    {% if field_width == 'half' %}
+                                        {% set field_class = field_class ~ ' col-md-6' %}
+                                    {% elseif field_width == 'third' %}
+                                        {% set field_class = field_class ~ ' col-md-4' %}
+                                    {% elseif field_width == 'two-thirds' %}
+                                        {% set field_class = field_class ~ ' col-md-8' %}
+                                    {% endif %}
+                                    
+                                    <div class="{{ field_class }}{% if field.css_class is defined and field.css_class %} {{ field.css_class }}{% endif %}">
+                                        {% if field.type == 'text' or field.type == 'email' or field.type == 'tel' or field.type == 'url' or field.type == 'number' or field.type == 'date' or field.type == 'color' %}
+                                            <input type="{{ field.type }}" class="form-control" name="{{ field.name }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %} {% if field.default_value is defined and field.default_value %}value="{{ field.default_value }}"{% endif %}>
+                                        {% elseif field.type == 'textarea' %}
+                                            <textarea class="form-control" name="{{ field.name }}" rows="{{ field.rows|default(4) }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %}>{% if field.default_value is defined and field.default_value %}{{ field.default_value }}{% endif %}</textarea>
+                                        {% elseif field.type == 'select' %}
+                                            <select class="form-select" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+                                                {% if field.placeholder is defined and field.placeholder %}
+                                                    <option value="">{{ field.placeholder }}</option>
+                                                {% endif %}
+                                                {% if field.options is defined and field.options %}
+                                                    {% for option in field.options %}
+                                                        <option value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}selected{% endif %}>{{ option }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                        {% elseif field.type == 'checkbox' %}
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}" {% if field.default_value is defined and field.default_value %}checked{% endif %}>
+                                                <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                                            </div>
+                                        {% elseif field.type == 'radio' %}
+                                            {% if field.options is defined and field.options %}
+                                                {% for option in field.options %}
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}checked{% endif %}>
+                                                        <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% elseif field.type == 'file' %}
+                                            <input type="file" class="form-control" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+                                        {% endif %}
+                                        
+                                        {% if field.help_text is defined and field.help_text %}
+                                            <div class="form-text">{{ field.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {# Fallback to hardcoded fields if no dynamic fields are defined #}
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
+                            </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            {{ data.submit_button_text|default('Submit') }}
+                        </button>
+                        
+                        {% if data.success_message %}
+                            <div id="successMessage" class="alert alert-success mt-3 d-none">
+                                {{ data.success_message }}
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

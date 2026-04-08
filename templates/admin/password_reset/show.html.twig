@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Password Reset Request - Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0"><i class="bi bi-key"></i> Password Reset Request</h1>
+        {% include 'admin/partials/_back_button.html.twig' %}
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Request #{{ request.id }}</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Request ID</dt>
+                <dd class="col-sm-9">{{ request.id }}</dd>
+
+                <dt class="col-sm-3">User</dt>
+                <dd class="col-sm-9">
+                    <a href="{{ path('admin_user_show', {'id': request.user.id}) }}">
+                        {{ request.user.name }}
+                    </a>
+                </dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    {% if request.status == 'pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% elseif request.status == 'approved' %}
+                        <span class="badge bg-info">Approved</span>
+                    {% elseif request.status == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% elseif request.status == 'completed' %}
+                        <span class="badge bg-success">Completed</span>
+                    {% endif %}
+                </dd>
+
+                <dt class="col-sm-3">Requested At</dt>
+                <dd class="col-sm-9">{{ request.requestedAt ? request.requestedAt|date('Y-m-d H:i:s') : 'N/A' }}</dd>
+
+                <dt class="col-sm-3">Processed By</dt>
+                <dd class="col-sm-9">{{ request.processedBy ? request.processedBy.name : '-' }}</dd>
+
+                <dt class="col-sm-3">Processed At</dt>
+                <dd class="col-sm-9">{{ request.processedAt ? request.processedAt|date('Y-m-d H:i:s') : '-' }}</dd>
+
+                <dt class="col-sm-3">Admin Note</dt>
+                <dd class="col-sm-9">{{ request.adminNote ?: '-' }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Actions</h5>
+        </div>
+        <div class="card-body">
+            {% if request.isPending() %}
+                <form method="post" action="{{ path('admin_password_reset_approve', {'id': request.id}) }}" class="d-inline me-2">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('approve' ~ request.id) }}">
+                    <button type="submit" class="btn btn-info">
+                        <i class="bi bi-check-circle"></i> Approve
+                    </button>
+                </form>
+
+                <form method="post" action="{{ path('admin_password_reset_reject', {'id': request.id}) }}" class="d-inline me-2">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('reject' ~ request.id) }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this request?')">
+                        <i class="bi bi-x-circle"></i> Reject
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if request.isApproved() or request.isPending() %}
+                <a href="{{ path('admin_password_reset_set_password', {'id': request.id}) }}" class="btn btn-warning">
+                    <i class="bi bi-key"></i> Set New Password
+                </a>
+            {% endif %}
+
+            {% if request.isApproved() and not request.isCompleted() %}
+                <form method="post" action="{{ path('admin_password_reset_complete', {'id': request.id}) }}" class="d-inline">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('complete' ~ request.id) }}">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check2-all"></i> Mark as Completed
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

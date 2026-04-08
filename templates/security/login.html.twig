@@ -1,0 +1,542 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <!-- Background Gradient Blobs -->
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Authentication Card -->
+    <div class="auth-card fade-in-up">
+        <div class="auth-header">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to continue</p>
+        </div>
+
+        {% if error %}
+            <div class="auth-alert alert-danger">
+                <i class="bi bi-exclamation-circle"></i> {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" class="auth-form" data-turbo="false">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <i class="bi bi-person input-icon"></i>
+                    <input type="text" id="inputUsername" name="_username"
+                           value="{{ last_username }}" class="form-control"
+                           required autocomplete="username" autofocus placeholder="Username">
+                </div>
+                <div class="invalid-feedback">Please enter your username</div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper password-input-group">
+                    <i class="bi bi-lock input-icon"></i>
+                    <input type="password" id="inputPassword" name="_password"
+                           class="form-control" required autocomplete="current-password" placeholder="Password">
+                    <button type="button" id="togglePassword" class="password-toggle">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback">Please enter your password</div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input type="checkbox" id="rememberMe" name="_remember_me" class="form-check-input" {{ remember_me ? 'checked' }}>
+                <label for="rememberMe" class="form-check-label">Remember me</label>
+            </div>
+
+            <input type="hidden" name="_target_path" value="{{ path('app_site_index') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                <span class="btn-text">Sign In</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+            
+            <div class="auth-footer">
+                <p class="auth-link-text">Don't have an account? <a href="{{ path('app_register') }}" class="auth-link">Sign up</a></p>
+                <p class="auth-link-text mt-2">
+                    <i class="bi bi-question-circle"></i> 
+                    Forgot your password? <a href="{{ path('password_reset_request') }}" class="auth-link">Contact admin to reset password</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Premium Authentication Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f0f9ff 100%);
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Background Blobs */
+    .background-blobs {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.3;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        top: -200px;
+        right: -200px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        width: 350px;
+        height: 350px;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        bottom: -150px;
+        left: -150px;
+        animation-delay: 5s;
+    }
+
+    .blob-3 {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-delay: 10s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        33% {
+            transform: translate(30px, -30px) scale(1.1);
+        }
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+    }
+
+    /* Authentication Card - Glassmorphism */
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        padding: 50px 40px;
+        width: 100%;
+        max-width: 420px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fade In Animation */
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    /* Form */
+    .auth-form {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        color: #9ca3af;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 16px 16px 16px 48px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        background-color: #f9fafb;
+        color: #1f2937;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #6366f1;
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control:focus + .input-icon,
+    .form-control:focus ~ .input-icon {
+        color: #6366f1;
+    }
+
+    .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Password Toggle */
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .password-toggle:hover {
+        color: #6b7280;
+        background-color: #f3f4f6;
+    }
+
+    /* Checkbox */
+    .form-check {
+        text-align: left;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        accent-color: #6366f1;
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input:checked {
+        animation: checkboxTick 0.3s ease;
+    }
+
+    @keyframes checkboxTick {
+        0% {
+            transform: scale(0.8);
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .form-check-label {
+        color: #6b7280;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .form-check-label:hover {
+        color: #4b5563;
+    }
+
+    /* Button */
+    .btn-primary {
+        width: 100%;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 8px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .btn-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Alert */
+    .auth-alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: #fee2e2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-5px);
+        }
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    .auth-alert i {
+        font-size: 20px;
+    }
+
+    /* Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 32px;
+    }
+
+    .auth-link-text {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    .auth-link {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .auth-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #6366f1;
+        transition: width 0.2s ease;
+    }
+
+    .auth-link:hover {
+        color: #4f46e5;
+    }
+
+    .auth-link:hover::after {
+        width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        .auth-card {
+            padding: 40px 30px;
+            margin: 10px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+        }
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            padding: 14px 14px 14px 44px;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            padding: 14px 20px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .auth-card {
+            padding: 32px 24px;
+        }
+
+        .auth-title {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('inputPassword');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+
+    // Toggle password visibility
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPasswordVisible = passwordInput.type === 'text';
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            
+            const icon = this.querySelector('i');
+            if (isPasswordVisible) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    }
+
+    // Form validation
+    const form = document.querySelector('.auth-form');
+    const usernameInput = document.getElementById('inputUsername');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            if (!usernameInput.value.trim()) {
+                usernameInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                usernameInput.classList.remove('is-invalid');
+            }
+            
+            if (!passwordInput.value) {
+                passwordInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                passwordInput.classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+        
+        // Remove invalid class on input
+        usernameInput.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+        
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Form\RegistrationType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
+class SecurityController extends AbstractController
+{
+    #[Route(path: '/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_site_index');
+        }
+
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+            'passwordVisible' => false,
+            'remember_me' => false,
+        ]);
+    }
+
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    #[Route('/register', name: 'app_register')]
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationType::class, $user);
+        $form->handleRequest($request);
+
+        // Debug logs
+        if ($form->isSubmitted()) {
+            error_log('Registration form submitted');
+            
+            if (!$form->isValid()) {
+                error_log('Form is invalid');
+                foreach ($form->getErrors(true) as $error) {
+                    error_log('Form error: ' . $error->getMessage());
+                }
+            } else {
+                error_log('Form is valid');
+            }
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword(
+                $passwordHasher->hashPassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+            );
+            $user->setRoles(['ROLE_USER']);
+
+            error_log('About to persist user: ' . $user->getName());
+            $entityManager->persist($user);
+            $entityManager->flush();
+            error_log('User persisted successfully');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Debug: Dump form state
+        $debugInfo = [
+            'isSubmitted' => $form->isSubmitted(),
+            'isValid' => null,
+            'errors' => [],
+        ];
+        
+        if ($form->isSubmitted()) {
+            $debugInfo['isValid'] = $form->isValid();
+            if (!$form->isValid()) {
+                foreach ($form->getErrors(true) as $error) {
+                    $debugInfo['errors'][] = $error->getMessage();
+                }
+            }
+        }
+        
+        return $this->render('security/register.html.twig', [
+            'registrationForm' => $form->createView(),
+            'debugInfo' => $debugInfo,
+        ]);
+    }
+}

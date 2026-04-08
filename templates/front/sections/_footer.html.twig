@@ -1,0 +1,296 @@
+{% set bgColor = data.background_color|default('#1a1a2e') %}
+{% set textColor = data.text_color|default('#ffffff') %}
+{% set headingColor = data.heading_color|default('#ffffff') %}
+{% set linkColor = data.link_color|default('#b8b8b8') %}
+{% set linkHoverColor = data.link_hover_color|default('#4a90e2') %}
+{% set borderTopColor = data.border_top_color|default('#333333') %}
+{% set paddingTop = data.padding_top|default(60) %}
+{% set paddingBottom = data.padding_bottom|default(40) %}
+{% set marginTop = data.margin_top|default(0) %}
+{% set marginBottom = data.margin_bottom|default(0) %}
+{% set titleFontSize = data.title_font_size|default(18) %}
+{% set textFontSize = data.text_font_size|default(14) %}
+{% set linkFontSize = data.link_font_size|default(14) %}
+{% set textAlignment = data.text_alignment|default('left') %}
+{% set columnGap = data.column_gap|default(30) %}
+{% set columnsCount = data.columns_count|default(3) %}
+{% set borderRadius = data.border_radius|default(8) %}
+{% set boxShadow = data.box_shadow|default('none') %}
+{% set containerWidth = data.container_width|default('1140px') %}
+{% set layoutType = data.layout_type|default('classic') %}
+{% set stackOnMobile = data.stack_on_mobile|default(true) %}
+{% set showDivider = data.show_divider|default(true) %}
+
+{% set companyName = data.company_name|default('') %}
+{% set companyDescription = data.company_description|default('') %}
+{% set usefulLinks = data.useful_links|default('') %}
+{% set address = data.address|default('') %}
+{% set phone = data.phone|default('') %}
+{% set email = data.email|default('') %}
+{% set copyrightText = data.copyright_text|default('') %}
+{% set ctaText = data.ctaText|default('') %}
+{% set ctaUrl = data.ctaUrl|default('') %}
+
+<footer class="site-footer" style="
+    background-color: {{ bgColor }};
+    color: {{ textColor }};
+    padding-top: {{ paddingTop }}px;
+    padding-bottom: {{ paddingBottom }}px;
+    margin-top: {{ marginTop }}px;
+    margin-bottom: {{ marginBottom }}px;
+    font-size: {{ textFontSize }}px;
+    {% if boxShadow != 'none' %}
+    box-shadow: {{ boxShadow }};
+    {% endif %}
+">
+    {% if showDivider %}
+    <div style="border-top: 1px solid {{ borderTopColor }}; margin-bottom: {{ paddingTop }}px;"></div>
+    {% endif %}
+    
+    <div class="container" style="max-width: {{ containerWidth }}; margin: 0 auto; padding: 0 15px;">
+        {# Layout based on layout_type #}
+        {% if layoutType == 'classic' %}
+        <div class="footer-content" style="display: grid; grid-template-columns: repeat({{ columnsCount }}, 1fr); gap: {{ columnGap }}px; text-align: {{ textAlignment }};">
+            {# Company Info Column #}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                {% if companyName %}
+                    <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px;">{{ companyName }}</h4>
+                {% endif %}
+                {% if companyDescription %}
+                    <p style="color: {{ textColor }}; line-height: 1.6;">{{ companyDescription|raw }}</p>
+                {% endif %}
+            </div>
+            
+            {# Useful Links Column #}
+            {% if usefulLinks %}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px;">Quick Links</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% set links = usefulLinks|split('\\n') %}
+                    {% for link in links %}
+                        {% if link %}
+                            {% set parts = link|split('|') %}
+                            {% if parts|length == 2 %}
+                                <li style="margin-bottom: 8px;">
+                                    <a href="{{ parts[1] }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ parts[0] }}</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {# Contact Info Column #}
+            {% if address or phone or email or ctaText %}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px;">Contact Us</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% if address %}
+                        <li style="color: {{ textColor }}; margin-bottom: 8px; font-size: {{ textFontSize }}px;">{{ address }}</li>
+                    {% endif %}
+                    {% if phone %}
+                        <li style="color: {{ textColor }}; margin-bottom: 8px; font-size: {{ textFontSize }}px;">
+                            <a href="tel:{{ phone }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ phone }}</a>
+                        </li>
+                    {% endif %}
+                    {% if email %}
+                        <li style="color: {{ textColor }}; margin-bottom: 8px; font-size: {{ textFontSize }}px;">
+                            <a href="mailto:{{ email }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ email }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% if ctaText and ctaUrl %}
+                <div style="margin-top: 15px;">
+                    <a href="{{ ctaUrl }}" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #4a90e2; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: {{ textFontSize }}px;">{{ ctaText }}</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        {% elseif layoutType == 'modern' %}
+        <div class="footer-content" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: {{ columnGap }}px; text-align: {{ textAlignment }};">
+            {# Brand Column #}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 25px; border-radius: {{ borderRadius }}px; background: rgba(255,255,255,0.05);{% endif %}">
+                {% if companyName %}
+                    <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px; font-weight: 600;">{{ companyName }}</h4>
+                {% endif %}
+                {% if companyDescription %}
+                    <p style="color: {{ textColor }}; line-height: 1.6; opacity: 0.9;">{{ companyDescription|raw }}</p>
+                {% endif %}
+            </div>
+            
+            {# Useful Links Column #}
+            {% if usefulLinks %}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 25px; border-radius: {{ borderRadius }}px;{% endif %}">
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px; font-weight: 600;">Quick Links</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% set links = usefulLinks|split('\\n') %}
+                    {% for link in links %}
+                        {% if link %}
+                            {% set parts = link|split('|') %}
+                            {% if parts|length == 2 %}
+                                <li style="margin-bottom: 10px;">
+                                    <a href="{{ parts[1] }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ parts[0] }}</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {# Address Column #}
+            {% if address %}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 25px; border-radius: {{ borderRadius }}px;{% endif %}">
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px; font-weight: 600;">Address</h4>
+                <p style="color: {{ textColor }}; line-height: 1.6; font-size: {{ textFontSize }}px;">{{ address }}</p>
+            </div>
+            {% endif %}
+            
+            {# Contact Column #}
+            {% if phone or email or ctaText %}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 25px; border-radius: {{ borderRadius }}px;{% endif %}">
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px; font-weight: 600;">Get in Touch</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% if phone %}
+                        <li style="margin-bottom: 10px;">
+                            <a href="tel:{{ phone }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ phone }}</a>
+                        </li>
+                    {% endif %}
+                    {% if email %}
+                        <li style="margin-bottom: 10px;">
+                            <a href="mailto:{{ email }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ email }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% if ctaText and ctaUrl %}
+                <div style="margin-top: 15px;">
+                    <a href="{{ ctaUrl }}" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #4a90e2; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: {{ textFontSize }}px;">{{ ctaText }}</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        {% elseif layoutType == 'simple' %}
+        <div class="footer-content" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: {{ columnGap }}px; text-align: {{ textAlignment }};">
+            {# Left - Brand & Description #}
+            <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                {% if companyName %}
+                    <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 10px;">{{ companyName }}</h4>
+                {% endif %}
+                {% if companyDescription %}
+                    <p style="color: {{ textColor }}; line-height: 1.5;">{{ companyDescription|raw }}</p>
+                {% endif %}
+            </div>
+            
+            {# Right - Links & Contact #}
+            <div style="display: flex; gap: {{ columnGap }}px; justify-content: flex-end;">
+                {% if usefulLinks %}
+                <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                    <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 10px;">Links</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% set links = usefulLinks|split('\\n') %}
+                        {% for link in links %}
+                            {% if link %}
+                                {% set parts = link|split('|') %}
+                                {% if parts|length == 2 %}
+                                    <li style="margin-bottom: 5px;">
+                                        <a href="{{ parts[1] }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ parts[0] }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                {% if phone or email or address or ctaText %}
+                <div class="footer-section" style="{% if boxShadow != 'none' %}padding: 20px; border-radius: {{ borderRadius }}px;{% endif %}">
+                    <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 10px;">Contact</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% if address %}<li style="color: {{ textColor }}; font-size: {{ textFontSize }}px; margin-bottom: 5px;">{{ address }}</li>{% endif %}
+                        {% if phone %}<li><a href="tel:{{ phone }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ phone }}</a></li>{% endif %}
+                        {% if email %}<li><a href="mailto:{{ email }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ email }}</a></li>{% endif %}
+                    </ul>
+                    {% if ctaText and ctaUrl %}
+                    <div style="margin-top: 15px;">
+                        <a href="{{ ctaUrl }}" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #4a90e2; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: {{ textFontSize }}px;">{{ ctaText }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% elseif layoutType == 'minimal' %}
+        <div class="footer-content" style="text-align: {{ textAlignment }}; padding: 20px 0;">
+            {% if companyName %}
+                <h4 style="color: {{ headingColor }}; font-size: {{ titleFontSize }}px; margin-bottom: 15px;">{{ companyName }}</h4>
+            {% endif %}
+            {% if companyDescription %}
+                <p style="color: {{ textColor }}; line-height: 1.6; max-width: 600px; margin: 0 auto 20px;">{{ companyDescription|raw }}</p>
+            {% endif %}
+            
+            {% if usefulLinks or phone or email or ctaText %}
+            <div style="margin-bottom: 20px;">
+                {% if usefulLinks %}
+                    {% set links = usefulLinks|split('\\n') %}
+                    {% for link in links %}
+                        {% if link %}
+                            {% set parts = link|split('|') %}
+                            {% if parts|length == 2 %}
+                                <a href="{{ parts[1] }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; margin: 0 15px; transition: color 0.3s ease;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ parts[0] }}</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if phone %}<a href="tel:{{ phone }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; margin: 0 15px;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ phone }}</a>{% endif %}
+                {% if email %}<a href="mailto:{{ email }}" style="color: {{ linkColor }}; font-size: {{ linkFontSize }}px; text-decoration: none; margin: 0 15px;" onmouseover="this.style.color='{{ linkHoverColor }}'" onmouseout="this.style.color='{{ linkColor }}'">{{ email }}</a>{% endif %}
+            </div>
+            {% endif %}
+            
+            {% if address %}
+                <p style="color: {{ textColor }}; font-size: {{ textFontSize }}px; opacity: 0.8;">{{ address }}</p>
+            {% endif %}
+            
+            {% if ctaText and ctaUrl %}
+            <div style="margin-top: 20px;">
+                <a href="{{ ctaUrl }}" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #4a90e2; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: {{ textFontSize }}px;">{{ ctaText }}</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {# Copyright Section #}
+        <div class="small-print" style="text-align: {{ textAlignment }}; padding-top: 30px; margin-top: 30px; border-top: 1px solid {{ borderTopColor }};">
+            <p style="color: {{ textColor }}; font-size: {{ textFontSize }}px; opacity: 0.8; margin: 0;">
+                {% if copyrightText %}
+                    {{ copyrightText|replace({'%year%': 'now'|date('Y')}) }}
+                {% else %}
+                    &copy; {{ 'now'|date('Y') }} {{ app.request.host|default('Company') }}. All rights reserved.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</footer>
+
+{# Responsive Styles #}
+{% if stackOnMobile %}
+<style>
+@media (max-width: 767px) {
+    .site-footer .footer-content {
+        grid-template-columns: 1fr !important;
+        text-align: center !important;
+    }
+    .site-footer .footer-content > div {
+        margin-bottom: 20px;
+    }
+    .site-footer .footer-content > div:last-child {
+        margin-bottom: 0;
+    }
+}
+</style>
+{% endif %}

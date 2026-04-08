@@ -1,0 +1,319 @@
+app:
+    resource: '../src/Controller/'
+    type: attribute
+
+# Site routes
+app_site_index:
+    path: /admin/site
+    controller: 'App\Controller\SiteController::index'
+    methods: ['GET', 'POST']
+
+app_site_new:
+    path: /admin/site/new
+    controller: 'App\Controller\SiteController::new'
+    methods: ['GET', 'POST']
+
+app_site_show:
+    path: /admin/site/{id}
+    controller: 'App\Controller\SiteController::show'
+    methods: ['GET']
+    requirements:
+        id: '\d+'
+
+app_site_edit:
+    path: /admin/site/{id}/edit
+    controller: 'App\Controller\SiteController::edit'
+    methods: ['GET', 'POST']
+    requirements:
+        id: '\d+'
+
+app_site_delete:
+    path: /admin/site/{id}/delete
+    controller: 'App\Controller\SiteController::delete'
+    methods: ['POST']
+    requirements:
+        id: '\d+'
+
+# Page routes
+app_page_new:
+    path: /admin/site/{site}/page/new
+    controller: 'App\Controller\PageController::new'
+    methods: ['GET', 'POST']
+    requirements:
+        site: '\d+'
+
+app_page_edit:
+    path: /admin/site/{site}/page/{pageId}/edit
+    controller: 'App\Controller\PageController::edit'
+    methods: ['GET', 'POST']
+    requirements:
+        site: '\d+'
+        pageId: '\d+'
+
+app_page_delete:
+    path: /admin/site/{site}/page/{pageId}/delete
+    controller: 'App\Controller\PageController::delete'
+    methods: ['POST']
+    requirements:
+        site: '\d+'
+        pageId: '\d+'
+
+# Page Builder routes
+app_page_builder:
+    path: /admin/site/{siteId}/page/{pageId}/builder
+    controller: 'App\Controller\PageBuilderController::index'
+    methods: ['GET']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+
+app_section_new:
+    path: /admin/site/{siteId}/page/{pageId}/section/new
+    controller: 'App\Controller\PageBuilderController::new'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+
+app_section_edit:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/edit
+    controller: 'App\Controller\PageBuilderController::edit'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+app_section_delete:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/delete
+    controller: 'App\Controller\PageBuilderController::delete'
+    methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+app_section_up:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/up
+    controller: 'App\Controller\PageBuilderController::up'
+    methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+app_section_down:
+    path: /admin/site/{siteId}/page/{pageId}/section/{sectionId}/down
+    controller: 'App\Controller\PageBuilderController::down'
+    methods: ['POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+# Calendar Routes
+calendar_index:
+    path: /calendar
+    controller: 'App\Controller\CalendarController::index'
+    methods: ['GET']
+
+calendar_month:
+    path: /calendar/{year}/{month}
+    controller: 'App\Controller\CalendarController::month'
+    methods: ['GET']
+    requirements:
+        year: '\d{4}'
+        month: '\d{1,2}'
+
+calendar_show:
+    path: /calendar/{slug}
+    controller: 'App\Controller\CalendarController::show'
+    methods: ['GET']
+
+# Security routes
+app_login:
+    path: /login
+    controller: 'App\Controller\SecurityController::login'
+    methods: ['GET', 'POST']
+
+app_logout:
+    path: /logout
+    controller: 'App\Controller\SecurityController::logout'
+    methods: ['GET']
+
+app_register:
+    path: /register
+    controller: 'App\Controller\SecurityController::register'
+    methods: ['GET', 'POST']
+
+app_dashboard:
+    path: /dashboard
+    controller: 'App\Controller\DashboardController::dashboard'
+    methods: ['GET']
+
+# Frontend routes
+app_home:
+    path: '/'
+    controller: 'App\Controller\HomeController::index'
+    methods: ['GET']
+
+app_contact:
+    path: '/contact'
+    controller: 'App\Controller\FrontController::contact'
+    methods: ['POST']
+
+app_front_page:
+    path: '/{slug}'
+    controller: 'App\Controller\FrontController::index'
+    methods: ['GET']
+    requirements:
+        slug: '^(?!login$|logout$|register$|admin|password-reset).*'
+
+# Admin User Management Routes
+admin_user_index:
+    path: /admin/users
+    controller: 'App\Controller\AdminUserController::index'
+    methods: ['GET']
+
+admin_user_show:
+    path: /admin/users/{id}
+    controller: 'App\Controller\AdminUserController::show'
+    methods: ['GET']
+
+admin_user_edit:
+    path: /admin/users/{id}/edit
+    controller: 'App\Controller\AdminUserController::edit'
+    methods: ['GET', 'POST']
+
+admin_user_change_password:
+    path: /admin/users/{id}/change-password
+    controller: 'App\Controller\AdminUserController::changePassword'
+    methods: ['GET', 'POST']
+
+admin_user_enable:
+    path: /admin/users/{id}/enable
+    controller: 'App\Controller\AdminUserController::enable'
+    methods: ['POST']
+
+admin_user_disable:
+    path: /admin/users/{id}/disable
+    controller: 'App\Controller\AdminUserController::disable'
+    methods: ['POST']
+
+# Admin Password Reset Request Routes
+admin_password_reset_index:
+    path: /admin/password-reset-requests
+    controller: 'App\Controller\AdminPasswordResetRequestController::index'
+    methods: ['GET']
+
+admin_password_reset_show:
+    path: /admin/password-reset-requests/{id}
+    controller: 'App\Controller\AdminPasswordResetRequestController::show'
+    methods: ['GET']
+
+admin_password_reset_approve:
+    path: /admin/password-reset-requests/{id}/approve
+    controller: 'App\Controller\AdminPasswordResetRequestController::approve'
+    methods: ['POST']
+
+admin_password_reset_reject:
+    path: /admin/password-reset-requests/{id}/reject
+    controller: 'App\Controller\AdminPasswordResetRequestController::reject'
+    methods: ['POST']
+
+admin_password_reset_set_password:
+    path: /admin/password-reset-requests/{id}/set-password
+    controller: 'App\Controller\AdminPasswordResetRequestController::setPassword'
+    methods: ['GET', 'POST']
+
+admin_password_reset_complete:
+    path: /admin/password-reset-requests/{id}/complete
+    controller: 'App\Controller\AdminPasswordResetRequestController::complete'
+    methods: ['POST']
+
+# User Password Reset Routes
+password_reset_request:
+    path: /password-reset/request
+    controller: 'App\Controller\PasswordResetRequestController::request'
+    methods: ['GET']
+
+password_reset_submit:
+    path: /password-reset/submit
+    controller: 'App\Controller\PasswordResetRequestController::submit'
+    methods: ['POST']
+
+password_reset_status:
+    path: /password-reset/status
+    controller: 'App\Controller\PasswordResetRequestController::status'
+    methods: ['GET']
+
+# Admin Event Routes
+admin_event_index:
+    path: /admin/event
+    controller: 'App\Controller\EventController::index'
+    methods: ['GET']
+
+admin_event_new:
+    path: /admin/event/new
+    controller: 'App\Controller\EventController::new'
+    methods: ['GET', 'POST']
+
+admin_event_edit:
+    path: /admin/event/{id}/edit
+    controller: 'App\Controller\EventController::edit'
+    methods: ['GET', 'POST']
+    requirements:
+        id: '\d+'
+
+admin_event_duplicate:
+    path: /admin/event/{id}/duplicate
+    controller: 'App\Controller\EventController::duplicate'
+    methods: ['GET']
+    requirements:
+        id: '\d+'
+
+admin_event_delete:
+    path: /admin/event/{id}
+    controller: 'App\Controller\EventController::delete'
+    methods: ['POST']
+    requirements:
+        id: '\d+'
+
+# Reference Section Routes
+app_reference_index:
+    path: /admin/reference
+    controller: 'App\Controller\ReferenceSectionController::index'
+    methods: ['GET']
+
+app_reference_save:
+    path: /admin/reference/save/{siteId}/{pageId}/{sectionId}
+    controller: 'App\Controller\ReferenceSectionController::save'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        sectionId: '\d+'
+
+app_reference_import:
+    path: /admin/reference/import/{siteId}/{pageId}/{referenceId}
+    controller: 'App\Controller\ReferenceSectionController::import'
+    methods: ['GET', 'POST']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+        referenceId: '\d+'
+
+app_reference_list:
+    path: /admin/reference/list/{siteId}/{pageId}
+    controller: 'App\Controller\ReferenceSectionController::list'
+    methods: ['GET']
+    requirements:
+        siteId: '\d+'
+        pageId: '\d+'
+
+app_reference_delete:
+    path: /admin/reference/{id}/delete
+    controller: 'App\Controller\ReferenceSectionController::delete'
+    methods: ['POST']
+    requirements:
+        id: '\d+'

@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event.title }} - Calendar{% endblock %}
+
+{% block head %}
+    <meta name="description" content="{{ event.description|slice(0, 160) }}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": "{{ event.title|escape('js') }}",
+        "description": "{{ event.description|escape('js') }}",
+        "startDate": "{{ event.startAt|date('c') }}",
+        "endDate": "{{ event.endAt|date('c') }}"
+        {% if event.location %},
+        "location": {
+            "@type": "Place",
+            "name": "{{ event.location|escape('js') }}"
+        }
+        {% endif %}
+    }
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('calendar_index') }}">Calendar</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title mb-4">{{ event.title }}</h1>
+                    
+                    <div class="mb-3">
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-calendar"></i> 
+                            <strong>Date:</strong> 
+                            {{ event.startAt|date('F j, Y') }}
+                            {% if event.startAt|date('H:i') != '00:00' %}
+                                at {{ event.startAt|date('H:i') }}
+                            {% endif %}
+                            {% if event.endAt and event.endAt != event.startAt %}
+                                 - {{ event.endAt|date('F j, Y') }}
+                                {% if event.endAt|date('H:i') != '00:00' %}
+                                    at {{ event.endAt|date('H:i') }}
+                                {% endif %}
+                            {% endif %}
+                        </p>
+                        {% if event.location %}
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-geo-alt"></i> 
+                            <strong>Location:</strong> {{ event.location }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <div class="card-text">
+                        {{ event.description|nl2br }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="{{ path('calendar_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Calendar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

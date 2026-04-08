@@ -1,0 +1,768 @@
+{{ form_row(form.type) }}
+
+
+
+{% if form.data is defined %}
+    <div class="section-data-fields">
+        {% set dataForm = form.data %}
+        
+        {% if form.vars.value.type == 'header' %}
+            <ul class="nav nav-tabs" id="headerSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#header-content" type="button" role="tab" aria-controls="header-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#header-style" type="button" role="tab" aria-controls="header-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#header-buttons" type="button" role="tab" aria-controls="header-buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="headerSectionTabsContent">
+                <div class="tab-pane fade show active" id="header-content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.brandText) }}
+                    {{ form_row(dataForm.logoUrl) }}
+                    {{ form_row(dataForm.menuItems) }}
+                    {{ form_row(dataForm.ctaText) }}
+                    {{ form_row(dataForm.ctaUrl) }}
+                </div>
+                <div class="tab-pane fade" id="header-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.paddingTop) }}
+                    {{ form_row(dataForm.paddingBottom) }}
+                    {{ form_row(dataForm.marginTop) }}
+                    {{ form_row(dataForm.marginBottom) }}
+                </div>
+                <div class="tab-pane fade" id="header-buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    {{ form_row(dataForm.buttonBackgroundColor) }}
+                    {{ form_row(dataForm.buttonTextColor) }}
+                    {{ form_row(dataForm.buttonBorderColor) }}
+                    {{ form_row(dataForm.buttonBorderRadius) }}
+                    {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'hero' %}
+            <ul class="nav nav-tabs" id="heroSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#hero-content" type="button" role="tab" aria-controls="hero-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#hero-media" type="button" role="tab" aria-controls="hero-media" aria-selected="false">Media</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="layout-tab" data-bs-toggle="tab" data-bs-target="#hero-layout" type="button" role="tab" aria-controls="hero-layout" aria-selected="false">Layout</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#hero-style" type="button" role="tab" aria-controls="hero-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#hero-buttons" type="button" role="tab" aria-controls="hero-buttons" aria-selected="false">Buttons</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-fields-tab" data-bs-toggle="tab" data-bs-target="#hero-form-fields" type="button" role="tab" aria-controls="hero-form-fields" aria-selected="false">Form Fields</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="heroSectionTabsContent">
+                
+                {# Content Tab #}
+                <div class="tab-pane fade" id="hero-content" role="tabpanel" aria-labelledby="content-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.hero_title) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.badge_text) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.hero_subtitle) }}
+                    {{ form_row(dataForm.description) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Primary Button</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.primary_button_text) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.primary_button_url) }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Secondary Button</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.secondary_button_text) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.secondary_button_url) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Media Tab #}
+                <div class="tab-pane fade" id="hero-media" role="tabpanel" aria-labelledby="media-tab">
+                    {{ form_row(dataForm.show_image) }}
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Toggle "Show Image" to display or hide the hero image.
+                    </div>
+                    {{ form_row(dataForm.hero_image_url) }}
+                    {{ form_row(dataForm.mobile_image_url) }}
+                    {{ form_row(dataForm.image_alt_text) }}
+                </div>
+                
+                {# Layout Tab #}
+                <div class="tab-pane fade" id="hero-layout" role="tabpanel" aria-labelledby="layout-tab">
+                    {{ form_row(dataForm.layout_type) }}
+                    {{ form_row(dataForm.text_alignment) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.content_width) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.section_height) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.vertical_alignment) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.column_gap) }}
+                        </div>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Select "Form Only" layout to hide the image block. Select "Form Right, Image Left" for split form layout.
+                    </div>
+                </div>
+                
+                {# Style Tab #}
+                <div class="tab-pane fade" id="hero-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.background_color) }}
+                    {{ form_row(dataForm.background_gradient) }}
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Enter a CSS gradient like: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.hero_text_color) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.title_color) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.subtitle_color) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.description_color) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.card_background_color) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.border_radius) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.box_shadow) }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Spacing</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_bottom) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_bottom) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Buttons Tab #}
+                <div class="tab-pane fade" id="hero-buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    <h6 class="text-muted mb-3">Primary Button Styling</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.primary_button_background_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.primary_button_text_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.primary_button_border_color) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.primary_button_border_radius) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.primary_button_style) }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Secondary Button Styling</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.secondary_button_background_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.secondary_button_text_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.secondary_button_border_color) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.secondary_button_border_radius) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.secondary_button_style) }}
+                        </div>
+                    </div>
+                </div>
+                {# Form Fields Tab #}
+                <div class="tab-pane fade" id="hero-form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
+                    {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
+                        'fields': form.hero_form_fields_json.vars.value ?? '[]',
+                        'field_types': {
+                            'text': 'Text Input',
+                            'textarea': 'Text Area',
+                            'email': 'Email',
+                            'tel': 'Phone',
+                            'select': 'Dropdown',
+                            'checkbox': 'Checkbox',
+                            'radio': 'Radio Buttons',
+                            'number': 'Number',
+                            'date': 'Date',
+                            'color': 'Color',
+                            'url': 'URL',
+                            'image': 'Image URL',
+                            'hidden': 'Hidden Field'
+                        }
+                    } %}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'body' %}
+            {{ form_row(dataForm.content) }}
+            
+        {% elseif form.vars.value.type == 'image' %}
+            {{ form_row(dataForm.imageUrl) }}
+            {{ form_row(dataForm.alt) }}
+            {{ form_row(dataForm.caption) }}
+            
+        {% elseif form.vars.value.type == 'cards' or form.vars.value.type == 'cards_premium' %}
+            <ul class="nav nav-tabs" id="cardsSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#cards-content" type="button" role="tab" aria-controls="cards-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="layout-tab" data-bs-toggle="tab" data-bs-target="#cards-layout" type="button" role="tab" aria-controls="cards-layout" aria-selected="false">Layout</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#cards-style" type="button" role="tab" aria-controls="cards-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#cards-buttons" type="button" role="tab" aria-controls="cards-buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="cardsSectionTabsContent">
+                <div class="tab-pane fade show active" id="cards-content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.sectionTitle) }}
+                    {{ form_row(dataForm.cards) }}
+                </div>
+                <div class="tab-pane fade" id="cards-layout" role="tabpanel" aria-labelledby="layout-tab">
+                    {{ form_row(dataForm.cardLayout) }}
+                    {{ form_row(dataForm.cardStyle) }}
+                    {{ form_row(dataForm.textAlignment) }}
+                </div>
+                <div class="tab-pane fade" id="cards-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.titleColor) }}
+                    {{ form_row(dataForm.subtitleColor) }}
+                    {{ form_row(dataForm.cardBackgroundColor) }}
+                    {{ form_row(dataForm.cardTitleColor) }}
+                    {{ form_row(dataForm.cardTextColor) }}
+                    {{ form_row(dataForm.cardBorderColor) }}
+                    {{ form_row(dataForm.cardShadow) }}
+                    {{ form_row(dataForm.cardBorderRadius) }}
+                    {{ form_row(dataForm.paddingTop) }}
+                    {{ form_row(dataForm.paddingBottom) }}
+                    {{ form_row(dataForm.marginTop) }}
+                    {{ form_row(dataForm.marginBottom) }}
+                </div>
+                <div class="tab-pane fade" id="cards-buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    {{ form_row(dataForm.buttonBackgroundColor) }}
+                    {{ form_row(dataForm.buttonTextColor) }}
+                    {{ form_row(dataForm.buttonBorderColor) }}
+                    {{ form_row(dataForm.buttonBorderRadius) }}
+                    {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'faq' %}
+            {{ form_row(dataForm.sectionTitle) }}
+            {{ form_row(dataForm.items) }}
+            
+        {% elseif form.vars.value.type == 'form' %}
+            <ul class="nav nav-tabs" id="formSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#form-content" type="button" role="tab" aria-controls="form-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#form-settings" type="button" role="tab" aria-controls="form-settings" aria-selected="false">Form Settings</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="layout-tab" data-bs-toggle="tab" data-bs-target="#form-layout" type="button" role="tab" aria-controls="form-layout" aria-selected="false">Layout</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#form-media" type="button" role="tab" aria-controls="form-media" aria-selected="false">Media</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#form-style" type="button" role="tab" aria-controls="form-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-fields-tab" data-bs-toggle="tab" data-bs-target="#form-fields" type="button" role="tab" aria-controls="form-fields" aria-selected="false">Form Fields</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="formSectionTabsContent">
+                {# Content Tab #}
+                <div class="tab-pane fade show active" id="form-content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.section_title) }}
+                    {{ form_row(dataForm.section_subtitle) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Form Content</h6>
+                    {{ form_row(dataForm.form_title) }}
+                    {{ form_row(dataForm.form_description) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.submit_button_text) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.success_message) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Form Settings Tab #}
+                <div class="tab-pane fade" id="form-settings" role="tabpanel" aria-labelledby="settings-tab">
+                    {{ form_row(dataForm.form_type) }}
+                    {{ form_row(dataForm.form_key) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Field Visibility</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_name_field) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_email_field) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_phone_field) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_message_field) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_company_field) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_checkbox_consent) }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Submission Settings</h6>
+                    {{ form_row(dataForm.redirect_url_after_submit) }}
+                    {{ form_row(dataForm.store_submissions) }}
+                </div>
+                
+                {# Layout Tab #}
+                <div class="tab-pane fade" id="form-layout" role="tabpanel" aria-labelledby="layout-tab">
+                    {{ form_row(dataForm.form_layout) }}
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Select "Split with Image" or "Split with Text" to show a two-column layout. Make sure to add an image in the Media tab.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.form_width) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.form_alignment) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.show_icon_above_title) }}
+                </div>
+                
+                {# Media Tab #}
+                <div class="tab-pane fade" id="form-media" role="tabpanel" aria-labelledby="media-tab">
+                    {{ form_row(dataForm.show_image) }}
+                    {{ form_row(dataForm.side_image_url) }}
+                    {{ form_row(dataForm.image_alt_text) }}
+                </div>
+                
+                {# Style Tab #}
+                <div class="tab-pane fade" id="form-style" role="tabpanel" aria-labelledby="style-tab">
+                    <h6 class="text-muted mb-3">Section Colors</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.section_background_color) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.form_card_background_color) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.title_color) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.subtitle_color) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.label_color) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Input Fields</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.input_background_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.input_text_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.input_border_color) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.input_border_radius) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Button</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.button_background_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.button_text_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.button_border_color) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.button_border_radius) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Spacing</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_bottom) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_bottom) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.box_shadow) }}
+                </div>
+                {# Form Fields Tab #}
+                <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
+                    {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
+                        'fields': form.form_fields_json.vars.value ?? '[]',
+                        'field_types': {
+                            'text': 'Text Input',
+                            'email': 'Email',
+                            'tel': 'Phone',
+                            'textarea': 'Text Area',
+                            'select': 'Dropdown',
+                            'radio': 'Radio Buttons',
+                            'checkbox': 'Checkbox',
+                            'number': 'Number',
+                            'date': 'Date',
+                            'hidden': 'Hidden Field'
+                        }
+                    } %}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'cta' %}
+            <ul class="nav nav-tabs" id="ctaSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#cta-content" type="button" role="tab" aria-controls="cta-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#cta-style" type="button" role="tab" aria-controls="cta-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#cta-buttons" type="button" role="tab" aria-controls="cta-buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="ctaSectionTabsContent">
+                <div class="tab-pane fade show active" id="cta-content" role="tabpanel" aria-labelledby="content-tab">
+                    
+                    {{ form_row(dataForm.text) }}
+                    {{ form_row(dataForm.buttonText) }}
+                    {{ form_row(dataForm.buttonUrl) }}
+                </div>
+                <div class="tab-pane fade" id="cta-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.titleColor) }}
+                    {{ form_row(dataForm.textAlignment) }}
+                    {{ form_row(dataForm.paddingTop) }}
+                    {{ form_row(dataForm.paddingBottom) }}
+                    {{ form_row(dataForm.marginTop) }}
+                    {{ form_row(dataForm.marginBottom) }}
+                </div>
+                <div class="tab-pane fade" id="cta-buttons" role="tabpanel" aria-labelledby="buttons-tab">
+                    {{ form_row(dataForm.buttonBackgroundColor) }}
+                    {{ form_row(dataForm.buttonTextColor) }}
+                    {{ form_row(dataForm.buttonBorderColor) }}
+                    {{ form_row(dataForm.buttonBorderRadius) }}
+                    {{ form_row(dataForm.buttonStyle) }}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'footer' %}
+            <ul class="nav nav-tabs" id="footerSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-content" type="button" role="tab" aria-controls="heroSplit-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-style" type="button" role="tab" aria-controls="heroSplit-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-buttons" type="button" role="tab" aria-controls="heroSplit-buttons" aria-selected="false">Buttons</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="heroSplitTabsContent">
+              
+                
+            </div>
+        
+        {% elseif form.vars.value.type == 'footer' %}
+            <ul class="nav nav-tabs" id="heroQuoteTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-content" type="button" role="tab" aria-controls="heroQuote-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-form" type="button" role="tab" aria-controls="heroQuote-form" aria-selected="false">Form</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-style" type="button" role="tab" aria-controls="heroQuote-style" aria-selected="false">Style</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="heroQuoteTabsContent">
+                <div class="tab-pane fade show active" id="heroQuote-content" role="tabpanel" aria-labelledby="content-tab">
+                    {{ form_row(dataForm.top_text) }}
+                    {{ form_row(dataForm.hero_title) }}
+                    {{ form_row(dataForm.hero_subtitle) }}
+                    {{ form_row(dataForm.phone_number) }}
+                    {{ form_row(dataForm.left_image) }}
+                </div>
+                <div class="tab-pane fade" id="heroQuote-form" role="tabpanel" aria-labelledby="form-tab">
+                    {{ form_row(dataForm.form_title) }}
+                    {{ form_row(dataForm.form_description) }}
+                    {{ form_row(dataForm.button_text) }}
+                </div>
+                <div class="tab-pane fade" id="heroQuote-style" role="tabpanel" aria-labelledby="style-tab">
+                    {{ form_row(dataForm.background_color) }}
+                    {{ form_row(dataForm.text_color) }}
+                    {{ form_row(dataForm.title_color) }}
+                    {{ form_row(dataForm.form_card_background) }}
+                    {{ form_row(dataForm.button_background_color) }}
+                    {{ form_row(dataForm.button_text_color) }}
+                    <hr>
+                    {{ form_row(dataForm.padding_top) }}
+                    {{ form_row(dataForm.padding_bottom) }}
+                </div>
+            </div>
+            
+        {% elseif form.vars.value.type == 'footer' %}
+            <ul class="nav nav-tabs" id="footerSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="footer-content-tab" data-bs-toggle="tab" data-bs-target="#footer-content" type="button" role="tab" aria-controls="footer-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="footer-style-tab" data-bs-toggle="tab" data-bs-target="#footer-style" type="button" role="tab" aria-controls="footer-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="footer-layout-tab" data-bs-toggle="tab" data-bs-target="#footer-layout" type="button" role="tab" aria-controls="footer-layout" aria-selected="false">Layout</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="footerSectionTabsContent">
+                {# Content Tab #}
+                <div class="tab-pane fade show active" id="footer-content" role="tabpanel" aria-labelledby="footer-content-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.company_name) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.copyright_text) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.company_description) }}
+                    {{ form_row(dataForm.useful_links) }}
+                    {{ form_row(dataForm.address) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.phone) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.email) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.ctaText) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.ctaUrl) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {# Style Tab #}
+                <div class="tab-pane fade" id="footer-style" role="tabpanel" aria-labelledby="footer-style-tab" data-controller="color-picker">
+                    {# Background Colors #}
+                    <div class="color-field-group">
+                        <div class="color-field-group-title">Background</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.background_color) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.border_top_color) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {# Text Colors #}
+                    <div class="color-field-group">
+                        <div class="color-field-group-title">Text</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.text_color) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.heading_color) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {# Link Colors #}
+                    <div class="color-field-group">
+                        <div class="color-field-group-title">Links</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.link_color) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(dataForm.link_hover_color) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Spacing</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.padding_bottom) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_top) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.margin_bottom) }}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Typography</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.title_font_size) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.text_font_size) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.link_font_size) }}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Advanced</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.text_alignment) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.column_gap) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.columns_count) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.border_radius) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.box_shadow) }}
+                </div>
+                
+                {# Layout Tab #}
+                <div class="tab-pane fade" id="footer-layout" role="tabpanel" aria-labelledby="footer-layout-tab">
+                    {{ form_row(dataForm.container_width) }}
+                    {{ form_row(dataForm.layout_type) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.stack_on_mobile) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.show_divider) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            {# Fallback for unknown section types - render all fields #}
+            {% for child in dataForm %}
+                {% if child.vars.name != 'id' %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endif %}

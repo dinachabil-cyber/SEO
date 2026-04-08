@@ -1,0 +1,592 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <!-- Background Gradient Blobs -->
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Authentication Card -->
+    <div class="auth-card fade-in-up">
+        <div class="auth-header">
+            <h1 class="auth-title">Create your account</h1>
+            <p class="auth-subtitle">Start your journey</p>
+        </div>
+
+        {{ form_start(registrationForm, {'attr': {'class': 'auth-form', 'data-turbo': 'false'}}) }}
+        
+        {# Global form errors #}
+        {% if registrationForm.vars.errors|length > 0 %}
+            <div class="auth-alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+                <div>
+                    {% for error in registrationForm.vars.errors %}
+                        {{ error.message }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <div class="input-wrapper">
+                <i class="bi bi-person input-icon"></i>
+                {{ form_widget(registrationForm.name, {'attr': {'class': 'form-control', 'placeholder': 'Username'}}) }}
+            </div>
+            {{ form_errors(registrationForm.name) }}
+        </div>
+
+        <div class="form-group">
+            <div class="input-wrapper password-input-group">
+                <i class="bi bi-lock input-icon"></i>
+                {{ form_widget(registrationForm.password.first, {'attr': {'class': 'form-control', 'placeholder': 'Password', 'autocomplete': 'new-password', 'id': 'inputPassword'}}) }}
+                <button type="button" id="togglePassword" class="password-toggle">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            {{ form_errors(registrationForm.password.first) }}
+            
+            <!-- Password Strength Indicator -->
+            <div class="password-strength">
+                <div class="strength-bar">
+                    <div id="strengthFill" class="strength-fill"></div>
+                </div>
+                <span id="strengthText" class="strength-text"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-wrapper password-input-group">
+                <i class="bi bi-lock input-icon"></i>
+                {{ form_widget(registrationForm.password.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirm Password', 'autocomplete': 'new-password', 'id': 'inputConfirmPassword'}}) }}
+                <button type="button" id="toggleConfirmPassword" class="password-toggle">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            {{ form_errors(registrationForm.password.second) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+            <span class="btn-text">Sign Up</span>
+            <i class="bi bi-person-plus"></i>
+        </button>
+        {{ form_end(registrationForm) }}
+
+        <div class="auth-footer">
+            <p class="auth-link-text">Already have an account? <a href="{{ path('app_login') }}" class="auth-link">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Premium Authentication Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f0f9ff 100%);
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Background Blobs */
+    .background-blobs {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.3;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        top: -200px;
+        right: -200px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        width: 350px;
+        height: 350px;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        bottom: -150px;
+        left: -150px;
+        animation-delay: 5s;
+    }
+
+    .blob-3 {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-delay: 10s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        33% {
+            transform: translate(30px, -30px) scale(1.1);
+        }
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+    }
+
+    /* Authentication Card - Glassmorphism */
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        padding: 50px 40px;
+        width: 100%;
+        max-width: 420px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fade In Animation */
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    /* Form */
+    .auth-form {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        color: #9ca3af;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 16px 16px 16px 48px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        background-color: #f9fafb;
+        color: #1f2937;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #6366f1;
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control:focus + .input-icon,
+    .form-control:focus ~ .input-icon {
+        color: #6366f1;
+    }
+
+    .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Password Toggle */
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .password-toggle:hover {
+        color: #6b7280;
+        background-color: #f3f4f6;
+    }
+
+    /* Password Strength Indicator */
+    .password-strength {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .strength-bar {
+        height: 4px;
+        background-color: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        width: 0;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .strength-fill.weak {
+        width: 33%;
+        background-color: #ef4444;
+    }
+
+    .strength-fill.medium {
+        width: 66%;
+        background-color: #f59e0b;
+    }
+
+    .strength-fill.strong {
+        width: 100%;
+        background-color: #10b981;
+    }
+
+    .strength-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #9ca3af;
+        transition: color 0.3s ease;
+    }
+
+    .strength-text.weak {
+        color: #ef4444;
+    }
+
+    .strength-text.medium {
+        color: #f59e0b;
+    }
+
+    .strength-text.strong {
+        color: #10b981;
+    }
+
+    /* Button */
+    .btn-primary {
+        width: 100%;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 8px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .btn-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Alert */
+    .auth-alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: #fee2e2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-5px);
+        }
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    .auth-alert i {
+        font-size: 20px;
+    }
+
+    /* Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 32px;
+    }
+
+    .auth-link-text {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    .auth-link {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .auth-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #6366f1;
+        transition: width 0.2s ease;
+    }
+
+    .auth-link:hover {
+        color: #4f46e5;
+    }
+
+    .auth-link:hover::after {
+        width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        .auth-card {
+            padding: 40px 30px;
+            margin: 10px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+        }
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            padding: 14px 14px 14px 44px;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            padding: 14px 20px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .auth-card {
+            padding: 32px 24px;
+        }
+
+        .auth-title {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('inputPassword');
+    const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
+    const confirmPasswordInput = document.getElementById('inputConfirmPassword');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+
+    // Toggle password visibility
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const isPasswordVisible = passwordInput.type === 'text';
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            
+            const icon = this.querySelector('i');
+            if (isPasswordVisible) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    }
+
+    if (toggleConfirmPasswordBtn && confirmPasswordInput) {
+        toggleConfirmPasswordBtn.addEventListener('click', function() {
+            const isPasswordVisible = confirmPasswordInput.type === 'text';
+            confirmPasswordInput.type = isPasswordVisible ? 'password' : 'text';
+            
+            const icon = this.querySelector('i');
+            if (isPasswordVisible) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+    }
+
+    // Password strength check
+    if (passwordInput && strengthFill && strengthText) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            
+            // Update strength bar
+            strengthFill.className = 'strength-fill';
+            strengthText.className = 'strength-text';
+            
+            if (strength === 0) {
+                strengthFill.style.width = '0';
+                strengthText.textContent = '';
+            } else if (strength === 1) {
+                strengthFill.classList.add('weak');
+                strengthText.classList.add('weak');
+                strengthText.textContent = 'Weak';
+            } else if (strength === 2) {
+                strengthFill.classList.add('medium');
+                strengthText.classList.add('medium');
+                strengthText.textContent = 'Medium';
+            } else {
+                strengthFill.classList.add('strong');
+                strengthText.classList.add('strong');
+                strengthText.textContent = 'Strong';
+            }
+        });
+    }
+
+    // Calculate password strength
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (password.length >= 12) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+        
+        return strength;
+    }
+});
+</script>
+{% endblock %}
