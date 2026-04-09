@@ -36,6 +36,26 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findByDay(int $year, int $month, int $day, ?int $siteId = null): array
+    {
+        $startDate = sprintf('%04d-%02d-%02d 00:00:00', $year, $month, $day);
+        $endDate = sprintf('%04d-%02d-%02d 23:59:59', $year, $month, $day);
+        
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.startAt >= :startDate')
+            ->andWhere('e.startAt <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('e.startAt', 'ASC');
+
+        if ($siteId !== null) {
+            $qb->andWhere('e.site = :siteId')
+               ->setParameter('siteId', $siteId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findUpcoming(?int $siteId = null, int $limit = 10): array
     {
         $now = new \DateTimeImmutable();

@@ -52,14 +52,15 @@
                             {% if is_granted('ROLE_ADMIN') %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('admin_user_index') }}">
-                                    <i class="bi bi-people"></i> Users
+                                    <i class="bi bi-people"></i> Users 
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('admin_event_index') }}">
-                                    <i class="bi bi-calendar-event"></i> Events
+                                    <i class="bi bi-calendar-event"></i> Events 
                                 </a>
-                            </li>
+                            </li> 
+                           
                             {% endif %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -86,6 +87,11 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('calendar_index') }}">
+                                    <i class="bi bi-calendar-event"></i> Events
+                                </a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i> {{ app.user.name }}
@@ -93,6 +99,9 @@
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="{{ path('app_dashboard') }}">
                                         <i class="bi bi-person"></i> Profile
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ path('calendar_index') }}">
+                                        <i class="bi bi-calendar-event"></i> Events
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ path('app_logout') }}">

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\Site;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,6 +19,9 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $sites = $options['sites'] ?? [];
+        $users = $options['users'] ?? [];
+        $defaultStart = $options['default_start'] ?? null;
+        $defaultEnd = $options['default_end'] ?? null;
 
         $builder
             ->add('title', TextType::class, [
@@ -47,6 +51,7 @@ class EventType extends AbstractType
                 'label' => 'Start Date & Time',
                 'required' => true,
                 'widget' => 'single_text',
+                'data' => $defaultStart ?? new \DateTimeImmutable(),
                 'attr' => [
                     'class' => 'form-control',
                 ],
@@ -55,6 +60,7 @@ class EventType extends AbstractType
                 'label' => 'End Date & Time',
                 'required' => true,
                 'widget' => 'single_text',
+                'data' => $defaultEnd ?? (new \DateTimeImmutable())->modify('+1 hour'),
                 'attr' => [
                     'class' => 'form-control',
                 ],
@@ -95,6 +101,21 @@ class EventType extends AbstractType
                 ],
             ]);
         }
+
+        if (!empty($users)) {
+            $builder->add('assignedUsers', EntityType::class, [
+                'label' => 'Assign Users',
+                'required' => false,
+                'class' => User::class,
+                'choices' => $users,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+                'help' => 'Select one or more users to assign this event to',
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -102,6 +123,9 @@ class EventType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Event::class,
             'sites' => [],
+            'users' => [],
+            'default_start' => null,
+            'default_end' => null,
         ]);
     }
 }

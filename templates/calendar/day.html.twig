@@ -1,0 +1,298 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Day View - {{ monthName }} {{ day }}, {{ year }}{% endblock %}
+
+{% block body %}
+<div class="calendar-day-wrapper">
+    <div class="calendar-header-section">
+        <div class="container">
+            <div class="day-view-header">
+                <div class="day-view-header-content">
+                    <a href="{{ path('calendar_index') }}" class="back-link">
+                        <i class="bi bi-arrow-left"></i> Back to Calendar
+                    </a>
+                    <h1 class="day-view-title">{{ monthName }} {{ day }}, {{ year }}</h1>
+                    {% if isToday %}
+                    <span class="today-badge">Today</span>
+                    {% endif %}
+                    <p class="day-view-subtitle">
+                        {{ events|length }} event{{ events|length != 1 ? 's' : '' }}
+                    </p>
+                </div>
+                <div class="day-view-nav">
+                    <a href="{{ path('calendar_month', {year: month == 1 ? year - 1 : year, month: month == 1 ? 12 : month - 1}) }}" class="btn-nav-calendar">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <a href="{{ path('calendar_month', {year: month == 12 ? year + 1 : year, month: month == 12 ? 1 : month + 1}) }}" class="btn-nav-calendar">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="day-schedule-grid">
+            {% for slot in hourlySlots %}
+            <div class="hour-slot {% if slot.events|length > 0 %}has-events{% endif %}">
+                <div class="hour-label">
+                    <span class="hour-time">{{ slot.hourFormatted }}</span>
+                </div>
+                <div class="hour-content">
+                    {% if slot.events|length > 0 %}
+                        {% for event in slot.events %}
+                        <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="hour-event">
+                            <div class="event-time">{{ event.startAt|date('H:i') }}{% if event.endAt %} - {{ event.endAt|date('H:i') }}{% endif %}</div>
+                            <div class="event-title">{{ event.title }}</div>
+                            {% if event.location %}
+                            <div class="event-location"><i class="bi bi-geo-alt"></i> {{ event.location }}</div>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-slot">
+                        <span class="empty-text">-</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_granted('ROLE_USER') %}
+        <div class="add-event-cta">
+            <a href="{{ path('admin_event_new') }}?date={{ year }}-{{ '%02d'|format(month) }}-{{ '%02d'|format(day) }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> Add Event to This Day
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.calendar-day-wrapper {
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.calendar-header-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    padding: 30px 0 40px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.day-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.day-view-header-content {
+    color: white;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    transition: color 0.2s ease;
+}
+
+.back-link:hover {
+    color: white;
+}
+
+.day-view-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.today-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 12px;
+    vertical-align: middle;
+}
+
+.day-view-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.day-view-nav {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-nav-calendar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-nav-calendar:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.day-schedule-grid {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 30px;
+}
+
+.hour-slot {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    min-height: 80px;
+}
+
+.hour-slot:last-child {
+    border-bottom: none;
+}
+
+.hour-slot.has-events {
+    background: rgba(124, 58, 237, 0.03);
+}
+
+.hour-label {
+    width: 100px;
+    min-width: 100px;
+    padding: 16px;
+    background: var(--surface-2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.hour-time {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.hour-content {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hour-event {
+    display: block;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.hour-event:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    color: white;
+}
+
+.event-time {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.event-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.event-location {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.empty-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 56px;
+}
+
+.empty-text {
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+
+.add-event-cta {
+    text-align: center;
+    padding: 30px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .day-view-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .day-view-title {
+        font-size: 1.5rem;
+    }
+    
+    .hour-slot {
+        flex-direction: column;
+        min-height: auto;
+    }
+    
+    .hour-label {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+        justify-content: flex-start;
+    }
+    
+    .hour-content {
+        padding: 12px;
+    }
+}
+</style>
+{% endblock %}

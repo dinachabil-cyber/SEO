@@ -68,5 +68,62 @@
             </div>
         </div>
     </div>
+
+    {% if events|length > 0 %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Upcoming Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Location</th>
+                                    <th>Site</th>
+                                    <th>Assigned Users</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('calendar_show', {slug: event.slug}) }}" target="_blank">
+                                            {{ event.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ event.startAt|date('Y-m-d H:i') }}</td>
+                                    <td>{{ event.endAt|date('Y-m-d H:i') }}</td>
+                                    <td>{{ event.location ?: '-' }}</td>
+                                    <td>{{ event.site ? event.site.domain : '-' }}</td>
+                                    <td>
+                                        {% if event.assignedUsers|length > 0 %}
+                                            {% for user in event.assignedUsers %}
+                                                <span class="badge bg-secondary">{{ user.name }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end">
+                        <a href="{{ path('admin_event_index') }}" class="btn btn-sm btn-outline-info">
+                            View All Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

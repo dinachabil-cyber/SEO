@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Site;
+use App\Entity\Event;
 use App\Form\SiteType;
 use App\Form\SiteFiltersType;
 use App\Repository\SiteRepository;
+use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +20,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
-    public function dashboard(Request $request, SiteRepository $siteRepository): Response
+    public function dashboard(Request $request, SiteRepository $siteRepository, EventRepository $eventRepository): Response
     {
+        $user = $this->getUser();
         $filtersForm = $this->createForm(SiteFiltersType::class);
         $filtersForm->handleRequest($request);
         
@@ -28,12 +31,28 @@ class DashboardController extends AbstractController
             $filters = array_filter($filtersForm->getData());
         }
         
-        // Only show user's own sites
-        $filters['owner'] = $this->getUser();
+        $filters['owner'] = $user;
         $sites = $siteRepository->findFiltered($filters);
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $events = $eventRepository->findAll();
+        } else {
+            $events = $eventRepository->createQueryBuilder('e')
+                ->leftJoin('e.assignedUsers', 'au')
+                ->addSelect('au')
+                ->leftJoin('e.site', 's')
+                ->addSelect('s')
+                ->getQuery()
+                ->getResult();
+        }
+
+        $upcomingEvents = array_filter($events, fn($e) => $e->getStartAt() > new \DateTimeImmutable());
+        usort($upcomingEvents, fn($a, $b) => $a->getStartAt() <=> $b->getStartAt());
+        $upcomingEvents = array_slice($upcomingEvents, 0, 5);
 
         return $this->render('dashboard/index.html.twig', [
             'sites' => $sites,
+            'events' => $upcomingEvents,
             'filtersForm' => $filtersForm,
         ]);
     }

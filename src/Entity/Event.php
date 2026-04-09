@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -34,6 +37,18 @@ class Event
     #[ORM\ManyToOne(targetEntity: Site::class)]
     private ?Site $site = null;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'event_user')]
+    private Collection $assignedUsers;
+
+    public function __construct()
+    {
+        $this->assignedUsers = new ArrayCollection();
+    }
+
     // --- Getters & Setters ---
     public function getId(): ?int { return $this->id; }
 
@@ -57,4 +72,31 @@ class Event
 
     public function getSite(): ?Site { return $this->site; }
     public function setSite(?Site $site): self { $this->site = $site; return $this; }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAssignedUsers(): Collection
+    {
+        return $this->assignedUsers;
+    }
+
+    public function addAssignedUser(User $user): static
+    {
+        if (!$this->assignedUsers->contains($user)) {
+            $this->assignedUsers->add($user);
+        }
+        return $this;
+    }
+
+    public function removeAssignedUser(User $user): static
+    {
+        $this->assignedUsers->removeElement($user);
+        return $this;
+    }
+
+    public function hasAssignedUser(User $user): bool
+    {
+        return $this->assignedUsers->contains($user);
+    }
 }

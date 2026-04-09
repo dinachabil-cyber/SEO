@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\Site;
+use App\Entity\User;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\SiteRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,15 +29,8 @@ class EventController extends AbstractController
             $events = $eventRepository->findAll();
             $sites = $siteRepository->findAll();
         } else {
-            $sites = $siteRepository->findBy(['owner' => $user]);
-            $siteIds = array_map(fn($s) => $s->getId(), $sites);
-            $events = $siteIds 
-                ? $eventRepository->createQueryBuilder('e')
-                    ->where('e.site IN (:siteIds)')
-                    ->setParameter('siteIds', $siteIds)
-                    ->getQuery()
-                    ->getResult()
-                : [];
+            $events = $eventRepository->findAll();
+            $sites = $siteRepository->findAll();
         }
 
         $selectedSiteId = $request->query->get('site');
@@ -51,19 +46,40 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'admin_event_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SiteRepository $siteRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SiteRepository $siteRepository, UserRepository $userRepository): Response
     {
         $event = new Event();
         
         $user = $this->getUser();
         if ($this->isGranted('ROLE_ADMIN')) {
             $sites = $siteRepository->findAll();
+            $users = $userRepository->findAll();
         } else {
             $sites = $siteRepository->findBy(['owner' => $user]);
+            $users = [];
+        }
+
+        // Handle pre-filled date from calendar
+        $defaultStart = null;
+        $defaultEnd = null;
+        $dateParam = $request->query->get('date');
+        if ($dateParam) {
+            try {
+                $date = new \DateTimeImmutable($dateParam);
+                // Default start time: 9 AM on the selected date
+                $defaultStart = $date->setTime(9, 0, 0);
+                // Default end time: 10 AM on the selected date
+                $defaultEnd = $date->setTime(10, 0, 0);
+            } catch (\Exception $e) {
+                // Invalid date, ignore
+            }
         }
 
         $form = $this->createForm(EventType::class, $event, [
             'sites' => $sites,
+            'users' => $users,
+            'default_start' => $defaultStart,
+            'default_end' => $defaultEnd,
         ]);
         $form->handleRequest($request);
 
@@ -83,7 +99,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'admin_event_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, SiteRepository $siteRepository): Response
+    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, SiteRepository $siteRepository, UserRepository $userRepository): Response
     {
         $user = $this->getUser();
         
@@ -94,10 +110,17 @@ class EventController extends AbstractController
             }
         }
 
+        $sites = $this->isGranted('ROLE_ADMIN') 
+            ? $siteRepository->findAll() 
+            : $siteRepository->findBy(['owner' => $user]);
+        
+        $users = $this->isGranted('ROLE_ADMIN')
+            ? $userRepository->findAll()
+            : [];
+
         $form = $this->createForm(EventType::class, $event, [
-            'sites' => $this->isGranted('ROLE_ADMIN') 
-                ? $siteRepository->findAll() 
-                : $siteRepository->findBy(['owner' => $user]),
+            'sites' => $sites,
+            'users' => $users,
         ]);
         $form->handleRequest($request);
 
@@ -135,6 +158,10 @@ class EventController extends AbstractController
         $newEvent->setLocation($event->getLocation());
         $newEvent->setSlug($event->getSlug() . '-copy-' . time());
         $newEvent->setSite($event->getSite());
+
+        foreach ($event->getAssignedUsers() as $user) {
+            $newEvent->addAssignedUser($user);
+        }
 
         $entityManager->persist($newEvent);
         $entityManager->flush();

@@ -3,88 +3,626 @@
 {% block title %}Calendar - {{ site ? site.companyName : 'Events' }}{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="mb-4">Calendar</h1>
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{{ path('calendar_month', {year: month == 1 ? year - 1 : year, month: month == 1 ? 12 : month - 1}) }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-chevron-left"></i> Previous
-                </a>
-                <h2 class="mb-0">{{ monthName }} {{ year }}</h2>
-                <a href="{{ path('calendar_month', {year: month == 12 ? year + 1 : year, month: month == 12 ? 1 : month + 1}) }}" class="btn btn-outline-secondary">
-                    Next <i class="bi bi-chevron-right"></i>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered mb-0 calendar-table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-center">Sun</th>
-                                    <th class="text-center">Mon</th>
-                                    <th class="text-center">Tue</th>
-                                    <th class="text-center">Wed</th>
-                                    <th class="text-center">Thu</th>
-                                    <th class="text-center">Fri</th>
-                                    <th class="text-center">Sat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for week in calendarWeeks %}
-                                <tr>
-                                    {% for day in week %}
-                                        <td class="{{ day.isCurrentMonth ? '' : 'text-muted' }} {{ day.isToday ? 'bg-light' : '' }}" style="min-width: 120px; min-height: 100px; vertical-align: top;">
-                                            {% if day.day > 0 %}
-                                                <div class="fw-bold">{{ day.day }}</div>
-                                                {% for event in day.events %}
-                                                    <div class="small">
-                                                        <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="text-decoration-none">
-                                                            <span class="badge bg-primary mb-1 d-block text-start">{{ event.startAt|date('H:i') }} {{ event.title }}</span>
-                                                        </a>
-                                                    </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+<div class="calendar-wrapper">
+    <div class="calendar-header-section">
+        <div class="container">
+            <div class="calendar-hero">
+                <div class="calendar-hero-content">
+                    <span class="calendar-badge"><i class="bi bi-calendar-event"></i> Events & Schedule</span>
+                    <h1 class="calendar-title">{{ monthName }} {{ year }}</h1>
+                    <p class="calendar-subtitle">Stay updated with all upcoming events and activities</p>
                 </div>
-            </div>
-
-            <div class="mt-4">
-                <h3>Upcoming Events</h3>
-                {% if events|length > 0 %}
-                    <div class="row">
-                        {% for event in events %}
-                            <div class="col-md-6 col-lg-4 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="text-decoration-none">{{ event.title }}</a>
-                                        </h5>
-                                        <p class="card-text text-muted small">
-                                            <i class="bi bi-calendar"></i> {{ event.startAt|date('M d, Y H:i') }}
-                                            {% if event.location %}
-                                                <br><i class="bi bi-geo-alt"></i> {{ event.location }}
-                                            {% endif %}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-muted">No events found for this month.</p>
-                {% endif %}
+                <div class="calendar-navigation">
+                    <a href="{{ path('calendar_month', {year: month == 1 ? year - 1 : year, month: month == 1 ? 12 : month - 1}) }}" class="btn-nav-calendar">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <a href="{{ path('calendar_month', {year: month == 12 ? year + 1 : year, month: month == 12 ? 1 : month + 1}) }}" class="btn-nav-calendar">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="container">
+        <div class="calendar-grid-container">
+            <div class="calendar-grid">
+                <div class="calendar-weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+                <div class="calendar-days">
+                    {% for week in calendarWeeks %}
+                        {% for day in week %}
+                            <div class="calendar-day {{ day.isCurrentMonth ? '' : 'other-month' }} {{ day.isToday ? 'today' : '' }}">
+                                {% if day.day > 0 %}
+                                    <a href="{{ path('calendar_day', {year: year, month: month, day: day.day}) }}" class="day-link">
+                                        <div class="day-number">{{ day.day }}</div>
+                                    </a>
+                                    <div class="day-events">
+                                        {% for event in day.events %}
+                                            <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="event-pill">
+                                                <span class="event-time">{{ event.startAt|date('H:i') }}</span>
+                                                <span class="event-title">{{ event.title }}</span>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                    {% if is_granted('ROLE_USER') %}
+                                    <a href="{{ path('admin_event_new') }}?date={{ year }}-{{ '%02d'|format(month) }}-{{ '%02d'|format(day.day) }}" class="add-day-event">
+                                        <i class="bi bi-plus"></i>
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if events|length > 0 %}
+        <div class="upcoming-events-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="bi bi-calendar-check"></i>
+                    Upcoming Events
+                </h2>
+                <span class="event-count">{{ events|length }} event{{ events|length > 1 ? 's' : '' }}</span>
+            </div>
+            <div class="events-grid">
+                {% for event in events %}
+                <a href="{{ path('calendar_show', {slug: event.slug}) }}" class="event-card">
+                    <div class="event-date-badge">
+                        <span class="event-month">{{ event.startAt|date('M') }}</span>
+                        <span class="event-day">{{ event.startAt|date('d') }}</span>
+                    </div>
+                    <div class="event-details">
+                        <h3 class="event-card-title">{{ event.title }}</h3>
+                        <div class="event-meta">
+                            <span class="meta-item">
+                                <i class="bi bi-clock"></i>
+                                {{ event.startAt|date('H:i') }}
+                            </span>
+                            {% if event.location %}
+                            <span class="meta-item">
+                                <i class="bi bi-geo-alt"></i>
+                                {{ event.location }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="event-arrow">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="no-events">
+            <div class="no-events-icon">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <h3>No Events This Month</h3>
+            <p>Check back later for upcoming events and activities.</p>
+        </div>
+        {% endif %}
+    </div>
 </div>
+
+<style>
+.calendar-wrapper {
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.calendar-header-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    padding: 40px 0 60px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-header-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+}
+
+.calendar-header-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+}
+
+.calendar-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.calendar-hero-content {
+    color: white;
+}
+
+.calendar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.calendar-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.calendar-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.calendar-navigation {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-nav-calendar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+}
+
+.btn-nav-calendar:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.calendar-grid-container {
+    margin-bottom: 40px;
+}
+
+.calendar-grid {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.weekday {
+    padding: 16px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 12px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+    position: relative;
+}
+
+.calendar-day:nth-child(7n) {
+    border-right: none;
+}
+
+.calendar-day:hover {
+    background: var(--surface-2);
+}
+
+.calendar-day:hover .add-day-event {
+    opacity: 1;
+}
+
+.calendar-day.other-month {
+    background: var(--bg);
+}
+
+.calendar-day.other-month .day-number {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.calendar-day.today {
+    background: rgba(124, 58, 237, 0.05);
+}
+
+.calendar-day.today::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+}
+
+.day-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.day-link:hover .day-number {
+    color: var(--primary);
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.event-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.event-pill:hover {
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    color: white;
+}
+
+.event-time {
+    font-weight: 600;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.add-day-event {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    opacity: 0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.add-day-event:hover {
+    background: var(--primary-2);
+    transform: scale(1.1);
+    color: white;
+}
+
+.upcoming-events-section {
+    margin-top: 40px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.event-count {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.event-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+}
+
+.event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+.event-date-badge {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 70px;
+    flex-shrink: 0;
+}
+
+.event-month {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.event-day {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.event-details {
+    flex-grow: 1;
+}
+
+.event-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.meta-item i {
+    color: var(--primary);
+}
+
+.event-arrow {
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.event-card:hover .event-arrow {
+    transform: translateX(4px);
+    color: var(--primary);
+}
+
+.no-events {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.no-events-icon {
+    font-size: 4rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+    margin-bottom: 20px;
+}
+
+.no-events h3 {
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.no-events p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+@media (max-width: 992px) {
+    .calendar-day {
+        min-height: 100px;
+        padding: 8px;
+    }
+    
+    .day-number {
+        font-size: 0.875rem;
+    }
+    
+    .event-pill {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+    
+    .event-time {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-hero {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+    }
+    
+    .calendar-title {
+        font-size: 1.75rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 6px;
+    }
+    
+    .day-number {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+    
+    .weekday {
+        padding: 12px 4px;
+        font-size: 0.7rem;
+    }
+    
+    .event-pill {
+        padding: 2px 4px;
+        font-size: 0.65rem;
+    }
+    
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .event-card {
+        padding: 16px;
+    }
+    
+    .event-date-badge {
+        padding: 12px;
+        min-width: 60px;
+    }
+    
+    .event-day {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-header-section {
+        padding: 30px 0 40px;
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+    }
+    
+    .day-events {
+        display: none;
+    }
+    
+    .calendar-day.today::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--primary);
+        border-radius: 50%;
+    }
+    
+    .add-day-event {
+        opacity: 1;
+    }
+}
+</style>
 {% endblock %}

@@ -1,6 +1,4 @@
-app:
-    resource: '../src/Controller/'
-    type: attribute
+# Explicit routes only - attribute routes disabled for this project
 
 # Site routes
 app_site_index:
@@ -117,6 +115,15 @@ calendar_index:
     controller: 'App\Controller\CalendarController::index'
     methods: ['GET']
 
+calendar_day:
+    path: /calendar/{year}/{month}/{day}
+    controller: 'App\Controller\CalendarController::day'
+    methods: ['GET']
+    requirements:
+        year: '\d{4}'
+        month: '\d{1,2}'
+        day: '\d{1,2}'
+
 calendar_month:
     path: /calendar/{year}/{month}
     controller: 'App\Controller\CalendarController::month'
@@ -126,7 +133,7 @@ calendar_month:
         month: '\d{1,2}'
 
 calendar_show:
-    path: /calendar/{slug}
+    path: /calendar/event/{slug}
     controller: 'App\Controller\CalendarController::show'
     methods: ['GET']
 

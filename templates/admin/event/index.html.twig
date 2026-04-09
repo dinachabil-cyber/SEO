@@ -36,6 +36,7 @@
                     <th>End Date</th>
                     <th>Location</th>
                     <th>Site</th>
+                    <th>Assigned Users</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -51,6 +52,15 @@
                     <td>{{ event.endAt|date('Y-m-d H:i') }}</td>
                     <td>{{ event.location ?: '-' }}</td>
                     <td>{{ event.site ? event.site.domain : '-' }}</td>
+                    <td>
+                        {% if event.assignedUsers|length > 0 %}
+                            {% for user in event.assignedUsers %}
+                                <span class="badge bg-info">{{ user.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="{{ path('admin_event_edit', {id: event.id}) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>

@@ -6,9 +6,7 @@ use App\Repository\EventRepository;
 use App\Repository\SiteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/calendar', name: 'calendar_')]
 class CalendarController extends AbstractController
 {
     private array $monthNames = [
@@ -17,7 +15,6 @@ class CalendarController extends AbstractController
         9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
     ];
 
-    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(EventRepository $eventRepository, SiteRepository $siteRepository): Response
     {
         $site = $siteRepository->findOneBy(['isActive' => true]);
@@ -26,9 +23,7 @@ class CalendarController extends AbstractController
         $year = (int) $now->format('Y');
         $month = (int) $now->format('n');
 
-        $events = $site 
-            ? $eventRepository->findByMonth($year, $month, $site->getId())
-            : $eventRepository->findByMonth($year, $month);
+        $events = $eventRepository->findByMonth($year, $month);
 
         $calendarWeeks = $this->buildCalendarWeeks($year, $month, $events);
 
@@ -42,7 +37,71 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route('/{year}/{month}', name: 'month', methods: ['GET'], requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'])]
+    public function show(string $slug, EventRepository $eventRepository): Response
+    {
+        $event = $eventRepository->findOneBySlug($slug);
+
+        if (!$event) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        return $this->render('calendar/show.html.twig', [
+            'event' => $event,
+            'site' => $event->getSite(),
+        ]);
+    }
+
+    public function day(int $year, int $month, int $day, EventRepository $eventRepository, SiteRepository $siteRepository): Response
+    {
+        if ($month < 1 || $month > 12) {
+            $month = 1;
+        }
+        if ($day < 1 || $day > 31) {
+            $day = 1;
+        }
+
+        $site = $siteRepository->findOneBy(['isActive' => true]);
+        
+        $events = $site 
+            ? $eventRepository->findByDay($year, $month, $day, $site->getId())
+            : $eventRepository->findByDay($year, $month, $day);
+
+        // Build hourly slots (24 hours)
+        $hourlySlots = [];
+        for ($hour = 0; $hour < 24; $hour++) {
+            $hourStart = sprintf('%04d-%02d-%02d %02d:00:00', $year, $month, $day, $hour);
+            $hourEnd = sprintf('%04d-%02d-%02d %02d:59:59', $year, $month, $day, $hour);
+            
+            $hourEvents = [];
+            foreach ($events as $event) {
+                $eventHour = (int) $event->getStartAt()->format('H');
+                if ($eventHour === $hour) {
+                    $hourEvents[] = $event;
+                }
+            }
+            
+            $hourlySlots[] = [
+                'hour' => $hour,
+                'hourFormatted' => sprintf('%02d:00', $hour),
+                'events' => $hourEvents,
+            ];
+        }
+
+        $currentDate = new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day));
+        $isToday = $currentDate->format('Y-m-d') === (new \DateTimeImmutable())->format('Y-m-d');
+
+        return $this->render('calendar/day.html.twig', [
+            'year' => $year,
+            'month' => $month,
+            'day' => $day,
+            'monthName' => $this->monthNames[$month],
+            'hourlySlots' => $hourlySlots,
+            'events' => $events,
+            'site' => $site,
+            'isToday' => $isToday,
+        ]);
+    }
+
     public function month(int $year, int $month, EventRepository $eventRepository, SiteRepository $siteRepository): Response
     {
         if ($month < 1 || $month > 12) {
@@ -64,21 +123,6 @@ class CalendarController extends AbstractController
             'monthName' => $this->monthNames[$month],
             'calendarWeeks' => $calendarWeeks,
             'site' => $site,
-        ]);
-    }
-
-    #[Route('/{slug}', name: 'show', methods: ['GET'])]
-    public function show(string $slug, EventRepository $eventRepository): Response
-    {
-        $event = $eventRepository->findOneBySlug($slug);
-
-        if (!$event) {
-            throw $this->createNotFoundException('Event not found');
-        }
-
-        return $this->render('calendar/show.html.twig', [
-            'event' => $event,
-            'site' => $event->getSite(),
         ]);
     }
 
