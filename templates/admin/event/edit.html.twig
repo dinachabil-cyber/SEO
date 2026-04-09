@@ -84,43 +84,27 @@
                         </div>
                         {% endif %}
 
-                        {% if form.assignedUsers is defined and form.assignedUsers.vars.choices|length > 0 %}
+                        {% if form.assignedUsers is defined %}
                         <div class="col-12">
                             <label class="form-label fw-semibold">
-                                <i class="bi bi-people me-2"></i>Team Members
+                                <i class="bi bi-people me-2"></i>{{ form.assignedUsers.vars.label }}
                             </label>
                             <p class="text-muted small mb-3">Select team members who will be assigned to this event</p>
                             
-                            {# Hide the default widget completely #}
-                            <div style="display: none;">{{ form_widget(form.assignedUsers) }}</div>
-                            
                             <div class="team-members-grid">
-                                {% for user in form.assignedUsers.vars.choices %}
+                                {% for child in form.assignedUsers %}
                                 <div class="team-member-option">
-                                    <input type="checkbox" 
-                                           id="{{ form.assignedUsers.vars.id }}_{{ user.value }}" 
-                                           name="{{ form.assignedUsers.vars.full_name }}[]" 
-                                           value="{{ user.value }}"
-                                           class="team-member-checkbox"
-                                           {% if user.value in form.assignedUsers.vars.value %}checked{% endif %}>
-                                    <label for="{{ form.assignedUsers.vars.id }}_{{ user.value }}" class="team-member-card">
+                                    {{ form_widget(child, {attr: {class: 'team-member-checkbox'}}) }}
+                                    <label for="{{ child.vars.id }}" class="team-member-card">
                                         <div class="team-member-avatar">
                                             <i class="bi bi-person-circle"></i>
                                         </div>
-                                        <span class="team-member-name">{{ user.label }}</span>
+                                        <span class="team-member-name">{{ child.vars.label }}</span>
                                         <i class="bi bi-check-circle-fill team-member-check"></i>
                                     </label>
                                 </div>
                                 {% endfor %}
                             </div>
-                            {{ form_errors(form.assignedUsers) }}
-                        </div>
-                        {% elseif form.assignedUsers is defined %}
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">
-                                <i class="bi bi-people me-2"></i>Team Members
-                            </label>
-                            <p class="text-muted small">No team members available. Create users first to assign them to events.</p>
                         </div>
                         {% endif %}
                     </div>

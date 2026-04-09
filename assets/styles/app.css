@@ -844,8 +844,11 @@ body{
 
 .team-member-checkbox {
     position: absolute;
+    width: 100%;
+    height: 100%;
     opacity: 0;
-    pointer-events: none;
+    cursor: pointer;
+    z-index: 1;
 }
 
 .team-member-card {

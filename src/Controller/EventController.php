@@ -51,13 +51,9 @@ class EventController extends AbstractController
         $event = new Event();
         
         $user = $this->getUser();
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $sites = $siteRepository->findAll();
-            $users = $userRepository->findAll();
-        } else {
-            $sites = $siteRepository->findBy(['owner' => $user]);
-            $users = [];
-        }
+        // Always show all sites and users for event creation (admins can assign to any)
+        $sites = $siteRepository->findAll();
+        $users = $userRepository->findAll();
 
         // Handle pre-filled date from calendar
         $defaultStart = null;
@@ -110,13 +106,9 @@ class EventController extends AbstractController
             }
         }
 
-        $sites = $this->isGranted('ROLE_ADMIN') 
-            ? $siteRepository->findAll() 
-            : $siteRepository->findBy(['owner' => $user]);
-        
-        $users = $this->isGranted('ROLE_ADMIN')
-            ? $userRepository->findAll()
-            : [];
+        // Always show all sites and users for event editing
+        $sites = $siteRepository->findAll();
+        $users = $userRepository->findAll();
 
         $form = $this->createForm(EventType::class, $event, [
             'sites' => $sites,

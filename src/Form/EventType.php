@@ -93,6 +93,7 @@ class EventType extends AbstractType
                 'class' => Site::class,
                 'choices' => $sites,
                 'choice_label' => 'domain',
+                'placeholder' => 'Select a site',
                 'attr' => [
                     'class' => 'form-select',
                 ],
@@ -110,8 +111,9 @@ class EventType extends AbstractType
                 'choices' => $users,
                 'choice_label' => 'name',
                 'multiple' => true,
+                'expanded' => true,
                 'attr' => [
-                    'class' => 'form-select',
+                    'class' => 'team-members-checkboxes',
                 ],
                 'help' => 'Select team members who will be working on this event',
             ]);
