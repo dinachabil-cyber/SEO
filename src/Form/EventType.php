@@ -104,7 +104,7 @@ class EventType extends AbstractType
 
         if (!empty($users)) {
             $builder->add('assignedUsers', EntityType::class, [
-                'label' => 'Assign Users',
+                'label' => 'Team Members',
                 'required' => false,
                 'class' => User::class,
                 'choices' => $users,
@@ -113,7 +113,7 @@ class EventType extends AbstractType
                 'attr' => [
                     'class' => 'form-select',
                 ],
-                'help' => 'Select one or more users to assign this event to',
+                'help' => 'Select team members who will be working on this event',
             ]);
         }
     }

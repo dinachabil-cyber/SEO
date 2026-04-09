@@ -62,9 +62,7 @@ class CalendarController extends AbstractController
 
         $site = $siteRepository->findOneBy(['isActive' => true]);
         
-        $events = $site 
-            ? $eventRepository->findByDay($year, $month, $day, $site->getId())
-            : $eventRepository->findByDay($year, $month, $day);
+        $events = $eventRepository->findByDay($year, $month, $day);
 
         // Build hourly slots (24 hours)
         $hourlySlots = [];
@@ -110,9 +108,7 @@ class CalendarController extends AbstractController
 
         $site = $siteRepository->findOneBy(['isActive' => true]);
         
-        $events = $site 
-            ? $eventRepository->findByMonth($year, $month, $site->getId())
-            : $eventRepository->findByMonth($year, $month);
+        $events = $eventRepository->findByMonth($year, $month);
 
         $calendarWeeks = $this->buildCalendarWeeks($year, $month, $events);
 

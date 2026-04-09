@@ -35,6 +35,7 @@ class Event
     private ?string $slug = null;
 
     #[ORM\ManyToOne(targetEntity: Site::class)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Site $site = null;
 
     /**

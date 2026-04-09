@@ -19,7 +19,13 @@ class EventRepository extends ServiceEntityRepository
     public function findByMonth(int $year, int $month, ?int $siteId = null): array
     {
         $startDate = sprintf('%04d-%02d-01 00:00:00', $year, $month);
-        $endDate = sprintf('%04d-%02d-01 00:00:00', $year, $month + 1);
+        $endMonth = $month + 1;
+        $endYear = $year;
+        if ($endMonth > 12) {
+            $endMonth = 1;
+            $endYear = $year + 1;
+        }
+        $endDate = sprintf('%04d-%02d-01 00:00:00', $endYear, $endMonth);
         
         $qb = $this->createQueryBuilder('e')
             ->andWhere('e.startAt < :endDate')

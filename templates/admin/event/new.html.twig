@@ -3,30 +3,170 @@
 {% block title %}New Event - Admin{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-3">
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ path('admin_event_index') }}">Events</a></li>
-            <li class="breadcrumb-item active" aria-current="page">New Event</li>
+            <li class="breadcrumb-item">
+                <a href="{{ path('admin_event_index') }}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Events
+                </a>
+            </li>
         </ol>
     </nav>
 
-    <h1 class="mb-4">New Event</h1>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card x-card">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h2 class="mb-1"><i class="bi bi-calendar-plus"></i> Create New Event</h2>
+                    <p class="text-muted mb-0">Fill in the details to create a new calendar event</p>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.title.vars.label }}</label>
+                            {{ form_widget(form.title, {attr: {class: 'form-control form-control-lg', placeholder: 'Enter event title'}}) }}
+                            {{ form_errors(form.title) }}
+                        </div>
 
-    {{ form_start(form) }}
-    <div class="card">
-        <div class="card-body">
-            {{ form_widget(form) }}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.description.vars.label }}</label>
+                            {{ form_widget(form.description, {attr: {class: 'form-control', rows: 4, placeholder: 'Enter event description'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.startAt.vars.label }}</label>
+                            {{ form_widget(form.startAt, {attr: {class: 'form-control'}}) }}
+                            {{ form_errors(form.startAt) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.endAt.vars.label }}</label>
+                            {{ form_widget(form.endAt, {attr: {class: 'form-control'}}) }}
+                            {{ form_errors(form.endAt) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.location.vars.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+                                {{ form_widget(form.location, {attr: {class: 'form-control', placeholder: 'Enter location (optional)'}}) }}
+                            </div>
+                            {{ form_errors(form.location) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.slug.vars.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+                                {{ form_widget(form.slug, {attr: {class: 'form-control', placeholder: 'e.g., team-meeting-april-2026'}}) }}
+                            </div>
+                            <div class="form-text">{{ form_help(form.slug) }}</div>
+                            {{ form_errors(form.slug) }}
+                        </div>
+
+                        {% if form.site is defined %}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.site.vars.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-globe"></i>
+                                </span>
+                                {{ form_widget(form.site, {attr: {class: 'form-select'}}) }}
+                            </div>
+                            {{ form_errors(form.site) }}
+                        </div>
+                        {% endif %}
+
+                        {% if form.assignedUsers is defined and form.assignedUsers.vars.choices|length > 0 %}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-people me-2"></i>Team Members
+                            </label>
+                            <p class="text-muted small mb-3">Select team members who will be assigned to this event</p>
+                            
+                            {# Hide the default widget completely #}
+                            <div style="display: none;">{{ form_widget(form.assignedUsers) }}</div>
+                            
+                            <div class="team-members-grid">
+                                {% for user in form.assignedUsers.vars.choices %}
+                                <div class="team-member-option">
+                                    <input type="checkbox" 
+                                           id="{{ form.assignedUsers.vars.id }}_{{ user.value }}" 
+                                           name="{{ form.assignedUsers.vars.full_name }}[]" 
+                                           value="{{ user.value }}"
+                                           class="team-member-checkbox"
+                                           {% if user.value in form.assignedUsers.vars.value %}checked{% endif %}>
+                                    <label for="{{ form.assignedUsers.vars.id }}_{{ user.value }}" class="team-member-card">
+                                        <div class="team-member-avatar">
+                                            <i class="bi bi-person-circle"></i>
+                                        </div>
+                                        <span class="team-member-name">{{ user.label }}</span>
+                                        <i class="bi bi-check-circle-fill team-member-check"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.assignedUsers) }}
+                        </div>
+                        {% elseif form.assignedUsers is defined %}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-people me-2"></i>Team Members
+                            </label>
+                            <p class="text-muted small">No team members available. Create users first to assign them to events.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+                        <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-lg me-2"></i>Create Event
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
         </div>
-        <div class="card-footer">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle"></i> Create Event
-            </button>
-            <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary">
-                Cancel
-            </a>
+
+        <div class="col-lg-4">
+            <div class="card x-card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Quick Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle text-success me-2 mt-1"></i>
+                                <small class="text-muted">Set a clear title that describes the event</small>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle text-success me-2 mt-1"></i>
+                                <small class="text-muted">Include location details if it's an in-person event</small>
+                            </div>
+                        </li>
+                        <li class="mb-0">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle text-success me-2 mt-1"></i>
+                                <small class="text-muted">Assign team members to keep everyone informed</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
-    {{ form_end(form) }}
 </div>
 {% endblock %}

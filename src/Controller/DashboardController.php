@@ -34,17 +34,7 @@ class DashboardController extends AbstractController
         $filters['owner'] = $user;
         $sites = $siteRepository->findFiltered($filters);
 
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $events = $eventRepository->findAll();
-        } else {
-            $events = $eventRepository->createQueryBuilder('e')
-                ->leftJoin('e.assignedUsers', 'au')
-                ->addSelect('au')
-                ->leftJoin('e.site', 's')
-                ->addSelect('s')
-                ->getQuery()
-                ->getResult();
-        }
+        $events = $eventRepository->findAll();
 
         $upcomingEvents = array_filter($events, fn($e) => $e->getStartAt() > new \DateTimeImmutable());
         usort($upcomingEvents, fn($a, $b) => $a->getStartAt() <=> $b->getStartAt());
