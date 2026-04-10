@@ -34,15 +34,20 @@ class DashboardController extends AbstractController
         $filters['owner'] = $user;
         $sites = $siteRepository->findFiltered($filters);
 
-        $userId = $user->getId();
-        $upcomingEvents = $eventRepository->findByAssignedUser($userId);
-        $upcomingEvents = array_filter($upcomingEvents, fn($e) => $e->getStartAt() > new \DateTimeImmutable());
-        usort($upcomingEvents, fn($a, $b) => $a->getStartAt() <=> $b->getStartAt());
-        $upcomingEvents = array_slice($upcomingEvents, 0, 5);
+        $events = [];
+        $userId = $user?->getId();
+        
+        // Debug: Get all events first
+        $allEvents = $eventRepository->findAll();
+        
+        if ($userId) {
+            $events = $eventRepository->findByAssignedUser($userId);
+        }
 
         return $this->render('dashboard/index.html.twig', [
             'sites' => $sites,
-            'events' => $upcomingEvents,
+            'events' => $events,
+            'allEvents' => $allEvents,
             'filtersForm' => $filtersForm,
         ]);
     }
