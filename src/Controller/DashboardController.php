@@ -34,9 +34,9 @@ class DashboardController extends AbstractController
         $filters['owner'] = $user;
         $sites = $siteRepository->findFiltered($filters);
 
-        $events = $eventRepository->findAll();
-
-        $upcomingEvents = array_filter($events, fn($e) => $e->getStartAt() > new \DateTimeImmutable());
+        $userId = $user->getId();
+        $upcomingEvents = $eventRepository->findByAssignedUser($userId);
+        $upcomingEvents = array_filter($upcomingEvents, fn($e) => $e->getStartAt() > new \DateTimeImmutable());
         usort($upcomingEvents, fn($a, $b) => $a->getStartAt() <=> $b->getStartAt());
         $upcomingEvents = array_slice($upcomingEvents, 0, 5);
 

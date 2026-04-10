@@ -9,9 +9,11 @@
             <h1 class="mb-1"><i class="bi bi-calendar-event"></i> Events</h1>
             <p class="text-muted mb-0">Manage your calendar events</p>
         </div>
+        {% if is_granted('ROLE_ADMIN') %}
         <a href="{{ path('admin_event_new') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> New Event
         </a>
+        {% endif %}
     </div>
 
     {% if sites|length > 1 %}
@@ -79,6 +81,7 @@
                                 {% endif %}
                             </div>
                         </div>
+                        {% if is_granted('ROLE_ADMIN') %}
                         <div class="d-flex gap-2 ms-3">
                             <a href="{{ path('admin_event_edit', {id: event.id}) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="bi bi-pencil"></i>
@@ -93,6 +96,7 @@
                                 </button>
                             </form>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -105,9 +109,11 @@
             <i class="bi bi-calendar-x display-1 text-muted"></i>
             <h4 class="mt-3">No Events Found</h4>
             <p class="text-muted mb-4">Get started by creating your first event.</p>
+            {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('admin_event_new') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-2"></i>Create Event
             </a>
+            {% endif %}
         </div>
     </div>
     {% endif %}

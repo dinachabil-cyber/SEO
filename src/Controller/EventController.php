@@ -46,6 +46,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'admin_event_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager, SiteRepository $siteRepository, UserRepository $userRepository): Response
     {
         $event = new Event();
@@ -76,6 +77,7 @@ class EventController extends AbstractController
             'users' => $users,
             'default_start' => $defaultStart,
             'default_end' => $defaultEnd,
+            'is_admin' => $this->isGranted('ROLE_ADMIN'),
         ]);
         $form->handleRequest($request);
 
@@ -95,6 +97,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'admin_event_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, SiteRepository $siteRepository, UserRepository $userRepository): Response
     {
         $user = $this->getUser();
@@ -113,6 +116,7 @@ class EventController extends AbstractController
         $form = $this->createForm(EventType::class, $event, [
             'sites' => $sites,
             'users' => $users,
+            'is_admin' => $this->isGranted('ROLE_ADMIN'),
         ]);
         $form->handleRequest($request);
 
@@ -131,6 +135,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/duplicate', name: 'admin_event_duplicate', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function duplicate(Event $event, EntityManagerInterface $entityManager, SiteRepository $siteRepository): Response
     {
         $user = $this->getUser();
@@ -164,6 +169,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}', name: 'admin_event_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();

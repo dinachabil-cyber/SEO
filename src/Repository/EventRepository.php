@@ -98,4 +98,15 @@ class EventRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findByAssignedUser(int $userId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.assignedUsers', 'u')
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('e.startAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

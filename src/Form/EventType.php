@@ -103,7 +103,7 @@ class EventType extends AbstractType
             ]);
         }
 
-        if (!empty($users)) {
+        if (!empty($users) && ($options['is_admin'] ?? false)) {
             $builder->add('assignedUsers', EntityType::class, [
                 'label' => 'Team Members',
                 'required' => false,
@@ -128,6 +128,7 @@ class EventType extends AbstractType
             'users' => [],
             'default_start' => null,
             'default_end' => null,
+            'is_admin' => false,
         ]);
     }
 }
