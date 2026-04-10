@@ -79,7 +79,7 @@
                         </ul>
                     </div>
                     {% else %}
-                    <a class="navbar-brand" href="{{ path('app_dashboard') }}">
+                    <a class="navbar-brand" href="{{ path('app_site_index') }}">
                         <i class="bi bi-building"></i> Dashboard
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,12 +87,13 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('admin_event_index') }}">
-                                    <i class="bi bi-calendar-event"></i> Events
-                                </a>
-                            </li>
-                            <li class="nav-item dropdown">
+<li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_event_index') }}">
+                            <i class="bi bi-calendar-event"></i> Events
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i> {{ app.user.name }}
                                 </a>
@@ -101,7 +102,6 @@
                                         <i class="bi bi-person"></i> Profile
                                     </a></li>
                                     <li><a class="dropdown-item" href="{{ path('admin_event_index') }}">
-                                        <i class="bi bi-calendar-event"></i> Events
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ path('app_logout') }}">

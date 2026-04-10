@@ -4,8 +4,8 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Dashboard</h1>
-    <p>Welcome{% if app.user %}, {{ app.user.name }}{% endif %}!</p>
+   
+    <p>Welcome to your profile!</p>
 
     {% for message in app.flashes('success') %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">

@@ -3,6 +3,17 @@
 {% block title %}Edit Section{% endblock %}
 
 {% block body %}
+<script>
+function beforeSubmitSectionForm() {
+    if (typeof updateHeroFieldsJson === 'function') {
+        updateHeroFieldsJson();
+    }
+    if (typeof updateFieldsJson === 'function') {
+        updateFieldsJson();
+    }
+    return true;
+}
+</script>
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -23,7 +34,7 @@
                         </div>
                     {% endif %}
 
-                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false', onsubmit: 'updateHeroFieldsJson(); updateFieldsJson(); return true;'}}) }}
+                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false', onsubmit: 'return beforeSubmitSectionForm()'}}) }}
                     
                     {% include 'admin/section/_form.html.twig' %}
                     

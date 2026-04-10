@@ -141,7 +141,7 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        {% set data = section.effectiveData %}
+                                        {% set data = section.effectiveData|default({}) %}
                                         {% if section.type == 'header' %}
                                             <p><strong>Logo Text:</strong> {{ data.logoText ?? '' }}</p>
                                             {% if data.ctaText|default('') != '' and data.ctaUrl|default('') != '' %}
@@ -185,14 +185,14 @@
                                             {% endif %}
                                             <p><strong>Items:</strong> {{ (data.items ?? [])|length }} FAQ item(s)</p>
                                         {% elseif section.type == 'form' %}
-                                            {% if data.form_title %}
+                                            {% if data.form_title is defined %}
                                                 <p><strong>Form Title:</strong> {{ data.form_title }}</p>
                                             {% endif %}
-                                            {% if data.section_title %}
+                                            {% if data.section_title is defined %}
                                                 <p><strong>Section Title:</strong> {{ data.section_title }}</p>
                                             {% endif %}
                                             <p><strong>Fields:</strong> {{ (data.form_fields ?? [])|length }} field(s) configured</p>
-                                            {% if data.form_layout %}
+                                            {% if data.form_layout is defined %}
                                                 <p><strong>Layout:</strong> {{ data.form_layout }}</p>
                                             {% endif %}
                                         {% elseif section.type == 'cta' %}

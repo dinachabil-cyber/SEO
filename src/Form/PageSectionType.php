@@ -33,29 +33,6 @@ class PageSectionType extends AbstractType
                     new Assert\NotBlank(),
                 ],
             ])
-            // Hidden field to store standalone form section fields JSON (type: form)
-            ->add('form_fields_json', HiddenType::class, [
-                'label' => false,
-                'required' => false,
-                'mapped' => false,
-                'data' => [], // Will be populated in PRE_SET_DATA for form type
-            ])
-            // Hidden field to store hero section embedded form fields JSON (type: hero)
-            // This is separate from standalone form sections to avoid conflicts
-            ->add('hero_form_fields_json', HiddenType::class, [
-                'label' => false,
-                'required' => false,
-                'mapped' => false,
-                'data' => [], // Will be populated in PRE_SET_DATA for hero type
-            ])
-            // DEPRECATED: Keep hero_fields for backward compatibility but map it to hero_form_fields
-            // This allows existing data to be migrated automatically
-            ->add('hero_fields', HiddenType::class, [
-                'label' => false,
-                'required' => false,
-                'mapped' => false,
-                'data' => [],
-            ])
         ;
 
         // Dynamic fields based on type
@@ -64,262 +41,36 @@ class PageSectionType extends AbstractType
             $form = $event->getForm();
 
             if ($section && $section->getType()) {
-                $existingData = $section->getData();
+                // Use getEffectiveData() to get data including reference section fallback
+                $existingData = method_exists($section, 'getEffectiveData') 
+                    ? $section->getEffectiveData() 
+                    : $section->getData();
                 // Ensure existing data is an array
                 if (!is_array($existingData)) {
                     $existingData = [];
                 }
+                
                 $this->addDynamicFields($form, $section->getType(), $existingData);
-                
-                // Load form_fields_json for standalone FORM section type
-                if ($section->getType() === 'form' && $form->has('form_fields_json')) {
-                    $existingFormFields = $existingData['form_fields'] ?? [];
-                    // Handle case where form_fields is already a string (corrupted data)
-                    if (is_string($existingFormFields)) {
-                        $decoded = json_decode($existingFormFields, true);
-                        $existingFormFields = is_array($decoded) ? $decoded : [];
-                    }
-                    $form->get('form_fields_json')->setData(json_encode($existingFormFields));
-                }
-                
-                // Load hero_form_fields_json for HERO section with embedded form
-                // Also check deprecated 'hero_fields' for backward compatibility
-                if ($section->getType() === 'hero' && $form->has('hero_form_fields_json')) {
-                    $existingHeroFormFields = $existingData['hero_form_fields'] ?? $existingData['hero_fields'] ?? [];
-                    // Handle case where it's already a string (corrupted data)
-                    if (is_string($existingHeroFormFields)) {
-                        $decoded = json_decode($existingHeroFormFields, true);
-                        $existingHeroFormFields = is_array($decoded) ? $decoded : [];
-                    }
-                    $form->get('hero_form_fields_json')->setData(json_encode($existingHeroFormFields));
-                }
-                
-                // Also set the deprecated hero_fields for backward compatibility
-                if ($section->getType() === 'hero' && $form->has('hero_fields')) {
-                    $existingHeroFields = $existingData['hero_form_fields'] ?? $existingData['hero_fields'] ?? [];
-                    if (is_string($existingHeroFields)) {
-                        $decoded = json_decode($existingHeroFields, true);
-                        $existingHeroFields = is_array($decoded) ? $decoded : [];
-                    }
-                    $form->get('hero_fields')->setData(json_encode($existingHeroFields));
-                }
             }
         });
 
-      $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-    $data = $event->getData();
-    $form = $event->getForm();
-
-    if (!is_array($data)) {
-        return;
-    }
-
-    if (isset($data['type'])) {
-        $existingData = $data['data'] ?? [];
-
-        if (!is_array($existingData)) {
-            $existingData = [];
-        }
-
-        // Handle hero embedded form fields (for hero type sections)
-        // Use hero_form_fields_json (new) or hero_fields (deprecated)
-        if (!empty($data['hero_form_fields_json']) && is_string($data['hero_form_fields_json'])) {
-            $decodedHeroForm = json_decode($data['hero_form_fields_json'], true);
-            if (is_array($decodedHeroForm)) {
-                $existingData['hero_form_fields'] = $decodedHeroForm;
-            }
-        } elseif (!empty($data['hero_fields']) && is_string($data['hero_fields'])) {
-            // Backward compatibility: also check deprecated hero_fields
-            $decodedHero = json_decode($data['hero_fields'], true);
-            if (is_array($decodedHero)) {
-                $existingData['hero_form_fields'] = $decodedHero;
-                // Also set deprecated key for backward compatibility
-                $existingData['hero_fields'] = $decodedHero;
-            }
-        }
-
-        // Handle standalone form section fields (for form type sections)
-        if (!empty($data['form_fields_json']) && is_string($data['form_fields_json'])) {
-            $decodedFormFields = json_decode($data['form_fields_json'], true);
-            if (is_array($decodedFormFields)) {
-                $existingData['form_fields'] = $decodedFormFields;
-            }
-        }
-
-        $this->addDynamicFields($form, $data['type'], $existingData);
-
-        $data['data'] = $existingData;
-        $event->setData($data);
-    }
-});
-
-        // Handle form submission - merge JSON data into the data array
+        // Handle form submission - data handled via plain inputs, no extra processing needed
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            $data = $event->getData();
-            $form = $event->getForm();
-
-            // Early return if data is not an array (e.g., when editing existing entity)
-            // The data will be handled via form->get() calls below for entity objects
-            if (!is_array($data)) {
-                // For entity objects, get form_fields_json and hero_form_fields_json from submitted values
-                // Use getNormData() to get the submitted value for unmapped fields
-                $formFieldsJson = null;
-                $heroFormFieldsJson = null;
-                $heroFields = null; // Deprecated field for backward compatibility
-                
-                // Get form_fields_json (for standalone form sections)
-                if ($form->has('form_fields_json')) {
-                    try {
-                        $formFieldsJson = $form->get('form_fields_json')->getNormData();
-                        if (!$formFieldsJson) {
-                            $formFieldsJson = $form->get('form_fields_json')->getViewData();
-                        }
-                    } catch (\Exception $e) {
-                        // Ignore errors, try next approach
-                    }
-                }
-                
-                // Get hero_form_fields_json (new field for hero embedded forms)
-                if ($form->has('hero_form_fields_json')) {
-                    try {
-                        $heroFormFieldsJson = $form->get('hero_form_fields_json')->getNormData();
-                        if (!$heroFormFieldsJson) {
-                            $heroFormFieldsJson = $form->get('hero_form_fields_json')->getViewData();
-                        }
-                    } catch (\Exception $e) {
-                        // Ignore errors
-                    }
-                }
-                
-                // Get hero_fields (deprecated, for backward compatibility)
-                if ($form->has('hero_fields')) {
-                    try {
-                        $heroFields = $form->get('hero_fields')->getNormData();
-                        if (!$heroFields) {
-                            $heroFields = $form->get('hero_fields')->getViewData();
-                        }
-                    } catch (\Exception $e) {
-                        // Ignore errors
-                    }
-                }
-                
-                if ($data instanceof PageSection) {
-                    $sectionData = $data->getData();
-                    if (!is_array($sectionData)) {
-                        $sectionData = [];
-                    }
-
-                    // Process hero embedded form fields (new field)
-                    if ($heroFormFieldsJson) {
-                        if (is_string($heroFormFieldsJson) && !empty($heroFormFieldsJson)) {
-                            $decoded = json_decode($heroFormFieldsJson, true);
-                            if (is_array($decoded)) {
-                                $sectionData['hero_form_fields'] = $decoded;
-                            }
-                        } elseif (is_array($heroFormFieldsJson)) {
-                            $sectionData['hero_form_fields'] = $heroFormFieldsJson;
-                        }
-                    }
-
-                    // Process deprecated hero_fields for backward compatibility
-                    if ($heroFields && !$heroFormFieldsJson) {
-                        if (is_string($heroFields) && !empty($heroFields)) {
-                            $decoded = json_decode($heroFields, true);
-                            if (is_array($decoded)) {
-                                // Store in both new and deprecated keys for backward compatibility
-                                $sectionData['hero_form_fields'] = $decoded;
-                                $sectionData['hero_fields'] = $decoded;
-                            }
-                        }
-                    }
-
-                    // Process form fields JSON (for standalone form sections)
-                    if ($formFieldsJson) {
-                        if (is_string($formFieldsJson) && !empty($formFieldsJson)) {
-                            $decoded = json_decode($formFieldsJson, true);
-                            if (is_array($decoded)) {
-                                $sectionData['form_fields'] = $decoded;
-                            }
-                        } elseif (is_array($formFieldsJson)) {
-                            $sectionData['form_fields'] = $formFieldsJson;
-                        }
-                    }
-
-                    $data->setData($sectionData);
-                }
-                
-                return;
-            }
-            
-            // Handle array data (new form submissions)
-            // Get form fields JSON (for form type sections)
-            $formFieldsJson = null;
-            if (isset($data['form_fields_json'])) {
-                $formFieldsJson = $data['form_fields_json'];
-            } elseif (isset($data['page_section']['form_fields_json'])) {
-                $formFieldsJson = $data['page_section']['form_fields_json'];
-            } elseif ($form->has('form_fields_json')) {
-                $formFieldsJson = $form->get('form_fields_json')->getData();
-            }
-
-            // Get hero embedded form fields (new field)
-            $heroFormFieldsJson = null;
-            if (isset($data['hero_form_fields_json'])) {
-                $heroFormFieldsJson = $data['hero_form_fields_json'];
-            } elseif (isset($data['page_section']['hero_form_fields_json'])) {
-                $heroFormFieldsJson = $data['page_section']['hero_form_fields_json'];
-            } elseif ($form->has('hero_form_fields_json')) {
-                $heroFormFieldsJson = $form->get('hero_form_fields_json')->getData();
-            }
-
-            // Get deprecated hero_fields for backward compatibility
-            $heroFields = null;
-            if (isset($data['hero_fields'])) {
-                $heroFields = $data['hero_fields'];
-            } elseif (isset($data['page_section']['hero_fields'])) {
-                $heroFields = $data['page_section']['hero_fields'];
-            } elseif ($form->has('hero_fields')) {
-                $heroFields = $form->get('hero_fields')->getData();
-            }
-
-            if ($data instanceof PageSection) {
-                $sectionData = $data->getData();
-                if (!is_array($sectionData)) {
-                    $sectionData = [];
-                }
-
-                // Process hero embedded form fields (new)
-                if ($heroFormFieldsJson && is_string($heroFormFieldsJson) && !empty($heroFormFieldsJson)) {
-                    $decoded = json_decode($heroFormFieldsJson, true);
-                    if (is_array($decoded)) {
-                        $sectionData['hero_form_fields'] = $decoded;
-                    }
-                }
-
-                // Process deprecated hero_fields for backward compatibility
-                if ($heroFields && !$heroFormFieldsJson && is_string($heroFields) && !empty($heroFields)) {
-                    $decoded = json_decode($heroFields, true);
-                    if (is_array($decoded)) {
-                        $sectionData['hero_form_fields'] = $decoded;
-                        $sectionData['hero_fields'] = $decoded;
-                    }
-                }
-
-                // Process form fields JSON (for standalone form sections)
-                if ($formFieldsJson && is_string($formFieldsJson) && !empty($formFieldsJson)) {
-                    $decoded = json_decode($formFieldsJson, true);
-                    if (is_array($decoded)) {
-                        $sectionData['form_fields'] = $decoded;
-                    }
-                } elseif (is_array($formFieldsJson)) {
-                    $sectionData['form_fields'] = $formFieldsJson;
-                }
-
-                $data->setData($sectionData);
-            }
+            // Data will be saved from JavaScript updating the fallback inputs
+            // The entity's data array will be merged with these values
         });
     }
 
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => PageSection::class,
+            'request' => null,
+            'allow_extra_fields' => true,
+        ]);
+    }
+
+    // Add dynamic fields based on section type
     public static function addDynamicFields($form, $type, $existingData = [])
     {
         // Remove existing data field if exists
@@ -332,16 +83,6 @@ class PageSectionType extends AbstractType
             'existing_data' => $existingData,
             'label' => false,
             'data' => $existingData, // Make sure data is passed to the form
-        ]);
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => PageSection::class,
-            'request' => null,
-            // Accept extra fields from dynamic builders (form_fields_json / hero_form_fields_json)
-            'allow_extra_fields' => true,
         ]);
     }
 }
