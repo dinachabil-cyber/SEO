@@ -11,9 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class ReferenceSection
 {
-    public const ALLOWED_TYPES = [
-        'header', 'hero', 'body', 'image', 'cards', 'cards_premium', 'faq', 'form', 'cta', 'footer'
-    ];
+    use SectionDataTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,37 +22,9 @@ class ReferenceSection
     #[Assert\NotBlank]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\Choice(choices: self::ALLOWED_TYPES, message: 'Invalid section type')]
-    private ?string $type = null;
-
-    #[ORM\Column(type: 'json')]
-    private array $data = [];
-
-    #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    private ?DateTimeImmutable $updatedAt = null;
-
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
         $this->data = [];
-    }
-
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -71,37 +41,5 @@ class ReferenceSection
     {
         $this->name = $name;
         return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    public function getData(): array
-    {
-        return $this->data;
-    }
-
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-        return $this;
-    }
-
-    public function getCreatedAt(): ?DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 }

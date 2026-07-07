@@ -1,4 +1,0 @@
-
-Parse error: syntax error, unexpected token "," in Command line code on line 1
-PHP Parse error:  syntax error, unexpected token "," in Command line code on line 1
-Failed to execute command `php -r "require 'vendor/autoload.php'; \$pdo = new PDO('mysql:host=db;dbname=db', 'db', 'db'); \$stmt = \$pdo- id, domain FROM site LIMIT 5'); foreach(\$stmt as \$row) { echo 'ID: ' . \$row['id'] . ' Domain: ' . \$row['domain'] . PHP_EOL; }"`: exit status 255

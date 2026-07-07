@@ -3,10 +3,10 @@
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
                 <div class="text-center">
-                    {% if data.imageUrl %}
-                    <img src="{{ data.imageUrl }}" alt="{{ data.alt }}" class="img-fluid rounded-3 shadow-sm">
+                    {% if data.imageUrl is defined and data.imageUrl %}
+                    <img src="{{ data.imageUrl }}" alt="{{ data.alt|default('') }}" class="img-fluid rounded-3 shadow-sm">
                     {% endif %}
-                    {% if data.caption %}
+                    {% if data.caption is defined and data.caption %}
                         <p class="text-muted mt-3">{{ data.caption }}</p>
                     {% endif %}
                 </div>

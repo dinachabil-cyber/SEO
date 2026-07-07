@@ -237,7 +237,7 @@ seo_project/
 
 ### Adding New Section Types
 
-1. Add the type to [`PageSection::ALLOWED_TYPES`](src/Entity/PageSection.php:14)
+1. Add the type to [`SectionTypes::ALL`](src/Entity/SectionTypes.php:5)
 2. Create a form builder in [`PageSectionType`](src/Form/PageSectionType.php:1)
 3. Create admin template in `templates/admin/section/partials/`
 4. Create frontend template in `templates/front/sections/`

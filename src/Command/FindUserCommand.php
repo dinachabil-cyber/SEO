@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\App\Command;
+namespace App\Command;
 
 use App\Repository\UserRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -32,9 +32,9 @@ class FindUserCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $username = $input->getArgument('username');
-        
+
         $user = $this->userRepository->findOneBy(['name' => $username]);
-        
+
         if ($user) {
             $io->success(sprintf('Found user: %s (ID: %d)', $user->getName(), $user->getId()));
             $io->writeln('Roles: ' . implode(', ', $user->getRoles()));

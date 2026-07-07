@@ -845,6 +845,7 @@ Option 2</textarea>
 let formFields = [];
 let fieldCounter = 0;
 let formFieldsBuilderInitialized = false;
+let symfonyInputId = '{{ symfony_input_id|default('')|e('js') }}';
 
 function initFormFieldsBuilder() {
     const wrapper = document.querySelector('.form-fields-builder[data-builder="form-fields"]');
@@ -853,7 +854,6 @@ function initFormFieldsBuilder() {
         return;
     }
 
-    // avoid double init
     if (wrapper.dataset.initialized === '1') {
         console.log('Form fields builder already initialized');
         return;
@@ -863,7 +863,7 @@ function initFormFieldsBuilder() {
     console.log('initFormFieldsBuilder');
 
     const fallbackInput = document.getElementById('form_fields_json_fallback');
-    const symfonyInput = document.getElementById('page_section_form_fields_json');
+    const symfonyInput = document.getElementById(symfonyInputId);
     const addBtn = document.getElementById('add-field-btn');
 
     console.log('fallbackInput:', fallbackInput ? 'found' : 'NOT FOUND');
@@ -1088,7 +1088,7 @@ function renderFormFields() {
 
 function updateFieldsJson() {
     const container = document.getElementById('form-fields-container');
-    const symfonyInput = document.getElementById('page_section_form_fields_json');
+    const symfonyInput = document.getElementById(symfonyInputId);
     const fallbackInput = document.getElementById('form_fields_json_fallback');
 
     if (!container) return;

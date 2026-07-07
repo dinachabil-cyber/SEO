@@ -1,25 +1,63 @@
-<section class="section premium-cards {% if data.backgroundColor is defined or (data.style is defined and data.style.backgroundColor is defined) %}custom-bg{% endif %}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px;{% endif %} {% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px;{% endif %} {% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px;{% endif %} {% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px;{% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px;{% endif %} {% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px;{% endif %} {% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px;{% endif %} {% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px;{% endif %}"{% endif %}>
+{% import 'front/sections/_macros.html.twig' as macros %}
+<section class="{{ macros.section_class('section premium-cards', data) }}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px;{% endif %} {% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px;{% endif %} {% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px;{% endif %} {% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px;{% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px;{% endif %} {% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px;{% endif %} {% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px;{% endif %} {% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px;{% endif %}"{% endif %}>
     <div class="container">
-        {% if data.sectionTitle %}
-            <div class="text-center mb-5 {% if data.textAlignment is defined %}text-{{ data.textAlignment }}{% elseif data.style is defined and data.style.textAlignment is defined %}text-{{ data.style.textAlignment }}{% endif %}">
-                <h2 {% if data.titleColor is defined %}style="color: {{ data.titleColor }}"{% elseif data.style is defined and data.style.titleColor is defined %}style="color: {{ data.style.titleColor }}"{% endif %}>{{ data.sectionTitle }}</h2>
+        {% if data.sectionTitle is defined and data.sectionTitle %}
+            <div class="text-center mb-5 {{ macros.text_align_class(data) }}">
+                {% set title_style = '' %}
+                {% if data.titleColor is defined %}{% set title_style = data.titleColor %}{% elseif data.style is defined and data.style.titleColor is defined %}{% set title_style = data.style.titleColor %}{% endif %}
+                <h2{% if title_style %} style="color: {{ title_style }}"{% endif %}>{{ data.sectionTitle }}</h2>
             </div>
         {% endif %}
         
         <div class="{% if data.cardLayout is defined %}{{ data.cardLayout }}{% elseif data.style is defined and data.style.cardLayout is defined %}{{ data.style.cardLayout }}{% else %}grid-3{% endif %}">
-            {% for card in data.cards %}
-                <div class="x-card premium {% if data.cardStyle is defined %}{{ data.cardStyle }}{% elseif data.style is defined and data.style.cardStyle is defined %}{{ data.style.cardStyle }}{% endif %}" {% if data.cardBackgroundColor is defined %}style="background-color: {{ data.cardBackgroundColor }}; {% if data.cardBorderColor is defined %}border-color: {{ data.cardBorderColor }};{% endif %} {% if data.cardBorderRadius is defined %}border-radius: {{ data.cardBorderRadius }}px;{% endif %} {% if data.cardShadow is defined %}box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);{% endif %}" {% elseif data.style is defined and data.style.cardBackgroundColor is defined %}style="background-color: {{ data.style.cardBackgroundColor }}; {% if data.style.cardBorderColor is defined %}border-color: {{ data.style.cardBorderColor }};{% endif %} {% if data.style.cardBorderRadius is defined %}border-radius: {{ data.style.cardBorderRadius }}px;{% endif %} {% if data.style.cardShadow is defined %}box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);{% endif %}"{% endif %}>
-                    {% if card.imageUrl %}
-                        <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 {% if data.cardStyle is defined and data.cardStyle == 'rounded' %}rounded{% elseif data.style is defined and data.style.cardStyle is defined and data.style.cardStyle == 'rounded' %}rounded{% endif %} {% if data.cardStyle is defined and data.cardStyle == 'oval' %}rounded-circle{% elseif data.style is defined and data.style.cardStyle is defined and data.style.cardStyle == 'oval' %}rounded-circle{% endif %} {% if data.cardStyle is defined and data.cardStyle == 'square' %}rounded-0{% elseif data.style is defined and data.style.cardStyle is defined and data.style.cardStyle == 'square' %}rounded-0{% endif %}">
+            {% set cardsToRender = [] %}
+            {% for c in (data.cards ?? []) %}
+                {% if (c.title is defined and c.title) or (c.description is defined and c.description) or (c.linkUrl is defined and c.linkUrl) or (c.imageUrl is defined and c.imageUrl) %}
+                    {% set cardsToRender = cardsToRender|merge([c]) %}
+                {% endif %}
+            {% endfor %}
+
+            {# IMPORTANT: premium cards must render exactly what exists in data.cards.
+               Filter out empty cards to prevent ghost/duplicate empty cards. #}
+            {% for card in cardsToRender %}
+                {% set is_empty_card = (card.title is not defined or not card.title) and (card.description is not defined or not card.description) and (card.linkUrl is not defined or not card.linkUrl) and (card.imageUrl is not defined or not card.imageUrl) %}
+                {% if not is_empty_card %}
+                    {% set card_style = '' %}
+                    {% if data.cardBackgroundColor is defined or data.style is defined and data.style.cardBackgroundColor is defined %}
+                        {% set card_bg = data.cardBackgroundColor is defined ? data.cardBackgroundColor : data.style.cardBackgroundColor %}
+                        {% set card_border = data.cardBorderColor is defined ? data.cardBorderColor : (data.style is defined ? data.style.cardBorderColor : '') %}
+                        {% set card_radius = data.cardBorderRadius is defined ? data.cardBorderRadius : (data.style is defined ? data.style.cardBorderRadius : '') %}
+                        {% set card_shadow = data.cardShadow is defined ? data.cardShadow : (data.style is defined ? data.style.cardShadow : '') %}
+                        {% set card_style = 'background-color: ' ~ card_bg ~ '; ' %}
+                        {% if card_border %}{% set card_style = card_style ~ 'border-color: ' ~ card_border ~ '; ' %}{% endif %}
+                        {% if card_radius %}{% set card_style = card_style ~ 'border-radius: ' ~ card_radius ~ 'px; ' %}{% endif %}
+                        {% if card_shadow %}{% set card_style = card_style ~ 'box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); ' %}{% endif %}
                     {% endif %}
-                    <h3 class="mb-2 {% if data.textAlignment is defined %}text-{{ data.textAlignment }}{% elseif data.style is defined and data.style.textAlignment is defined %}text-{{ data.style.textAlignment }}{% endif %}" {% if data.cardTitleColor is defined %}style="color: {{ data.cardTitleColor }}"{% elseif data.style is defined and data.style.cardTitleColor is defined %}style="color: {{ data.style.cardTitleColor }}"{% endif %}>{{ card.title }}</h3>
-                    <p class="mb-4 {% if data.textAlignment is defined %}text-{{ data.textAlignment }}{% elseif data.style is defined and data.style.textAlignment is defined %}text-{{ data.style.textAlignment }}{% endif %} {% if data.cardTextColor is not defined and (data.style is not defined or data.style.cardTextColor is not defined) %}text-muted{% endif %}" {% if data.cardTextColor is defined %}style="color: {{ data.cardTextColor }}"{% elseif data.style is defined and data.style.cardTextColor is defined %}style="color: {{ data.style.cardTextColor }}"{% endif %}>{{ card.description }}</p>
-                    {% if card.linkUrl %}
-                        <a href="{{ card.linkUrl }}" class="btn btn-{% if data.buttonStyle is defined %}{{ data.buttonStyle }}{% elseif data.style is defined and data.style.buttonStyle is defined %}{{ data.style.buttonStyle }}{% else %}primary{% endif %}" {% if data.buttonBackgroundColor is defined %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined %}color: {{ data.buttonTextColor }};{% endif %} {% if data.buttonBorderColor is defined %}border-color: {{ data.buttonBorderColor }};{% endif %} {% if data.buttonBorderRadius is defined %}border-radius: {{ data.buttonBorderRadius }}px;{% endif %}" {% elseif data.style is defined and data.style.buttonBackgroundColor is defined %}style="background-color: {{ data.style.buttonBackgroundColor }}; {% if data.style.buttonTextColor is defined %}color: {{ data.style.buttonTextColor }};{% endif %} {% if data.style.buttonBorderColor is defined %}border-color: {{ data.style.buttonBorderColor }};{% endif %} {% if data.style.buttonBorderRadius is defined %}border-radius: {{ data.style.buttonBorderRadius }}px;{% endif %}"{% endif %}>
-                            Learn More
-                        </a>
-                    {% endif %}
-                </div>
+
+                    <div class="x-card premium {% if data.cardStyle is defined %}{{ data.cardStyle }}{% elseif data.style is defined and data.style.cardStyle is defined %}{{ data.style.cardStyle }}{% endif %}" {% if card_style %}style="{{ card_style|trim('; ') }}"{% endif %}>
+                        {% if card.imageUrl is defined and card.imageUrl %}
+                            {% set card_img_style = macros.card_image_style(data) %}
+                            {% set card_img_classes = macros.card_image_classes(data) %}
+                            <img src="{{ card.imageUrl }}" alt="{{ card.title }}" class="img-fluid mb-4 {{ card_img_classes }}" style="{{ card_img_style }}">
+                        {% endif %}
+                        <h3 class="mb-2 {{ macros.text_align_class(data) }}"{% if (data.cardTitleColor is defined ? data.cardTitleColor : (data.style is defined and data.style.cardTitleColor is defined ? data.style.cardTitleColor : '')) %} style="color: {{ data.cardTitleColor is defined ? data.cardTitleColor : data.style.cardTitleColor }}"{% endif %}>{{ card.title }}</h3>
+                        <p class="mb-4 {{ macros.text_align_class(data) }}{% if data.cardTextColor is not defined and (data.style is not defined or data.style.cardTextColor is not defined) %} text-muted{% endif %}"{% if data.cardTextColor is defined %} style="color: {{ data.cardTextColor }}"{% elseif data.style is defined and data.style.cardTextColor is defined %} style="color: {{ data.style.cardTextColor }}"{% endif %}>{{ card.description }}</p>
+                        {% if card.linkUrl is defined and card.linkUrl %}
+                            {# Force button background to respect configured buttonBackgroundColor (even if CSS classes default to blue).
+                               Use !important to override any .btn-primary/.btn-outline-primary gradients. #}
+                            {% set btn_style = macros.button_style_string(data) %}
+                            {% set forced_btn_style = '' %}
+                            {% if data.buttonBackgroundColor is defined and data.buttonBackgroundColor %}
+                                {% set forced_btn_style = 'background-color: ' ~ data.buttonBackgroundColor ~ ' !important;' %}
+                            {% elseif data.style is defined and data.style.buttonBackgroundColor is defined and data.style.buttonBackgroundColor %}
+                                {% set forced_btn_style = 'background-color: ' ~ data.style.buttonBackgroundColor ~ ' !important;' %}
+                            {% endif %}
+                            <a href="{{ card.linkUrl }}" class="{{ macros.button_class_string(data) }}" style="{{ (forced_btn_style ~ (btn_style ? btn_style : ''))|trim }}">
+                                Learn More
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

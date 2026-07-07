@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\ReferenceSection;
+use App\Entity\SectionTypes;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,7 +25,7 @@ class ReferenceSectionType extends AbstractType
             ])
             ->add('type', ChoiceType::class, [
                 'label' => 'Section Type',
-                'choices' => array_combine(ReferenceSection::ALLOWED_TYPES, ReferenceSection::ALLOWED_TYPES),
+                'choices' => array_combine(SectionTypes::ALL, SectionTypes::ALL),
                 'required' => true,
                 'attr' => [
                     'class' => 'form-select',

@@ -619,6 +619,18 @@
 <script>
 // Hero Fields Builder JavaScript
 let heroFieldIndex = 0;
+let symfonyInputId = '{{ symfony_input_id|default('')|e('js') }}';
+// Symfony hidden input id/name can vary depending on how this partial is included.
+// Auto-detect the actual field that will be submitted in the parent PageSectionType form.
+function findSymfonyHeroInput() {
+    return (
+        document.getElementById(symfonyInputId) ||
+        document.querySelector('input[name="page_section[data][hero_form_fields]"]') ||
+        document.getElementById('page_section_data_hero_form_fields') ||
+        null
+    );
+}
+
 
 function handleAddHeroField() {
     const select = document.getElementById('add-field-type-select');
@@ -694,93 +706,75 @@ function updateHeroFieldsEmptyState() {
 }
 
 function updateHeroFieldsJson() {
-    console.log('updateHeroFieldsJson called');
     const container = document.getElementById('hero-fields-container');
+    if (!container) return;
+
     const fields = container.querySelectorAll('.field-card');
     const fieldsData = [];
-    
-    fields.forEach(function(fieldCard, index) {
-        const fieldData = {
-            type: fieldCard.querySelector('input[name*="[type]"]')?.value || 'text',
-            label: fieldCard.querySelector('input[name*="[label]"]')?.value || '',
-            name: fieldCard.querySelector('input[name*="[name]"]')?.value || '',
-            default_value: fieldCard.querySelector('input[name*="[default_value]"]')?.value || '',
-            category: fieldCard.querySelector('select[name*="[category]"]')?.value || 'content',
-            placeholder: fieldCard.querySelector('input[name*="[placeholder]"]')?.value || '',
-            help_text: fieldCard.querySelector('input[name*="[help_text]"]')?.value || '',
-            options: fieldCard.querySelector('textarea[name*="[options]"]')?.value || '',
-            enabled: fieldCard.querySelector('input[name*="[enabled]"]')?.checked || false
+
+    fields.forEach(function(fieldCard) {
+        const getVal = (selector, fallback = '') => {
+            const el = fieldCard.querySelector(selector);
+            if (!el) return fallback;
+        const tag = (el.tagName || '').toUpperCase();
+            if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return el.value ?? fallback;
+            return fallback;
         };
+
+        const getChecked = (selector, fallback = false) => {
+            const el = fieldCard.querySelector(selector);
+            return el ? !!el.checked : fallback;
+        };
+
+        const fieldData = {
+            type: getVal('input[type="hidden"][data-field="type"], input[name*="[type]"], input[name*="[type]"]') || (fieldCard.dataset.fieldType || 'text'),
+            label: getVal('.field-field[data-field="label"], input[name*="[label]"], input[name*="[label"]'),
+            name: getVal('.field-field[data-field="name"], input[name*="[name]"], input[name*="[name"]'),
+            default_value: getVal('.field-field[data-field="default_value"], textarea[name*="[default_value]"], input[name*="[default_value]"], textarea[name*="[default_value]"], input[name*="[default_value"]'),
+            category: getVal('select[name*="[category]"], select.field-field[name*="[category]"], .field-field[data-field="category"]', 'content'),
+            placeholder: getVal('.field-field[data-field="placeholder"], input[name*="[placeholder]"], input[name*="[placeholder"]'),
+            help_text: getVal('.field-field[data-field="help_text"], input[name*="[help_text]"], input[name*="[help_text"]'),
+            options: getVal('textarea[name*="[options]"], textarea.field-field[data-field="options"], textarea[data-field="options"]'),
+            enabled: getChecked('input[name*="[enabled]"], input.field-field[name*="[enabled]"], input.field-field[data-field="enabled"]')
+        };
+
+        // Normalize enabled/default_value for different input types
+        if (typeof fieldData.enabled !== 'boolean') fieldData.enabled = !!fieldData.enabled;
+        if (fieldData.type === 'checkbox' && (fieldData.default_value === '1' || fieldData.default_value === 1)) {
+            // keep as-is
+        }
+
         fieldsData.push(fieldData);
     });
-    
-    // Update the Symfony-rendered hidden input (id: page_section_hero_form_fields_json)
-    const symfonyInput = document.getElementById('page_section_hero_form_fields_json');
-    console.log('Symfony hero_form_fields_json input:', symfonyInput);
-    if (symfonyInput) {
-        symfonyInput.value = JSON.stringify(fieldsData);
-        console.log('Updated Symfony hero_form_fields_json value to:', symfonyInput.value);
-    } else {
-        console.log('ERROR: Symfony hero_form_fields_json input not found, trying deprecated hero_fields');
-        // Fallback to deprecated hero_fields for backward compatibility
-        const deprecatedInput = document.getElementById('page_section_hero_fields');
-        if (deprecatedInput) {
-            deprecatedInput.value = JSON.stringify(fieldsData);
-            console.log('Updated deprecated hero_fields value to:', deprecatedInput.value);
-        }
-    }
-    
-    // Also update the fallback input
+
+    const symfonyInput = findSymfonyHeroInput();
+    if (symfonyInput) symfonyInput.value = JSON.stringify(fieldsData);
+
     const fallbackInput = document.getElementById('hero_form_fields_fallback');
-    console.log('Fallback hero_form_fields input:', fallbackInput);
-    if (fallbackInput) {
-        fallbackInput.value = JSON.stringify(fieldsData);
-        console.log('Updated fallback hero_form_fields value to:', fallbackInput.value);
-    } else {
-        // Fallback to deprecated fallback input
-        const deprecatedFallback = document.getElementById('hero_fields_fallback');
-        if (deprecatedFallback) {
-            deprecatedFallback.value = JSON.stringify(fieldsData);
-        }
-    }
+    if (fallbackInput) fallbackInput.value = JSON.stringify(fieldsData);
 }
 
 // Initialize - load existing fields
 document.addEventListener('DOMContentLoaded', function() {
-    // Try new hero_form_fields_json field first, then fallback to deprecated hero_fields
-    const jsonInput = document.getElementById('page_section_hero_form_fields_json');
-    console.log('Symfony hero_form_fields_json input element:', jsonInput);
-    console.log('hero_form_fields_json input value:', jsonInput ? jsonInput.value : 'not found');
+    const jsonInput = findSymfonyHeroInput();
+    console.log('Symfony hero_form_fields input element:', jsonInput);
+    console.log('hero_form_fields input value:', jsonInput ? jsonInput.value : 'not found');
     
-    // If new field not found, try deprecated hero_fields
     let initialValue = jsonInput && jsonInput.value ? jsonInput.value : null;
+
     
-    // Also check fallback inputs
     const fallbackInput = document.getElementById('hero_form_fields_fallback');
     console.log('Fallback hero_form_fields input element:', fallbackInput);
     console.log('Fallback value:', fallbackInput ? fallbackInput.value : 'not found');
     
-    // Try fallback if main input is empty
     if ((!initialValue || initialValue === '[]') && fallbackInput && fallbackInput.value) {
         initialValue = fallbackInput.value;
-    }
-    
-    // Final fallback to deprecated hero_fields
-    if ((!initialValue || initialValue === '[]')) {
-        const deprecatedInput = document.getElementById('page_section_hero_fields');
-        const deprecatedFallback = document.getElementById('hero_fields_fallback');
-        if (deprecatedInput && deprecatedInput.value) {
-            initialValue = deprecatedInput.value;
-        } else if (deprecatedFallback && deprecatedFallback.value) {
-            initialValue = deprecatedFallback.value;
-        }
     }
     
     if (initialValue) {
         try {
             const parsed = JSON.parse(initialValue);
             console.log('Parsed hero fields:', parsed);
-            // Ensure fields is always an array
             const fields = Array.isArray(parsed) ? parsed : [];
             console.log('Loading hero fields, count:', fields.length);
             const container = document.getElementById('hero-fields-container');
@@ -794,7 +788,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     clone.id = '';
                     clone.style.display = 'block';
                     
-                    // Set values
                     let html = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
                     html = html.replace(/name="fields\[__INDEX__\]\[label\]" value="/, 'name="fields[' + heroFieldIndex + '][label]" value="' + (field.label || ''));
                     html = html.replace(/name="fields\[__INDEX__\]\[name\]" value="/, 'name="fields[' + heroFieldIndex + '][name]" value="' + (field.name || ''));
@@ -802,12 +795,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     html = html.replace(/name="fields\[__INDEX__\]\[placeholder\]" value="/, 'name="fields[' + heroFieldIndex + '][placeholder]" value="' + (field.placeholder || ''));
                     html = html.replace(/name="fields\[__INDEX__\]\[help_text\]" value="/, 'name="fields[' + heroFieldIndex + '][help_text]" value="' + (field.help_text || ''));
                     
-                    // Set category select
                     if (field.category) {
                         html = html.replace(/value="content">/, 'value="' + field.category + '">');
                     }
                     
-                    // Set enabled checkbox
                     if (field.enabled === false) {
                         html = html.replace(/name="fields\[__INDEX__\]\[enabled\]" value="1" checked/, 'name="fields[' + heroFieldIndex + '][enabled]" value="1"');
                     }
@@ -824,8 +815,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add event listeners for real-time updates
+
     document.addEventListener('input', function(e) {
+
         if (e.target.classList.contains('field-field')) {
             updateHeroFieldsJson();
         }

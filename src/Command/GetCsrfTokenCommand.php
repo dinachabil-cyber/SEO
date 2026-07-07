@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\App\Command;
+namespace App\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,10 +23,10 @@ class GetCsrfTokenCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         // The token id for the registration form
         $token = $this->csrfTokenManager->getToken('registration');
-        
+
         $io->writeln('CSRF Token: ' . $token->getValue());
 
         return Command::SUCCESS;

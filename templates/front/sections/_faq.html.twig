@@ -1,6 +1,6 @@
 <section class="section faq-section">
     <div class="container">
-        {% if data.sectionTitle %}
+        {% if data.sectionTitle is defined and data.sectionTitle %}
             <div class="text-center mb-5">
                 <h2>{{ data.sectionTitle }}</h2>
             </div>
@@ -9,16 +9,16 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="accordion" id="faqAccordion">
-                    {% for item in data.items %}
+                    {% for item in data.items ?? [] %}
                         <div class="faq-item">
                             <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="faqCollapse{{ loop.index }}">
-                                    {{ item.question }}
+                                    {{ item.question|default('') }}
                                 </button>
                             </h2>
                             <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="faqHeading{{ loop.index }}" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    {{ item.answer|raw }}
+                                    {{ item.answer|default('')|raw }}
                                 </div>
                             </div>
                         </div>

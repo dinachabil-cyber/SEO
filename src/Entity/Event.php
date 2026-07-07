@@ -34,8 +34,8 @@ class Event
     #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
-    #[ORM\ManyToOne(targetEntity: Site::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Site $site = null;
 
     /**

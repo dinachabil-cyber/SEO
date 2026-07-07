@@ -27,14 +27,14 @@ function beforeSubmitSectionForm() {
                 
                 <div class="card-body">
                     {% if section.referenceSection %}
-                        <div class="alert alert-warning mb-4">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            This section is linked to the <strong>{{ section.referenceSection.name }}</strong> reference.
-                            Editing this section will edit the reference, which affects all pages using it.
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This section was imported from the <strong>{{ section.referenceSection.name }}</strong> reference.
+                            You can now edit it independently without affecting other pages.
                         </div>
                     {% endif %}
 
-                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false', onsubmit: 'return beforeSubmitSectionForm()'}}) }}
+                    {{ form_start(form, {attr: {class: 'needs-validation', 'data-turbo': 'false', 'novalidate': 'novalidate', onsubmit: 'return beforeSubmitSectionForm()'}}) }}
                     
                     {% include 'admin/section/_form.html.twig' %}
                     

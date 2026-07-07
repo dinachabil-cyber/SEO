@@ -102,9 +102,11 @@ class EventRepository extends ServiceEntityRepository
     public function findByAssignedUser(int $userId): array
     {
         return $this->createQueryBuilder('e')
-            ->join('e.assignedUsers', 'u')
-            ->andWhere('u.id = :userId')
+            ->leftJoin('e.assignedUsers', 'au')
+            ->leftJoin('e.site', 's')
+            ->andWhere('au.id = :userId OR s.owner = :userId')
             ->setParameter('userId', $userId)
+            ->groupBy('e.id')
             ->orderBy('e.startAt', 'ASC')
             ->getQuery()
             ->getResult();

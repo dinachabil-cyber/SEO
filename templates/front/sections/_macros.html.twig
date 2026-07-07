@@ -1,0 +1,244 @@
+{# Reusable macros for front-end section templates #}
+
+{% macro get_value(data, key, default = '') %}
+    {% if data is defined and data is not null and data[key] is defined and data[key] is not null %}
+        {{ data[key] }}
+    {% elseif data is defined and data is not null and data.style is defined and data.style[key] is defined and data.style[key] is not null %}
+        {{ data.style[key] }}
+    {% else %}
+        {{ default }}
+    {% endif %}
+{% endmacro %}
+
+{% macro get_value_raw(data, key, default = '') %}
+    {% set value = '' %}
+    {% if data is defined and data is not null and attribute(data, key) is defined and attribute(data, key) is not null %}
+        {% set value = attribute(data, key) %}
+    {% elseif data is defined and data is not null and data.style is defined and data.style is not null and attribute(data.style, key) is defined and attribute(data.style, key) is not null %}
+        {% set value = attribute(data.style, key) %}
+    {% else %}
+        {% set value = default %}
+    {% endif %}
+    {{ value }}
+{% endmacro %}
+
+{% macro has_background(data, bg_field = 'backgroundColor') %}
+    {% if data is defined and data is not null and attribute(data, bg_field) is defined and attribute(data, bg_field) is not null %}
+        {% set has_bg = true %}
+    {% elseif data is defined and data is not null and data.style is defined and data.style is not null and attribute(data.style, bg_field) is defined and attribute(data.style, bg_field) is not null %}
+        {% set has_bg = true %}
+    {% else %}
+        {% set has_bg = false %}
+    {% endif %}
+    {{ has_bg }}
+{% endmacro %}
+
+{% macro section_class(base_class, data, bg_field = 'backgroundColor') %}
+    {% set has_bg = false %}
+    {% if data is defined and data is not null and attribute(data, bg_field) is defined and attribute(data, bg_field) is not null %}
+        {% set has_bg = true %}
+    {% elseif data is defined and data is not null and data.style is defined and data.style is not null and attribute(data.style, bg_field) is defined and attribute(data.style, bg_field) is not null %}
+        {% set has_bg = true %}
+    {% endif %}
+    {{ base_class }}{% if has_bg %} custom-bg{% endif %}
+{% endmacro %}
+
+{% macro section_style(data, field_map) %}
+    {% set style_parts = [] %}
+    {% for field, default in field_map %}
+        {% set val = '' %}
+        {% if data is defined and data is not null and attribute(data, field) is defined and attribute(data, field) is not null %}
+            {% set val = attribute(data, field) %}
+        {% elseif data is defined and data is not null and data.style is defined and data.style is not null and attribute(data.style, field) is defined and attribute(data.style, field) is not null %}
+            {% set val = attribute(data.style, field) %}
+        {% else %}
+            {% set val = default %}
+        {% endif %}
+        {% if val is not empty %}
+            {% if field in ['paddingTop', 'paddingBottom', 'marginTop', 'marginBottom', 'cardBorderRadius', 'buttonBorderRadius', 'borderRadius', 'padding_top', 'padding_bottom', 'margin_top', 'margin_bottom', 'card_border_radius', 'button_border_radius', 'border_radius'] %}
+                {% set style_parts = style_parts|merge([field|replace({'_': '-'})|replace({'paddingTop': 'padding-top'})|replace({'paddingBottom': 'padding-bottom'})|replace({'marginTop': 'margin-top'})|replace({'marginBottom': 'margin-bottom'})|replace({'cardBorderRadius': 'border-radius'})|replace({'buttonBorderRadius': 'border-radius'})|replace({'borderRadius': 'border-radius'}) ~ ': ' ~ val ~ 'px']) %}
+            {% else %}
+                {% set style_parts = style_parts|merge([field|replace({'_': '-'})|replace({'background': 'background-color'})|replace({'text': 'color'})|replace({'title': 'color'})|replace({'subtitle': 'color'})|replace({'buttonBackground': 'background-color'})|replace({'buttonText': 'color'})|replace({'buttonBorder': 'border-color'}) ~ ': ' ~ val]) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if style_parts|length > 0 %}style="{{ style_parts|join('; ') }}"{% endif %}
+{% endmacro %}
+
+{% macro style_attr(data, field, default = '', suffix = '') %}
+    {% set val = '' %}
+    {% if data is defined and data is not null and attribute(data, field) is defined and attribute(data, field) is not null %}
+        {% set val = attribute(data, field) %}
+    {% elseif data is defined and data is not null and data.style is defined and data.style is not null and attribute(data.style, field) is defined and attribute(data.style, field) is not null %}
+        {% set val = attribute(data.style, field) %}
+    {% else %}
+        {% set val = default %}
+    {% endif %}
+    {% if val is not empty %}{{ field|replace({'_': '-'}) }}: {{ val }}{{ suffix }};{% endif %}
+{% endmacro %}
+
+{% macro get_single_value(data, key, default = '') %}
+{{ '' }}
+{%- if data is defined and data is not null and data[key] is defined and data[key] is not null -%}
+{{ data[key] }}
+{%- elseif data is defined and data is not null and data.style is defined and data.style[key] is defined and data.style[key] is not null -%}
+{{ data.style[key] }}
+{%- else -%}
+{{ default }}
+{%- endif %}
+{% endmacro %}
+
+{% macro text_align_class(data, key = 'textAlignment') %}
+    {%- set align = '' -%}
+    {%- if data is defined and data is not null and data[key] is defined and data[key] is not null -%}
+        {%- set align = data[key] -%}
+    {%- elseif data is defined and data is not null and data.style is defined and data.style[key] is defined and data.style[key] is not null -%}
+        {%- set align = data.style[key] -%}
+    {%- endif -%}
+    {%- if align is not empty %}text-{{ align }}{% endif -%}
+{% endmacro %}
+
+{% macro button_style_string(data, bg_key = 'buttonBackgroundColor', text_key = 'buttonTextColor', border_key = 'buttonBorderColor', radius_key = 'buttonBorderRadius') %}
+    {%- set parts = [] -%}
+    {%- set bg = '' -%}
+    {%- if data[bg_key] is defined and data[bg_key] is not null -%}
+        {%- set bg = data[bg_key] -%}
+    {%- elseif data.style[bg_key] is defined and data.style[bg_key] is not null -%}
+        {%- set bg = data.style[bg_key] -%}
+    {%- endif -%}
+    {%- if bg is not empty -%}
+        {%- set parts = parts|merge(['background-color: ' ~ bg]) -%}
+    {%- endif -%}
+    {%- set text = '' -%}
+    {%- if data[text_key] is defined and data[text_key] is not null -%}
+        {%- set text = data[text_key] -%}
+    {%- elseif data.style[text_key] is defined and data.style[text_key] is not null -%}
+        {%- set text = data.style[text_key] -%}
+    {%- endif -%}
+    {%- if text is not empty -%}
+        {%- set parts = parts|merge(['color: ' ~ text]) -%}
+    {%- endif -%}
+    {%- set border = '' -%}
+    {%- if data[border_key] is defined and data[border_key] is not null -%}
+        {%- set border = data[border_key] -%}
+    {%- elseif data.style[border_key] is defined and data.style[border_key] is not null -%}
+        {%- set border = data.style[border_key] -%}
+    {%- endif -%}
+    {%- if border is not empty -%}
+        {%- set parts = parts|merge(['border-color: ' ~ border]) -%}
+    {%- endif -%}
+    {%- set radius = '' -%}
+    {%- if data[radius_key] is defined and data[radius_key] is not null -%}
+        {%- set radius = data[radius_key] -%}
+    {%- elseif data.style[radius_key] is defined and data.style[radius_key] is not null -%}
+        {%- set radius = data.style[radius_key] -%}
+    {%- endif -%}
+    {%- if radius is not empty -%}
+        {%- set parts = parts|merge(['border-radius: ' ~ radius ~ 'px']) -%}
+    {%- endif -%}
+    {%- if parts|length > 0 -%}{{ parts|join('; ') }}{%- endif -%}
+{% endmacro %}
+
+{% macro button_class_string(data, style_key = 'buttonStyle', default = 'primary') %}
+    {%- set style = '' -%}
+    {%- if data[style_key] is defined and data[style_key] is not null -%}
+        {%- set style = data[style_key] -%}
+    {%- elseif data.style[style_key] is defined and data.style[style_key] is not null -%}
+        {%- set style = data.style[style_key] -%}
+    {%- else -%}
+        {%- set style = default -%}
+    {%- endif -%}
+    btn btn-{{ style }}
+{% endmacro %}
+
+{% macro render_form_field(field) %}
+    {%- set field_width = field.width|default('full') -%}
+    {%- set field_class = 'mb-3' -%}
+    {%- if field_width == 'half' -%}
+        {%- set field_class = field_class ~ ' col-md-6' -%}
+    {%- elseif field_width == 'third' -%}
+        {%- set field_class = field_class ~ ' col-md-4' -%}
+    {%- elseif field_width == 'two-thirds' -%}
+        {%- set field_class = field_class ~ ' col-md-8' -%}
+    {%- endif -%}
+    
+    {%- set is_enabled = field.enabled is not defined or field.enabled -%}
+    
+    {%- if is_enabled -%}
+        <div class="{{ field_class }}{% if field.css_class is defined and field.css_class %} {{ field.css_class }}{% endif %}">
+            {%- if field.type == 'text' or field.type == 'email' or field.type == 'tel' or field.type == 'url' or field.type == 'number' or field.type == 'date' or field.type == 'color' -%}
+                <input type="{{ field.type }}" class="form-control" name="{{ field.name }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %} {% if field.default_value is defined and field.default_value %}value="{{ field.default_value }}"{% endif %}>
+            {%- elseif field.type == 'textarea' -%}
+                <textarea class="form-control" name="{{ field.name }}" rows="{{ field.rows|default(4) }}" placeholder="{{ field.placeholder|default('') }}" {% if field.required is defined and field.required %}required{% endif %}>{% if field.default_value is defined and field.default_value %}{{ field.default_value }}{% endif %}</textarea>
+            {%- elseif field.type == 'select' -%}
+                <select class="form-select" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+                    {%- if field.placeholder is defined and field.placeholder -%}
+                        <option value="">{{ field.placeholder }}</option>
+                    {%- endif -%}
+                    {%- if field.options is defined and field.options -%}
+                        {%- for option in field.options -%}
+                            <option value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}selected{% endif %}>{{ option }}</option>
+                        {%- endfor -%}
+                    {%- endif -%}
+                </select>
+            {%- elseif field.type == 'checkbox' -%}
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}" {% if field.default_value is defined and field.default_value %}checked{% endif %}>
+                    <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
+                </div>
+            {%- elseif field.type == 'radio' -%}
+                {%- if field.options is defined and field.options -%}
+                    {%- for option in field.options -%}
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>
+                        </div>
+                    {%- endfor -%}
+                {%- endif -%}
+            {%- elseif field.type == 'file' -%}
+                <input type="file" class="form-control" name="{{ field.name }}" {% if field.required is defined and field.required %}required{% endif %}>
+            {%- endif -%}
+            
+            {%- if field.help_text is defined and field.help_text -%}
+                <div class="form-text">{{ field.help_text }}</div>
+            {%- endif -%}
+        </div>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro render_fallback_form_fields() %}
+    <div class="mb-3">
+        <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+    </div>
+    <div class="mb-3">
+        <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+    </div>
+    <div class="mb-3">
+        <input type="tel" class="form-control" name="phone" placeholder="Your Phone">
+    </div>
+    <div class="mb-3">
+        <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
+    </div>
+{% endmacro %}
+
+{% macro card_image_classes(data, key = 'cardStyle') %}
+    {%- set style = '' -%}
+    {%- if data[key] is defined and data[key] is not null -%}
+        {%- set style = data[key] -%}
+    {%- elseif data.style is defined and data.style[key] is defined and data.style[key] is not null -%}
+        {%- set style = data.style[key] -%}
+    {%- endif -%}
+    {%- if style == 'rounded' %}rounded{% endif -%}
+    {%- if style == 'oval' %}rounded-circle{% endif -%}
+    {%- if style == 'square' %}rounded-0{% endif -%}
+{% endmacro %}
+
+{% macro card_image_style(data, key = 'cardStyle') %}
+    {%- set style = '' -%}
+    {%- if data[key] is defined and data[key] is not null -%}
+        {%- set style = data[key] -%}
+    {%- elseif data.style is defined and data.style[key] is defined and data.style[key] is not null -%}
+        {%- set style = data.style[key] -%}
+    {%- endif -%}
+    {%- if style == 'oval' %}width: 150px; height: 150px; object-fit: cover;{% else %}height: 200px; object-fit: cover;{% endif -%}
+{% endmacro %}

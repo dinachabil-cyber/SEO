@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\PageSection;
 use App\Entity\ReferenceSection;
 use App\Form\SaveReferenceType;
+use App\Repository\PageRepository;
 use App\Repository\PageSectionRepository;
 use App\Repository\ReferenceSectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -81,8 +82,9 @@ class ReferenceSectionController extends AbstractController
         int $siteId,
         int $pageId,
         int $referenceId,
-        ReferenceSectionRepository $referenceSectionRepository,
+        PageRepository $pageRepository,
         PageSectionRepository $pageSectionRepository,
+        ReferenceSectionRepository $referenceSectionRepository,
         EntityManagerInterface $entityManager
     ): Response {
         $reference = $referenceSectionRepository->find($referenceId);
@@ -95,7 +97,7 @@ class ReferenceSectionController extends AbstractController
             ]);
         }
 
-        $page = $pageSectionRepository->find($pageId)?->getPage();
+        $page = $pageRepository->find($pageId);
         
         if (!$page || $page->getSite()->getId() !== $siteId) {
             $this->addFlash('error', 'Page not found');

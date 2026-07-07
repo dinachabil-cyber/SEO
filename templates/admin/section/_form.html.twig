@@ -174,18 +174,18 @@
                     <h6 class="text-muted mb-3">Spacing</h6>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_top) }}
+                            {{ form_row(dataForm.paddingTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_bottom) }}
+                            {{ form_row(dataForm.paddingBottom) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_top) }}
+                            {{ form_row(dataForm.marginTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_bottom) }}
+                            {{ form_row(dataForm.marginBottom) }}
                         </div>
                     </div>
                 </div>
@@ -236,14 +236,16 @@
                 </div>
                 {# Form Fields Tab #}
                 <div class="tab-pane fade" id="hero-form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
-                    <input type="hidden" id="hero_form_fields_fallback" data-hero-form-fields-json value="[]">
+                    {{ form_row(dataForm.hero_form_fields) }}
+                    <input type="hidden" id="hero_form_fields_fallback" data-hero-form-fields-json value="{{ dataForm.hero_form_fields.vars.value|default('[]') }}">
                     {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
-                        'hero_form_fields_json': '[]',
+                        'hero_form_fields_json': dataForm.hero_form_fields.vars.value|default('[]'),
+                        'symfony_input_id': dataForm.hero_form_fields.vars.id,
                         'field_types': {
                             'text': 'Text Input',
-                            'textarea': 'Text Area',
                             'email': 'Email',
                             'tel': 'Phone',
+                            'textarea': 'Text Area',
                             'select': 'Dropdown',
                             'checkbox': 'Checkbox',
                             'radio': 'Radio Buttons',
@@ -284,13 +286,134 @@
             <div class="tab-content p-3 border border-top-0" id="cardsSectionTabsContent">
                 <div class="tab-pane fade show active" id="cards-content" role="tabpanel" aria-labelledby="content-tab">
                     {{ form_row(dataForm.sectionTitle) }}
-                    {{ form_row(dataForm.cards) }}
+
+                    <div class="cards-collection" id="cards-collection" data-index="{{ dataForm.cards|length }}">
+                        {% if dataForm.cards is defined and dataForm.cards|length > 0 %}
+                            {% for cardForm in dataForm.cards %}
+                                <div class="collection-item mb-3" data-card-index="{{ loop.index0 }}">
+                                    <div class="collection-item-header d-flex justify-content-between align-items-center">
+                                        <strong>Card {{ loop.index }}</strong>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-card" data-target="#card-{{ loop.index0 }}">
+                                            <i class="bi bi-trash"></i> Remove
+                                        </button>
+                                    </div>
+
+                                    <div class="collection-item-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form_row(cardForm.title) }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form_row(cardForm.imageUrl) }}
+                                            </div>
+                                        </div>
+
+                                        {{ form_row(cardForm.description) }}
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form_row(cardForm.linkUrl) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted small">No cards added yet. Click the button below to add your first card.</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-primary mt-2" id="add-card-btn">
+                        <i class="bi bi-plus-circle me-1"></i> Add Card
+                    </button>
+
+                    <div id="card-prototype-source" style="display: none;">
+                        {{ form_widget(dataForm.cards.vars.prototype) }}
+                    </div>
+
+                    <script>
+                        (function() {
+                            const container = document.getElementById('cards-collection');
+                            const addBtn = document.getElementById('add-card-btn');
+                            const prototypeSource = document.getElementById('card-prototype-source');
+                            if (!container || !addBtn || !prototypeSource) {
+                                return;
+                            }
+
+                            // Prevent double-initialization (Turbo / re-render)
+                            if (container.dataset.cardsJsBound === '1') {
+                                return;
+                            }
+                            container.dataset.cardsJsBound = '1';
+
+
+                            let nextIndex = container.dataset.index ? parseInt(container.dataset.index, 10) : 0;
+
+                            function updateNames(containerItem, index) {
+                                const inputs = containerItem.querySelectorAll('input, textarea, select');
+                                inputs.forEach(function(input) {
+                                    const name = input.getAttribute('name') || '';
+                                    const updatedName = name.replace(/__name__/g, index.toString());
+                                    input.setAttribute('name', updatedName);
+
+                                    const id = input.getAttribute('id');
+                                    if (id) {
+                                        input.setAttribute('id', id.replace(/__name__/g, index.toString()));
+                                    }
+                                });
+                            }
+
+                            addBtn.addEventListener('click', function() {
+                                const source = prototypeSource.firstElementChild.cloneNode(true);
+                                updateNames(source, nextIndex);
+
+                                source.querySelectorAll('input, textarea').forEach(function(input) {
+                                    if (input.type !== 'hidden') {
+                                        input.value = '';
+                                        if (input.hasAttribute('required')) {
+                                            input.removeAttribute('required');
+                                        }
+                                    }
+                                });
+
+                                const removeBtn = source.querySelector('.remove-card');
+                                if (removeBtn) {
+                                    removeBtn.addEventListener('click', function() {
+                                        if (confirm('Remove this card?')) {
+                                            source.remove();
+                                        }
+                                    });
+                                }
+
+                                container.appendChild(source);
+                                nextIndex = nextIndex + 1;
+                                container.dataset.index = nextIndex.toString();
+
+                                const prototypeInputs = prototypeSource.querySelectorAll('input, textarea, select');
+                                prototypeInputs.forEach(function(input) { input.value = ''; });
+                            });
+
+                            container.querySelectorAll('.collection-item').forEach(function(item) {
+                                const removeBtn = item.querySelector('.remove-card');
+                                if (removeBtn && !removeBtn._cardsJsBound) {
+                                    removeBtn._cardsJsBound = true;
+                                    removeBtn.addEventListener('click', function() {
+                                        if (confirm('Remove this card?')) {
+                                            item.remove();
+                                        }
+                                    });
+                                }
+                            });
+                        })();
+                    </script>
                 </div>
+
                 <div class="tab-pane fade" id="cards-layout" role="tabpanel" aria-labelledby="layout-tab">
                     {{ form_row(dataForm.cardLayout) }}
                     {{ form_row(dataForm.cardStyle) }}
                     {{ form_row(dataForm.textAlignment) }}
                 </div>
+
                 <div class="tab-pane fade" id="cards-style" role="tabpanel" aria-labelledby="style-tab">
                     {{ form_row(dataForm.backgroundColor) }}
                     {{ form_row(dataForm.textColor) }}
@@ -307,6 +430,7 @@
                     {{ form_row(dataForm.marginTop) }}
                     {{ form_row(dataForm.marginBottom) }}
                 </div>
+
                 <div class="tab-pane fade" id="cards-buttons" role="tabpanel" aria-labelledby="buttons-tab">
                     {{ form_row(dataForm.buttonBackgroundColor) }}
                     {{ form_row(dataForm.buttonTextColor) }}
@@ -315,6 +439,7 @@
                     {{ form_row(dataForm.buttonStyle) }}
                 </div>
             </div>
+
             
         {% elseif form.vars.value.type == 'faq' %}
             {{ form_row(dataForm.sectionTitle) }}
@@ -473,27 +598,29 @@
                     <h6 class="text-muted mb-3">Spacing</h6>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_top) }}
+                            {{ form_row(dataForm.paddingTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_bottom) }}
+                            {{ form_row(dataForm.paddingBottom) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_top) }}
+                            {{ form_row(dataForm.marginTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_bottom) }}
+                            {{ form_row(dataForm.marginBottom) }}
                         </div>
                     </div>
                     {{ form_row(dataForm.box_shadow) }}
                 </div>
                 {# Form Fields Tab #}
                 <div class="tab-pane fade" id="form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
-                    <input type="hidden" id="form_fields_json_fallback" value="[]">
+                    {{ form_row(dataForm.form_fields) }}
+                    <input type="hidden" id="form_fields_json_fallback" value="{{ dataForm.form_fields.vars.value|default('[]') }}">
                     {% include 'admin/section/partials/_form_fields_builder.html.twig' with {
-                        'form_fields_json': '[]',
+                        'form_fields_json': dataForm.form_fields.vars.value|default('[]'),
+                        'symfony_input_id': dataForm.form_fields.vars.id,
                         'field_types': {
                             'text': 'Text Input',
                             'email': 'Email',

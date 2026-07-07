@@ -77,7 +77,6 @@
                 </div>
                 <div class="card-body">
                     {% set events_list = events|default([]) %}
-                    <p>Debug: User ID = {{ app.user.id|default('none') }} | Events assigned: {{ events_list|length }} | All events: {{ allEvents|length }}</p>
                     {% if events_list|length > 0 %}
                     <div class="table-responsive">
                         <table class="table table-hover">

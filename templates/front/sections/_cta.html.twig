@@ -1,16 +1,22 @@
-<section class="cta-section {% if data.backgroundColor is defined or (data.style is defined and data.style.backgroundColor is defined) %}custom-bg{% endif %}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px;{% endif %} {% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px;{% endif %} {% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px;{% endif %} {% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px;{% endif %} {% if data.textColor is defined %}color: {{ data.textColor }};{% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px;{% endif %} {% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px;{% endif %} {% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px;{% endif %} {% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px;{% endif %} {% if data.style.textColor is defined %}color: {{ data.style.textColor }};{% endif %}"{% endif %}>
+{% import 'front/sections/_macros.html.twig' as macros %}
+<section class="{{ macros.section_class('cta-section', data) }}" {% if data.backgroundColor is defined %}style="background-color: {{ data.backgroundColor }}; {% if data.paddingTop is defined %}padding-top: {{ data.paddingTop }}px;{% endif %} {% if data.paddingBottom is defined %}padding-bottom: {{ data.paddingBottom }}px;{% endif %} {% if data.marginTop is defined %}margin-top: {{ data.marginTop }}px;{% endif %} {% if data.marginBottom is defined %}margin-bottom: {{ data.marginBottom }}px;{% endif %} {% if data.textColor is defined %}color: {{ data.textColor }};{% endif %}" {% elseif data.style is defined and data.style.backgroundColor is defined %}style="background-color: {{ data.style.backgroundColor }}; {% if data.style.paddingTop is defined %}padding-top: {{ data.style.paddingTop }}px;{% endif %} {% if data.style.paddingBottom is defined %}padding-bottom: {{ data.style.paddingBottom }}px;{% endif %} {% if data.style.marginTop is defined %}margin-top: {{ data.style.marginTop }}px;{% endif %} {% if data.style.marginBottom is defined %}margin-bottom: {{ data.style.marginBottom }}px;{% endif %} {% if data.style.textColor is defined %}color: {{ data.style.textColor }};{% endif %}"{% endif %}>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h2 class="mb-4" {% if data.titleColor is defined %}style="color: {{ data.titleColor }}"{% elseif data.style is defined and data.style.titleColor is defined %}style="color: {{ data.style.titleColor }}"{% endif %}>{{ data.title }}</h2>
-                {% if data.text %}
+                {% set title_color = '' %}
+                {% if data.titleColor is defined %}{% set title_color = data.titleColor %}{% elseif data.style is defined and data.style.titleColor is defined %}{% set title_color = data.style.titleColor %}{% endif %}
+                {% if data.title is defined and data.title %}
+                    <h2 class="mb-4"{% if title_color %} style="color: {{ title_color }}"{% endif %}>{{ data.title }}</h2>
+                {% endif %}
+                {% if data.text is defined and data.text %}
                     <p class="mb-5 opacity-75">{{ data.text }}</p>
                 {% endif %}
-                {% if data.buttonUrl and data.buttonText %}
-                <a href="{{ data.buttonUrl }}" class="btn btn-light btn-lg" {% if data.buttonBackgroundColor is defined %}style="background-color: {{ data.buttonBackgroundColor }}; {% if data.buttonTextColor is defined %}color: {{ data.buttonTextColor }};{% endif %} {% if data.buttonBorderColor is defined %}border-color: {{ data.buttonBorderColor }};{% endif %} {% if data.buttonBorderRadius is defined %}border-radius: {{ data.buttonBorderRadius }}px;{% endif %}" {% elseif data.style is defined and data.style.buttonBackgroundColor is defined %}style="background-color: {{ data.style.buttonBackgroundColor }}; {% if data.style.buttonTextColor is defined %}color: {{ data.style.buttonTextColor }};{% endif %} {% if data.style.buttonBorderColor is defined %}border-color: {{ data.style.buttonBorderColor }};{% endif %} {% if data.style.buttonBorderRadius is defined %}border-radius: {{ data.style.buttonBorderRadius }}px;{% endif %}"{% endif %}>
-                    {{ data.buttonText }}
-                </a>
-                {% endif %}
+                     {% if data.buttonUrl is defined and data.buttonUrl and data.buttonText is defined and data.buttonText %}
+                        {% set btn_style = macros.button_style_string(data) %}
+                        <a href="{{ data.buttonUrl }}" class="btn btn-light btn-lg" {% if btn_style %}style="{{ btn_style }}"{% endif %}>
+                            {{ data.buttonText }}
+                        </a>
+                    {% endif %}
             </div>
         </div>
     </div>

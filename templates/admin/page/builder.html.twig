@@ -108,31 +108,31 @@
                                             <a href="{{ path('app_reference_save', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="btn btn-sm btn-outline-info">
                                                 <i class="bi bi-bookmark"></i> Save as Reference
                                             </a>
-                                            <form method="POST" action="{{ path('app_section_delete', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this section?');">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_section' ~ section.id) }}">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </form>
+<form method="POST" action="{{ path('app_section_delete', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline" data-turbo="false" onsubmit="return confirm('Are you sure you want to delete this section?');">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_section' ~ section.id) }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </form>
                                             {% if loop.index0 > 0 %}
-                                                <form method="POST" action="{{ path('app_section_up', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('move_section' ~ section.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                        <i class="bi bi-arrow-up"></i> Up
-                                                    </button>
-                                                </form>
+<form method="POST" action="{{ path('app_section_up', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline" data-turbo="false">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('move_section' ~ section.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="bi bi-arrow-up"></i> Up
+                                                            </button>
+                                                        </form>
                                             {% else %}
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
                                                     <i class="bi bi-arrow-up"></i> Up
                                                 </button>
                                             {% endif %}
                                             {% if loop.index < page.sections|length %}
-                                                <form method="POST" action="{{ path('app_section_down', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('move_section' ~ section.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                        <i class="bi bi-arrow-down"></i> Down
-                                                    </button>
-                                                </form>
+<form method="POST" action="{{ path('app_section_down', {siteId: page.site.id, pageId: page.id, sectionId: section.id}) }}" class="d-inline" data-turbo="false">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('move_section' ~ section.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="bi bi-arrow-down"></i> Down
+                                                            </button>
+                                                        </form>
                                             {% else %}
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
                                                     <i class="bi bi-arrow-down"></i> Down
@@ -148,22 +148,22 @@
                                                 <p><strong>CTA:</strong> {{ data.ctaText ?? '' }} ({{ data.ctaUrl ?? '' }})</p>
                                             {% endif %}
                                         {% elseif section.type == 'hero' %}
-                                            {% if data.hero_title %}
+                                            {% if data.hero_title is defined and data.hero_title %}
                                                 <p><strong>Title:</strong> {{ data.hero_title }}</p>
                                             {% endif %}
-                                            {% if data.hero_subtitle %}
+                                            {% if data.hero_subtitle is defined and data.hero_subtitle %}
                                                 <p><strong>Subtitle:</strong> {{ data.hero_subtitle }}</p>
                                             {% endif %}
-                                            {% if data.badge_text %}
+                                            {% if data.badge_text is defined and data.badge_text %}
                                                 <p><strong>Badge:</strong> {{ data.badge_text }}</p>
                                             {% endif %}
-                                            {% if data.description %}
+                                            {% if data.description is defined and data.description %}
                                                 <p><strong>Description:</strong> {{ data.description }}</p>
                                             {% endif %}
-                                            {% if data.primary_button_text %}
+                                            {% if data.primary_button_text is defined and data.primary_button_text %}
                                                 <p><strong>Primary Button:</strong> {{ data.primary_button_text }} ({{ data.primary_button_url ?? '#' }})</p>
                                             {% endif %}
-                                            {% if data.secondary_button_text %}
+                                            {% if data.secondary_button_text is defined and data.secondary_button_text %}
                                                 <p><strong>Secondary Button:</strong> {{ data.secondary_button_text }} ({{ data.secondary_button_url ?? '#' }})</p>
                                             {% endif %}
                                             {% if data.blocks is defined and data.blocks|length > 0 %}
@@ -180,7 +180,7 @@
                                             {% endif %}
                                             <p><strong>Cards:</strong> {{ (data.cards ?? [])|length }} card(s)</p>
                                         {% elseif section.type == 'faq' %}
-                                            {% if data.sectionTitle %}
+                                            {% if data.sectionTitle is defined and data.sectionTitle %}
                                                 <p><strong>Title:</strong> {{ data.sectionTitle ?? '' }}</p>
                                             {% endif %}
                                             <p><strong>Items:</strong> {{ (data.items ?? [])|length }} FAQ item(s)</p>
@@ -200,10 +200,10 @@
                                             <p><strong>Button:</strong> {{ data.buttonText ?? '' }} ({{ data.buttonUrl ?? '' }})</p>
                                         {% elseif section.type == 'footer' %}
                                             <p><strong>Text:</strong> {{ (data.text ?? '')|striptags|slice(0, 100) }}...</p>
-                                            {% if data.phone %}
+                                            {% if data.phone is defined and data.phone %}
                                                 <p><strong>Phone:</strong> {{ data.phone ?? '' }}</p>
                                             {% endif %}
-                                            {% if data.email %}
+                                            {% if data.email is defined and data.email %}
                                                 <p><strong>Email:</strong> {{ data.email ?? '' }}</p>
                                             {% endif %}
                                             {% if data.ctaText|default('') != '' %}

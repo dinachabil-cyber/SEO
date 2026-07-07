@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\SiteRepository;
+use App\Entity\Event;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -64,12 +65,19 @@ class Site
     #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'site', orphanRemoval: true)]
     private Collection $pages;
 
+    /**
+     * @var Collection<int, Event>
+     */
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'site', orphanRemoval: true)]
+    private Collection $events;
+
     #[ORM\Column(options: ['default' => 0])]
     private int $pageCount = 0;
 
     public function __construct()
     {
         $this->pages = new ArrayCollection();
+        $this->events = new ArrayCollection();
         $this->defaultLocale = 'fr';
         $this->isActive = true;
         $this->createdAt = new DateTime();
@@ -408,6 +416,36 @@ class Site
     public function decrementPageCount(): static
     {
         $this->pageCount--;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): static
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): static
+    {
+        if ($this->events->removeElement($event)) {
+            // set the owning side to null (unless already changed)
+            if ($event->getSite() === $this) {
+                $event->setSite(null);
+            }
+        }
+
         return $this;
     }
 }

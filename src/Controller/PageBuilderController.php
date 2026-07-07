@@ -13,15 +13,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Psr\Log\LoggerInterface;
 
 #[Route('/admin/site/{siteId}/page/{pageId}', requirements: ['siteId' => '\d+', 'pageId' => '\d+'])]
 class PageBuilderController extends AbstractController
 {
+    use FormErrorFlashTrait;
+
+    public function __construct(private readonly LoggerInterface $logger)
+    {
+    }
+
     #[Route('/builder', name: 'app_page_builder', methods: ['GET'])]
     public function index(int $siteId, int $pageId, PageRepository $pageRepository): Response
     {
-        $page = $pageRepository->findWithSectionsCached($pageId);
-        
+        $page = $pageRepository->findWithSections($pageId);
+
         if (!$page || $page->getSite()->getId() !== $siteId) {
             $this->addFlash('error', 'Page not found');
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
@@ -36,9 +43,8 @@ class PageBuilderController extends AbstractController
     #[Route('/section/new', name: 'app_section_new', methods: ['GET', 'POST'])]
     public function new(Request $request, int $siteId, int $pageId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
-        $page = $pageRepository->find($pageId);
-        
-        if (!$page || $page->getSite()->getId() !== $siteId) {
+        $page = $this->findOwnedPage($siteId, $pageId, $pageRepository);
+        if (!$page) {
             $this->addFlash('error', 'Page not found');
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
@@ -72,16 +78,14 @@ class PageBuilderController extends AbstractController
     #[Route('/section/{sectionId}/edit', name: 'app_section_edit', methods: ['GET', 'POST'], requirements: ['sectionId' => '\d+'])]
     public function edit(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
-        $page = $pageRepository->find($pageId);
-        
-        if (!$page || $page->getSite()->getId() !== $siteId) {
+        $page = $this->findOwnedPage($siteId, $pageId, $pageRepository);
+        if (!$page) {
             $this->addFlash('error', 'Page not found');
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
 
-        $section = $pageSectionRepository->find($sectionId);
-        
-        if (!$section || $section->getPage()->getId() !== $pageId) {
+        $section = $this->findOwnedSection($pageId, $sectionId, $pageSectionRepository);
+        if (!$section) {
             $this->addFlash('error', 'Section not found');
             return $this->redirectToRoute('app_page_builder', [
                 'siteId' => $siteId,
@@ -93,6 +97,10 @@ class PageBuilderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($section->getReferenceSection()) {
+                $section->setReferenceSection(null);
+            }
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Section updated successfully');
@@ -104,10 +112,14 @@ class PageBuilderController extends AbstractController
 
         // Debug helper for 422 cases: surface form errors to the UI
         if ($form->isSubmitted() && !$form->isValid()) {
-            $errors = (string) $form->getErrors(true, false);
-            if ($errors) {
-                $this->addFlash('error', $errors);
-            }
+            $submitted = $form->getSubmittedData();
+
+            $this->flashFormErrors($form, 'Section update failed. Check your inputs and try again.');
+
+            $this->logger->info('Section edit invalid', [
+                'submitted_type' => is_array($submitted) ? array_keys($submitted) : null,
+                'submitted_data' => $submitted,
+            ]);
         }
 
         return $this->render('admin/section/edit.html.twig', [
@@ -121,16 +133,14 @@ class PageBuilderController extends AbstractController
     #[Route('/section/{sectionId}/delete', name: 'app_section_delete', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
     public function delete(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
-        $page = $pageRepository->find($pageId);
-        
-        if (!$page || $page->getSite()->getId() !== $siteId) {
+        $page = $this->findOwnedPage($siteId, $pageId, $pageRepository);
+        if (!$page) {
             $this->addFlash('error', 'Page not found');
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
 
-        $section = $pageSectionRepository->find($sectionId);
-        
-        if (!$section || $section->getPage()->getId() !== $pageId) {
+        $section = $this->findOwnedSection($pageId, $sectionId, $pageSectionRepository);
+        if (!$section) {
             $this->addFlash('error', 'Section not found');
             return $this->redirectToRoute('app_page_builder', [
                 'siteId' => $siteId,
@@ -155,16 +165,33 @@ class PageBuilderController extends AbstractController
     #[Route('/section/{sectionId}/up', name: 'app_section_up', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
     public function up(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
     {
-        $page = $pageRepository->find($pageId);
-        
-        if (!$page || $page->getSite()->getId() !== $siteId) {
+        return $this->moveSection($request, $siteId, $pageId, $sectionId, 'up', $pageRepository, $pageSectionRepository, $entityManager);
+    }
+
+    #[Route('/section/{sectionId}/down', name: 'app_section_down', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
+    public function down(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
+    {
+        return $this->moveSection($request, $siteId, $pageId, $sectionId, 'down', $pageRepository, $pageSectionRepository, $entityManager);
+    }
+
+    private function moveSection(
+        Request $request,
+        int $siteId,
+        int $pageId,
+        int $sectionId,
+        string $direction,
+        PageRepository $pageRepository,
+        PageSectionRepository $pageSectionRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $page = $this->findOwnedPage($siteId, $pageId, $pageRepository);
+        if (!$page) {
             $this->addFlash('error', 'Page not found');
             return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
         }
 
-        $section = $pageSectionRepository->find($sectionId);
-        
-        if (!$section || $section->getPage()->getId() !== $pageId) {
+        $section = $this->findOwnedSection($pageId, $sectionId, $pageSectionRepository);
+        if (!$section) {
             $this->addFlash('error', 'Section not found');
             return $this->redirectToRoute('app_page_builder', [
                 'siteId' => $siteId,
@@ -172,24 +199,48 @@ class PageBuilderController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
 
-        $previousSection = $pageSectionRepository->findPreviousSection($section);
-        
-        if ($previousSection) {
-            if (!$this->isCsrfTokenValid('move_section' . $section->getId(), $request->request->get('_token'))) {
-                $this->addFlash('error', 'Invalid CSRF token');
-                return $this->redirectToRoute('app_page_builder', [
-                    'siteId' => $siteId,
-                    'pageId' => $pageId,
-                ], Response::HTTP_SEE_OTHER);
-            }
-            
-            $tempPosition = $section->getPosition();
-            $section->setPosition($previousSection->getPosition());
-            $previousSection->setPosition($tempPosition);
-            
-            $entityManager->flush();
-            $this->addFlash('success', 'Section moved up successfully');
+        $neighbor = $direction === 'up'
+            ? $pageSectionRepository->findPreviousSection($section)
+            : $pageSectionRepository->findNextSection($section);
+
+        if (!$neighbor) {
+            $this->logger->info(sprintf('Section %s - already at %s', $direction, $direction === 'up' ? 'top' : 'bottom'));
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
         }
+
+        if (!$this->isCsrfTokenValid('move_section' . $section->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Invalid CSRF token');
+            $this->logger->warning('Section move - CSRF validation failed', [
+                'sectionId' => $section->getId(),
+                'direction' => $direction,
+            ]);
+            return $this->redirectToRoute('app_page_builder', [
+                'siteId' => $siteId,
+                'pageId' => $pageId,
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        // Normalize positions, then swap with the neighbor
+        $sections = $pageSectionRepository->findByPageOrdered($page);
+        foreach ($sections as $index => $s) {
+            $s->setPosition($index);
+        }
+
+        $currentPosition = $section->getPosition();
+        $section->setPosition($neighbor->getPosition());
+        $neighbor->setPosition($currentPosition);
+
+        $entityManager->flush();
+        $this->addFlash('success', sprintf('Section moved %s successfully', $direction));
+        $this->logger->info(sprintf('Section %s - position swapped', $direction), [
+            'sectionId' => $section->getId(),
+            'sectionNewPosition' => $section->getPosition(),
+            'neighborId' => $neighbor->getId(),
+            'neighborNewPosition' => $neighbor->getPosition(),
+        ]);
 
         return $this->redirectToRoute('app_page_builder', [
             'siteId' => $siteId,
@@ -197,48 +248,15 @@ class PageBuilderController extends AbstractController
         ], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/section/{sectionId}/down', name: 'app_section_down', methods: ['POST'], requirements: ['sectionId' => '\d+'])]
-    public function down(Request $request, int $siteId, int $pageId, int $sectionId, PageRepository $pageRepository, PageSectionRepository $pageSectionRepository, EntityManagerInterface $entityManager): Response
+    private function findOwnedPage(int $siteId, int $pageId, PageRepository $pageRepository): ?Page
     {
         $page = $pageRepository->find($pageId);
-        
-        if (!$page || $page->getSite()->getId() !== $siteId) {
-            $this->addFlash('error', 'Page not found');
-            return $this->redirectToRoute('app_site_show', ['id' => $siteId], Response::HTTP_SEE_OTHER);
-        }
+        return ($page && $page->getSite()->getId() === $siteId) ? $page : null;
+    }
 
+    private function findOwnedSection(int $pageId, int $sectionId, PageSectionRepository $pageSectionRepository): ?PageSection
+    {
         $section = $pageSectionRepository->find($sectionId);
-        
-        if (!$section || $section->getPage()->getId() !== $pageId) {
-            $this->addFlash('error', 'Section not found');
-            return $this->redirectToRoute('app_page_builder', [
-                'siteId' => $siteId,
-                'pageId' => $pageId,
-            ], Response::HTTP_SEE_OTHER);
-        }
-
-        $nextSection = $pageSectionRepository->findNextSection($section);
-        
-        if ($nextSection) {
-            if (!$this->isCsrfTokenValid('move_section' . $section->getId(), $request->request->get('_token'))) {
-                $this->addFlash('error', 'Invalid CSRF token');
-                return $this->redirectToRoute('app_page_builder', [
-                    'siteId' => $siteId,
-                    'pageId' => $pageId,
-                ], Response::HTTP_SEE_OTHER);
-            }
-            
-            $tempPosition = $section->getPosition();
-            $section->setPosition($nextSection->getPosition());
-            $nextSection->setPosition($tempPosition);
-            
-            $entityManager->flush();
-            $this->addFlash('success', 'Section moved down successfully');
-        }
-
-        return $this->redirectToRoute('app_page_builder', [
-            'siteId' => $siteId,
-            'pageId' => $pageId,
-        ], Response::HTTP_SEE_OTHER);
+        return ($section && $section->getPage()->getId() === $pageId) ? $section : null;
     }
 }

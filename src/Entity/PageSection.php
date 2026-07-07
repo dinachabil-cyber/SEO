@@ -5,15 +5,12 @@ namespace App\Entity;
 use App\Repository\PageSectionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PageSectionRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class PageSection
 {
-    public const ALLOWED_TYPES = [
-        'header', 'hero', 'body', 'image', 'cards', 'cards_premium', 'faq', 'form', 'cta', 'footer'
-    ];
+    use SectionDataTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,41 +21,17 @@ class PageSection
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Page $page = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\Choice(choices: self::ALLOWED_TYPES, message: 'Invalid section type')]
-    private ?string $type = null;
-
     #[ORM\Column]
     private ?int $position = null;
 
-    #[ORM\Column(type: 'json')]
-    private array $data = [];
-
-    #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    private ?DateTimeImmutable $updatedAt = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'reference_section_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?ReferenceSection $referenceSection = null;
 
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
         $this->data = [];
         $this->position = 0;
-    }
-
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -77,17 +50,6 @@ class PageSection
         return $this;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-        return $this;
-    }
-
     public function getPosition(): ?int
     {
         return $this->position;
@@ -98,21 +60,6 @@ class PageSection
         $this->position = $position;
         return $this;
     }
-
-    public function getData(): array
-    {
-        return $this->data;
-    }
-
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-        return $this;
-    }
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'reference_section_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    private ?ReferenceSection $referenceSection = null;
 
     public function getReferenceSection(): ?ReferenceSection
     {
@@ -130,16 +77,7 @@ class PageSection
         if ($this->referenceSection) {
             return $this->referenceSection->getData();
         }
+
         return $this->data;
-    }
-
-    public function getCreatedAt(): ?DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 }

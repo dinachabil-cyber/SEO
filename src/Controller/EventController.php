@@ -25,13 +25,8 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
         
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $events = $eventRepository->findAll();
-            $sites = $siteRepository->findAll();
-        } else {
-            $events = $eventRepository->findAll();
-            $sites = $siteRepository->findAll();
-        }
+        $events = $eventRepository->findAll();
+        $sites = $siteRepository->findAll();
 
         $selectedSiteId = $request->query->get('site');
         if ($selectedSiteId) {

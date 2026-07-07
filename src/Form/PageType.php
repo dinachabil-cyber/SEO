@@ -26,12 +26,15 @@ class PageType extends AbstractType
                         pattern: '/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
                         message: 'Slug must contain only lowercase letters, numbers, and hyphens'
                     ),
-                    new Length(max: 255, maxMessage: 'Slug cannot exceed {{ limit }} characters'),
+                    new Length(
+                        max: 255,
+                        maxMessage: 'Slug cannot exceed {{ limit }} characters'
+                    ),
                 ],
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'example-page',
-                    'pattern' => '[a-z0-9-]+',
+                    'pattern' => '[a-z0-9]+(?:-[a-z0-9]+)*',
                 ],
                 'help' => 'Use lowercase letters, numbers, and hyphens only',
             ])
@@ -39,12 +42,7 @@ class PageType extends AbstractType
                 'label' => 'Meta Title',
                 'constraints' => [
                     new NotBlank(message: 'Please enter a meta title'),
-                    new Length(
-                        max: 70,
-                        maxMessage: 'Meta title cannot exceed {{ limit }} characters',
-                        min: 60,
-                        minMessage: 'Meta title should be at least {{ limit }} characters'
-                    ),
+                    new Length(max: 70, maxMessage: 'Meta title cannot exceed {{ limit }} characters'),
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -57,12 +55,7 @@ class PageType extends AbstractType
                 'label' => 'Meta Description',
                 'constraints' => [
                     new NotBlank(message: 'Please enter a meta description'),
-                    new Length(
-                        max: 170,
-                        maxMessage: 'Meta description cannot exceed {{ limit }} characters',
-                        min: 160,
-                        minMessage: 'Meta description should be at least {{ limit }} characters'
-                    ),
+                    new Length(max: 170, maxMessage: 'Meta description cannot exceed {{ limit }} characters'),
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -79,7 +72,7 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'keywords, separated, by, commas',
                 ],
-                'help' => 'Comma-separated list of keywords for SEO',
+                'help' => 'Comma-separated list of keywords.',
             ])
             ->add('googleAdsId', TextType::class, [
                 'label' => 'Google Ads ID',
@@ -88,7 +81,7 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'AW-XXXXXXXXXX',
                 ],
-                'help' => 'Google Ads conversion tracking ID',
+                'help' => 'Google Ads conversion tracking ID.',
             ])
             ->add('googleAnalyticsId', TextType::class, [
                 'label' => 'Google Analytics ID',
@@ -97,7 +90,7 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'G-XXXXXXXXXX',
                 ],
-                'help' => 'Google Analytics 4 measurement ID',
+                'help' => 'Google Analytics 4 Measurement ID.',
             ])
             ->add('googleTagManagerId', TextType::class, [
                 'label' => 'Google Tag Manager ID',
@@ -106,13 +99,16 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'GTM-XXXXXXX',
                 ],
-                'help' => 'Google Tag Manager container ID',
+                'help' => 'Google Tag Manager Container ID.',
             ])
             ->add('h1', TextType::class, [
                 'label' => 'H1 Heading',
                 'constraints' => [
                     new NotBlank(message: 'Please enter an H1 heading'),
-                    new Length(max: 255, maxMessage: 'H1 heading cannot exceed {{ limit }} characters'),
+                    new Length(
+                        max: 255,
+                        maxMessage: 'H1 heading cannot exceed {{ limit }} characters'
+                    ),
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -125,15 +121,15 @@ class PageType extends AbstractType
                 'attr' => [
                     'class' => 'form-check-input',
                 ],
-                'help' => 'Published pages will be visible to visitors',
-            ])
-        ;
+                'help' => 'Published pages will be visible to visitors.',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Page::class,
+            'allow_extra_fields' => true,
         ]);
     }
 }

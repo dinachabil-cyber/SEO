@@ -56,9 +56,17 @@ class SiteController extends AbstractController
             // Debug information
             error_log('Form submitted');
             error_log('Form isValid(): ' . ($form->isValid() ? 'true' : 'false'));
-            
+
             if (!$form->isValid()) {
-                // Form is invalid - render the form again with errors
+                // Surface exact validation errors to quickly identify why site creation fails
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $errors[] = $error->getOrigin()->getName() . ': ' . $error->getMessage();
+                }
+
+                $message = 'Site create failed. ' . (count($errors) ? implode(' | ', $errors) : 'Unknown validation error');
+                $this->addFlash('error', $message);
+                error_log($message);
             }
 
             if ($form->isValid()) {

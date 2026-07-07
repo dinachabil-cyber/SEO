@@ -38,6 +38,7 @@ class PageSectionRepository extends ServiceEntityRepository
             ->where('ps.page = :page')
             ->setParameter('page', $page)
             ->orderBy('ps.position', 'ASC')
+            ->addOrderBy('ps.id', 'ASC')
             ->getQuery()
             ->getResult();
     }

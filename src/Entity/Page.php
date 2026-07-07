@@ -11,7 +11,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['site', 'slug'], message: 'This slug is already used for this site.')]
+#[UniqueEntity(
+    fields: ['site', 'slug'],
+    message: 'This slug is already used for this site.',
+    errorPath: 'slug',
+    ignore: ['id']
+)]
 class Page
 {
     #[ORM\Id]
@@ -26,8 +31,13 @@ class Page
     /**
      * @var Collection<int, PageSection>
      */
-    #[ORM\OneToMany(targetEntity: PageSection::class, mappedBy: 'page', orphanRemoval: true, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OneToMany(
+        targetEntity: PageSection::class,
+        mappedBy: 'page',
+        orphanRemoval: true,
+        cascade: ['persist', 'remove']
+    )]
+    #[ORM\OrderBy(['position' => 'ASC', 'id' => 'ASC'])]
     private Collection $sections;
 
     #[ORM\Column(length: 255)]
@@ -92,7 +102,6 @@ class Page
     public function removeSection(PageSection $section): static
     {
         if ($this->sections->removeElement($section)) {
-            // set the owning side to null (unless already changed)
             if ($section->getPage() === $this) {
                 $section->setPage(null);
             }
@@ -134,14 +143,12 @@ class Page
 
     public function setSite(?Site $site): static
     {
-        // Update page count on old site
         if ($this->site && $this->site !== $site) {
             $this->site->decrementPageCount();
         }
 
         $this->site = $site;
 
-        // Update page count on new site
         if ($this->site) {
             $this->site->incrementPageCount();
         }
@@ -157,6 +164,7 @@ class Page
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
         return $this;
     }
 
@@ -168,6 +176,7 @@ class Page
     public function setMetaTitle(?string $metaTitle): static
     {
         $this->metaTitle = $metaTitle;
+
         return $this;
     }
 
@@ -239,6 +248,7 @@ class Page
     public function setH1(?string $h1): static
     {
         $this->h1 = $h1;
+
         return $this;
     }
 

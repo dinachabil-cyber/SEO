@@ -692,6 +692,10 @@ body{
     color: white;
 }
 
+.cta-section.custom-bg {
+    background: none;
+}
+
 .cta-section h2 {
     font-weight: 700;
 }

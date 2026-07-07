@@ -62,33 +62,10 @@ class PageRepository extends ServiceEntityRepository
             ->andWhere('p.id = :id')
             ->leftJoin('p.sections', 's')
             ->addSelect('s')
+            ->addOrderBy('s.position', 'ASC')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult()
         ;
-    }
-
-    /**
-     * Find page with sections and cache the result
-     */
-    public function findWithSectionsCached(int $id): ?Page
-    {
-        $cacheKey = 'page_with_sections_' . $id;
-        $cache = $this->getEntityManager()->getCache();
-        
-        if ($cache && $cache->containsEntity(Page::class, $id)) {
-            return $this->find($id);
-        }
-        
-        $page = $this->findWithSections($id);
-        if ($page && $cache) {
-            $cache->evictEntity(Page::class, $id);
-            $cache->persistEntity($page);
-            foreach ($page->getSections() as $section) {
-                $cache->persistEntity($section);
-            }
-        }
-        
-        return $page;
     }
 }
