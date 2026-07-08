@@ -368,27 +368,6 @@ class SectionDataType extends AbstractType
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'description')),
                         'attr' => ['rows' => 3],
-                    ])
-                    
-                    ->add('primary_button_text', TextType::class, [
-                        'label' => 'Primary Button Text',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'primary_button_text', $this->get($existingData, 'ctaText'))),
-                    ])
-                    ->add('primary_button_url', TextType::class, [
-                        'label' => 'Primary Button URL',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'primary_button_url', $this->get($existingData, 'ctaUrl'))),
-                    ])
-                    ->add('secondary_button_text', TextType::class, [
-                        'label' => 'Secondary Button Text',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'secondary_button_text')),
-                    ])
-                    ->add('secondary_button_url', TextType::class, [
-                        'label' => 'Secondary Button URL',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'secondary_button_url')),
                     ]);
 
                 $this->addHiddenLegacyField($builder, 'title', $existingData);
@@ -414,6 +393,49 @@ class SectionDataType extends AbstractType
                 ]);
 
                 $builder
+                    ->add('form_title', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_title')),
+                    ])
+                    ->add('form_subtitle', TextareaType::class, [
+                        'label' => 'Form Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_subtitle')),
+                        'attr' => ['rows' => 2],
+                    ])
+                    ->add('submit_button_text', TextType::class, [
+                        'label' => 'Submit Button Text',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'submit_button_text', 'Send Message')),
+                    ])
+                    ->add('submit_button_background_color', ColorType::class, [
+                        'label' => 'Submit Button Background Color',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'submit_button_background_color')),
+                    ])
+                    ->add('submit_button_text_color', ColorType::class, [
+                        'label' => 'Submit Button Text Color',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'submit_button_text_color')),
+                    ])
+                    ->add('submit_button_border_radius', TextType::class, [
+                        'label' => 'Submit Button Border Radius (px)',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'submit_button_border_radius')),
+                    ])
+                    ->add('form_title_color', ColorType::class, [
+                        'label' => 'Form Title Color',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_title_color')),
+                    ])
+                    ->add('form_subtitle_color', ColorType::class, [
+                        'label' => 'Form Subtitle Color',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_subtitle_color')),
+                    ]);
+
+                $builder
                     ->add('hero_image_url', TextType::class, [
                         'label' => 'Hero Image URL',
                         'required' => false,
@@ -433,15 +455,14 @@ class SectionDataType extends AbstractType
                         'label' => 'Layout Type',
                         'required' => false,
                         'choices' => [
-                            'Text Left, Image Right' => 'text_left_image_right',
-                            'Image Left, Text Right' => 'image_left_text_right',
-                            'Centered' => 'centered',
-                            'Form Right, Image Left' => 'form_right_image_left',
+                            'Form Left, Image Right' => 'form_left_image_right',
+                            'Image Left, Form Right' => 'image_left_form_right',
+                            'Centered (Image above Form)' => 'centered',
                             'Form Only' => 'form_only',
                         ],
-                        'data' => $this->get($existingData, 'layout_type', 'centered'),
+                        'data' => $this->get($existingData, 'layout_type', 'form_left_image_right'),
                         'placeholder' => 'Select layout',
-                        'help' => 'How the hero content and media are arranged. "Form Only" shows just a lead form with no image.',
+                        'help' => 'Position of the form and image. "Form Only" shows just the lead form with no image.',
                     ])
                     ->add('text_alignment', ChoiceType::class, [
                         'label' => 'Text Alignment',
@@ -504,46 +525,10 @@ class SectionDataType extends AbstractType
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'background_color', $this->get($existingData, 'backgroundColor'))),
                     ])
-                    ->add('background_gradient', TextType::class, [
-                        'label' => 'Background Gradient (CSS)',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'background_gradient')),
-                        'attr' => ['placeholder' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'],
-                    ])
                     ->add('hero_text_color', ColorType::class, [
                         'label' => 'Hero Text Color',
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'hero_text_color', $this->get($existingData, 'textColor'))),
-                    ])
-                    ->add('title_color', ColorType::class, [
-                        'label' => 'Title Color',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'title_color', $this->get($existingData, 'titleColor'))),
-                    ])
-                    ->add('subtitle_color', ColorType::class, [
-                        'label' => 'Subtitle Color',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'subtitle_color', $this->get($existingData, 'subtitleColor'))),
-                    ])
-                    ->add('description_color', ColorType::class, [
-                        'label' => 'Description Color',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'description_color')),
-                    ])
-                    ->add('card_background_color', ColorType::class, [
-                        'label' => 'Card Background Color',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'card_background_color')),
-                    ])
-                    ->add('border_radius', TextType::class, [
-                        'label' => 'Border Radius (px)',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'border_radius')),
-                    ])
-                    ->add('box_shadow', CheckboxType::class, [
-                        'label' => 'Show Box Shadow',
-                        'required' => false,
-                        'data' => $this->get($existingData, 'box_shadow', false),
                     ]);
 
                 $this->addSpacingFields($builder, $existingData, [
@@ -551,8 +536,6 @@ class SectionDataType extends AbstractType
                     'paddingBottom' => '60',
                 ]);
 
-                $this->addButtonFields($builder, 'primary', $existingData, 'primary');
-                $this->addButtonFields($builder, 'secondary', $existingData, 'outline');
                 break;
 
             case 'body':
@@ -1281,7 +1264,8 @@ class CardType extends AbstractType
             ->add('title', TextType::class, ['label' => 'Title'])
             ->add('description', TextareaType::class, ['label' => 'Description', 'attr' => ['rows' => 3]])
             ->add('imageUrl', TextType::class, ['label' => 'Image URL', 'required' => false])
-            ->add('linkUrl', TextType::class, ['label' => 'Link URL', 'required' => false]);
+            ->add('linkUrl', TextType::class, ['label' => 'Link URL', 'required' => false])
+            ->add('buttonText', TextType::class, ['label' => 'Button Text', 'required' => false]);
     }
 }
 

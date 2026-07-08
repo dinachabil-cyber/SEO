@@ -466,7 +466,7 @@ body{
     }
     
     .hero .row {
-        flex-direction: column-reverse;
+        flex-direction: column;
     }
 }
 
@@ -521,6 +521,26 @@ body{
     color: var(--text);
 }
 
+/* Submit button: respect the inline color set from the admin, and give clear
+   disabled / hover states. Inline style wins for the chosen colors; the rules
+   below only adjust interaction feedback. */
+.lead-form .hero-submit-btn {
+    transition: opacity 0.2s ease, transform 0.1s ease, filter 0.2s ease;
+}
+
+.lead-form .hero-submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.2);
+}
+
+.lead-form .hero-submit-btn:not(:disabled):hover {
+    filter: brightness(1.05);
+}
+
+.lead-form .hero-submit-btn:not(:disabled):active {
+    transform: translateY(1px);
+}
 /* ====== SITE NAVBAR ====== */
 
 .site-navbar {

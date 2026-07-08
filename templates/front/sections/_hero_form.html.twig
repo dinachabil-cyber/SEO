@@ -1,0 +1,52 @@
+{# Hero Lead Form partial - renders the lead form with its own macro import #}
+{% import 'front/sections/_macros.html.twig' as macros %}
+
+<div class="lead-form">
+    {% set form_title_style = '' %}
+    {% if data.form_title_color is defined and data.form_title_color %}
+        {% set form_title_style = 'color: ' ~ data.form_title_color ~ ';' %}
+    {% endif %}
+    {% if data.form_subtitle_color is defined and data.form_subtitle_color %}
+        {% set form_subtitle_style = 'color: ' ~ data.form_subtitle_color ~ ';' %}
+    {% endif %}
+
+    {% if data.form_title is defined and data.form_title %}
+        <h3 class="lead-form-title mb-2"{% if form_title_style %} style="{{ form_title_style }}"{% endif %}>{{ data.form_title }}</h3>
+    {% endif %}
+
+    {% if data.form_subtitle is defined and data.form_subtitle %}
+        <p class="mb-4 text-muted"{% if form_subtitle_style %} style="{{ form_subtitle_style }}"{% endif %}>{{ data.form_subtitle }}</p>
+    {% endif %}
+
+    <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
+
+        {% if data.hero_form_fields is defined and data.hero_form_fields %}
+            {% for field in data.hero_form_fields %}
+                {{ macros.render_form_field(field) }}
+            {% endfor %}
+        {% else %}
+            {{ macros.render_fallback_form_fields() }}
+        {% endif %}
+
+        {% set submit_text = data.submit_button_text is defined and data.submit_button_text ? data.submit_button_text : 'Send Message' %}
+
+        {% set btn_style = '' %}
+        {% if data.submit_button_background_color is defined and data.submit_button_background_color %}
+            {% set btn_style = btn_style ~ 'background-color: ' ~ data.submit_button_background_color ~ '; border-color: ' ~ data.submit_button_background_color ~ ';' %}
+        {% endif %}
+        {% if data.submit_button_text_color is defined and data.submit_button_text_color %}
+            {% set btn_style = btn_style ~ ' color: ' ~ data.submit_button_text_color ~ ';' %}
+        {% endif %}
+        {% if data.submit_button_border_radius is defined and data.submit_button_border_radius %}
+            {% set btn_style = btn_style ~ ' border-radius: ' ~ data.submit_button_border_radius ~ 'px;' %}
+        {% endif %}
+
+        {# Only use Bootstrap's blue "btn-primary" when no custom color is chosen #}
+        {% set btn_class = btn_style ? 'btn w-100 hero-submit-btn' : 'btn btn-primary w-100 hero-submit-btn' %}
+
+        <button type="submit" class="{{ btn_class }}"{% if btn_style %} style="{{ btn_style }}"{% endif %}>
+            {{ submit_text }}
+        </button>
+    </form>
+</div>

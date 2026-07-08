@@ -49,9 +49,28 @@
                             <p class="mb-4 {{ macros.text_align_class(data) }}{% if data.cardTextColor is not defined and (data.style is not defined or data.style.cardTextColor is not defined) %} text-muted{% endif %}"{% if data.cardTextColor is defined %} style="color: {{ data.cardTextColor }}"{% elseif data.style is defined and data.style.cardTextColor is defined %} style="color: {{ card_text_color_val }}"{% endif %}>{{ card.description }}</p>
                             
                             {% if card.linkUrl is defined and card.linkUrl %}
+                                {# Force the configured button colors over the default blue (btn-primary) so the user's choice always wins. #}
                                 {% set btn_style = macros.button_style_string(data) %}
-                                <a href="{{ card.linkUrl }}" class="{{ macros.button_class_string(data) }}" {% if btn_style %}style="{{ btn_style }}"{% endif %}>
-                                    Learn More
+                                {% set forced_btn_style = '' %}
+                                {% set chosen_bg = data.buttonBackgroundColor is defined ? data.buttonBackgroundColor : (data.style is defined and data.style.buttonBackgroundColor is defined ? data.style.buttonBackgroundColor : '') %}
+                                {% if chosen_bg %}
+                                    {# Override the whole background (incl. the .btn-primary gradient image) so the chosen color shows. #}
+                                    {% set forced_btn_style = 'background: ' ~ chosen_bg ~ ' !important; background-image: none !important;' %}
+                                {% endif %}
+                                {% set chosen_text = data.buttonTextColor is defined ? data.buttonTextColor : (data.style is defined and data.style.buttonTextColor is defined ? data.style.buttonTextColor : '') %}
+                                {% if chosen_text %}
+                                    {% set forced_btn_style = forced_btn_style ~ ' color: ' ~ chosen_text ~ ' !important;' %}
+                                {% endif %}
+                                {% set chosen_border = data.buttonBorderColor is defined ? data.buttonBorderColor : (data.style is defined and data.style.buttonBorderColor is defined ? data.style.buttonBorderColor : '') %}
+                                {% if chosen_border %}
+                                    {% set forced_btn_style = forced_btn_style ~ ' border: 1px solid ' ~ chosen_border ~ ' !important;' %}
+                                {% endif %}
+                                {% set chosen_radius = data.buttonBorderRadius is defined ? data.buttonBorderRadius : (data.style is defined and data.style.buttonBorderRadius is defined ? data.style.buttonBorderRadius : '') %}
+                                {% if chosen_radius %}
+                                    {% set forced_btn_style = forced_btn_style ~ ' border-radius: ' ~ chosen_radius ~ 'px !important;' %}
+                                {% endif %}
+                                <a href="{{ card.linkUrl }}" class="{{ macros.button_class_string(data) }}" style="{{ (forced_btn_style ~ (btn_style ? btn_style : ''))|trim }}">
+                                    {{ card.buttonText is defined and card.buttonText ? card.buttonText : 'Learn More' }}
                                 </a>
                             {% endif %}
                         </div>

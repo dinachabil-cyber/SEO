@@ -4,7 +4,9 @@
 {% import 'front/sections/_macros.html.twig' as macros %}
 
 {% set hero_style = '' %}
-{% if data.background_color is defined and data.background_color %}
+{% if data.background_gradient is defined and data.background_gradient %}
+    {% set hero_style = hero_style ~ 'background: ' ~ data.background_gradient ~ ';' %}
+{% elseif data.background_color is defined and data.background_color %}
     {% set hero_style = hero_style ~ 'background-color: ' ~ data.background_color ~ ';' %}
 {% elseif data.style is defined and data.style.background_color is defined %}
     {% set hero_style = hero_style ~ 'background-color: ' ~ data.style.background_color ~ ';' %}
@@ -36,110 +38,111 @@
     {% set hero_class = hero_class ~ ' custom-bg' %}
 {% endif %}
 
+{# ---- Layout configuration from the "Layout Type" style select ---- #}
+{% set layout_type = data.layout_type is defined and data.layout_type ? data.layout_type : 'form_left_image_right' %}
+
+{% set show_image = data.show_image is defined ? data.show_image : true %}
+{% set show_form  = data.show_form is defined ? data.show_form : false %}
+
+{% set hero_image = '' %}
+{% if data.hero_image_url is defined and data.hero_image_url %}
+    {% set hero_image = data.hero_image_url %}
+{% elseif data.left_image is defined and data.left_image %}
+    {% set hero_image = data.left_image %}
+{% endif %}
+
+{% set has_image = show_image and hero_image %}
+{% set has_form  = show_form %}
+
+{# Image on the LEFT, form on the RIGHT #}
+{% set image_left = (layout_type == 'image_left_form_right') %}
+
 <section class="{{ hero_class }}" {% if hero_style %} style="{{ hero_style }}"{% endif %}>
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-content {{ text_align_class }}" {% if text_style %} style="{{ text_style }}"{% endif %}>
-                    
-                    
-                    
-                    {% if data.hero_title is defined and data.hero_title %}
-                        {% set title_color = '' %}
-                        {% if data.title_color is defined %}{% set title_color = data.title_color %}{% elseif data.style is defined and data.style.title_color is defined %}{% set title_color = data.style.title_color %}{% endif %}
-                        <h1 class="display-4 mb-4" {% if title_color %}style="color: {{ title_color }}"{% endif %}>
-                            {{ data.hero_title }}
-                        </h1>
-                    {% endif %}
-                    
-                    {% if data.hero_subtitle is defined and data.hero_subtitle %}
-                        {% set subtitle_color = '' %}
-                        {% if data.subtitle_color is defined %}{% set subtitle_color = data.subtitle_color %}{% elseif data.style is defined and data.style.subtitle_color is defined %}{% set subtitle_color = data.style.subtitle_color %}{% endif %}
-                        <p class="lead mb-4" {% if subtitle_color %}style="color: {{ subtitle_color }}"{% endif %}>
-                            {{ data.hero_subtitle }}
-                        </p>
-                    {% endif %}
-                    
-                    {% if data.description is defined and data.description %}
-                        <p class="mb-4">{{ data.description }}</p>
-                    {% endif %}
-                    
-                     {% if data.primary_button_text is defined and data.primary_button_text and data.primary_button_url is defined and data.primary_button_url %}
-                        {% set btn_style = macros.button_style_string(data, 'primary_button_background_color', 'primary_button_text_color', 'primary_button_border_color', 'primary_button_border_radius') %}
-                        <a href="{{ data.primary_button_url }}" class="{{ macros.button_class_string(data, 'primary_button_style', 'primary') }} btn-lg" 
-                           {% if btn_style %}style="{{ btn_style }}"{% endif %}>
-                             {{ data.primary_button_text }}
-                        </a>
-                    {% endif %}
-                    
-                    {% if data.phone_number is defined and data.phone_number %}
-                        <div class="hero-phone mt-3">
-                            {% set phone_color = '' %}
-                            {% if data.subtitle_color is defined %}{% set phone_color = data.subtitle_color %}{% endif %}
-                            <a href="tel:{{ data.phone_number }}" class="text-decoration-none" style="{% if phone_color %}color: {{ phone_color }}{% endif %}">
-                                <i class="bi bi-telephone me-2"></i>{{ data.phone_number }}
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+        {# ---- TITLE / TEXT ALWAYS ABOVE THE IMAGE ---- #}
+        {% if (data.hero_title is defined and data.hero_title)
+            or (data.hero_subtitle is defined and data.hero_subtitle)
+            or (data.description is defined and data.description)
+            or (data.phone_number is defined and data.phone_number) %}
+            <div class="hero-head {{ text_align_class }} mb-5" {% if text_style %} style="{{ text_style }}"{% endif %}>
+                {% if data.hero_title is defined and data.hero_title %}
+                    <h1 class="display-4 mb-4">
+                        {{ data.hero_title }}
+                    </h1>
+                {% endif %}
 
-            {% set show_image = true %}
-            {% if data.show_image is defined %}
-                {% set show_image = data.show_image %}
-            {% endif %}
-            
-            {% if show_image %}
-                {% if data.hero_image_url is defined and data.hero_image_url %}
-                    <div class="col-lg-6 mt-4 mt-lg-0">
-                        <div class="hero-media">
-                            <img src="{{ data.hero_image_url }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
-                        </div>
-                    </div>
-                {% elseif data.left_image is defined and data.left_image %}
-                    <div class="col-lg-6 mt-4 mt-lg-0">
-                        <div class="hero-media">
-                            <img src="{{ data.left_image }}" alt="{{ data.image_alt_text|default('') }}" class="img-fluid">
-                        </div>
+                {% if data.hero_subtitle is defined and data.hero_subtitle %}
+                    <p class="lead mb-4">
+                        {{ data.hero_subtitle }}
+                    </p>
+                {% endif %}
+
+                {% if data.description is defined and data.description %}
+                    <p class="mb-4">{{ data.description }}</p>
+                {% endif %}
+
+                {% if data.phone_number is defined and data.phone_number %}
+                    <div class="hero-phone mt-3">
+                        <a href="tel:{{ data.phone_number }}" class="text-decoration-none">
+                            <i class="bi bi-telephone me-2"></i>{{ data.phone_number }}
+                        </a>
                     </div>
                 {% endif %}
-            {% endif %}
-        </div>
-    </div>
-</section>
-
-{% if data.show_form is defined and data.show_form %}
-<section class="section-sm bg-light">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="lead-form">
-                    {% if data.form_title is defined and data.form_title %}
-                        <h3 class="lead-form-title mb-2">{{ data.form_title }}</h3>
-                    {% else %}
-                        <h3 class="lead-form-title mb-4">Get in Touch</h3>
-                    {% endif %}
-                    
-                    {% if data.form_subtitle is defined and data.form_subtitle %}
-                        <p class="mb-4 text-muted">{{ data.form_subtitle }}</p>
-                    {% endif %}
-                    
-                    <form method="POST" action="{{ path('app_contact') }}" data-turbo="false">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('contact_form') }}">
-                        
-                        {% if data.hero_form_fields is defined and data.hero_form_fields %}
-                            {% for field in data.hero_form_fields %}
-                                {{ macros.render_form_field(field) }}
-                            {% endfor %}
-                        {% else %}
-                            {{ macros.render_fallback_form_fields() }}
-                        {% endif %}
-                        
-                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
-                    </form>
-                </div>
             </div>
-        </div>
+        {% endif %}
+
+        {# ---- IMAGE + FORM AREA (side by side, side depends on style select) ---- #}
+        {% if has_image or has_form %}
+            {% if layout_type == 'form_only' and has_form %}
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-xl-6">
+                        {% include 'front/sections/_hero_form.html.twig' with {data: data} %}
+                    </div>
+                </div>
+            {% elseif layout_type == 'centered' %}
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-10 col-xl-8">
+                        {% if has_image %}
+                            <div class="hero-media mb-4">
+                                <img src="{{ hero_image }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
+                            </div>
+                        {% endif %}
+                        {% if has_form %}
+                            {% include 'front/sections/_hero_form.html.twig' with {data: data} %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row align-items-center g-4">
+                    {% if image_left %}
+                        {% if has_image %}
+                            <div class="col-lg-6">
+                                <div class="hero-media">
+                                    <img src="{{ hero_image }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if has_form %}
+                            <div class="col-lg-6">
+                                {% include 'front/sections/_hero_form.html.twig' with {data: data} %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if has_form %}
+                            <div class="col-lg-6">
+                                {% include 'front/sections/_hero_form.html.twig' with {data: data} %}
+                            </div>
+                        {% endif %}
+                        {% if has_image %}
+                            <div class="col-lg-6">
+                                <div class="hero-media">
+                                    <img src="{{ hero_image }}" alt="{{ data.hero_title is defined ? data.hero_title : '' }}" class="img-fluid">
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
     </div>
 </section>
-{% endif %}

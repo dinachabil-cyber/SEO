@@ -210,10 +210,9 @@ class HeroFieldsConfig
                     'label' => 'Layout Type',
                     'required' => false,
                     'choices' => [
-                        'Text Left, Image Right' => 'text_left_image_right',
-                        'Image Left, Text Right' => 'image_left_text_right',
-                        'Centered' => 'centered',
-                        'Form Right, Image Left' => 'form_right_image_left',
+                        'Form Left, Image Right' => 'form_left_image_right',
+                        'Image Left, Form Right' => 'image_left_form_right',
+                        'Centered (Image above Form)' => 'centered',
                         'Form Only' => 'form_only',
                     ],
                     'placeholder' => 'Select layout',
@@ -300,16 +299,6 @@ class HeroFieldsConfig
                 ],
                 'legacy_key' => 'backgroundColor',
             ],
-            'background_gradient' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Background Gradient (CSS)',
-                    'required' => false,
-                    'attr' => ['placeholder' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'],
-                ],
-            ],
-            
-            // Text colors
             'hero_text_color' => [
                 'type' => ColorType::class,
                 'options' => [
@@ -318,53 +307,7 @@ class HeroFieldsConfig
                 ],
                 'legacy_key' => 'textColor',
             ],
-            'title_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Title Color',
-                    'required' => false,
-                ],
-                'legacy_key' => 'titleColor',
-            ],
-            'subtitle_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Subtitle Color',
-                    'required' => false,
-                ],
-                'legacy_key' => 'subtitleColor',
-            ],
-            'description_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Description Color',
-                    'required' => false,
-                ],
-            ],
-            
-            // Card styling
-            'card_background_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Card Background Color',
-                    'required' => false,
-                ],
-            ],
-            'border_radius' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Border Radius (px)',
-                    'required' => false,
-                ],
-            ],
-            'box_shadow' => [
-                'type' => CheckboxType::class,
-                'options' => [
-                    'label' => 'Show Box Shadow',
-                    'required' => false,
-                ],
-            ],
-            
+
             // Spacing
             'padding_top' => [
                 'type' => TextType::class,
@@ -403,133 +346,11 @@ class HeroFieldsConfig
 
     /**
      * BUTTONS TAB FIELDS
-     * Button-specific styling and configuration
+     * Removed for the hero section (no CTA buttons used).
      */
     public static function getButtonsFields(): array
     {
-        return [
-            // Primary button styling
-            'primary_button_background_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Primary Button Background Color',
-                    'required' => false,
-                ],
-                'legacy_key' => 'buttonBackgroundColor',
-            ],
-            'primary_button_text_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Primary Button Text Color',
-                    'required' => false,
-                ],
-                'legacy_key' => 'buttonTextColor',
-            ],
-            'primary_button_border_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Primary Button Border Color',
-                    'required' => false,
-                ],
-                'legacy_key' => 'buttonBorderColor',
-            ],
-            'primary_button_border_radius' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Primary Button Border Radius (px)',
-                    'required' => false,
-                ],
-                'legacy_key' => 'buttonBorderRadius',
-            ],
-            'primary_button_style' => [
-                'type' => ChoiceType::class,
-                'options' => [
-                    'label' => 'Primary Button Style',
-                    'required' => false,
-                    'choices' => [
-                        'Primary' => 'primary',
-                        'Secondary' => 'secondary',
-                        'Outline' => 'outline',
-                        'Ghost' => 'ghost',
-                    ],
-                    'placeholder' => 'Select style',
-                ],
-            ],
-            
-            // Secondary button styling
-            'secondary_button_background_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Secondary Button Background Color',
-                    'required' => false,
-                ],
-            ],
-            'secondary_button_text_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Secondary Button Text Color',
-                    'required' => false,
-                ],
-            ],
-            'secondary_button_border_color' => [
-                'type' => ColorType::class,
-                'options' => [
-                    'label' => 'Secondary Button Border Color',
-                    'required' => false,
-                ],
-            ],
-            'secondary_button_border_radius' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Secondary Button Border Radius (px)',
-                    'required' => false,
-                ],
-            ],
-'secondary_button_style' => [
-                 'type' => ChoiceType::class,
-                 'options' => [
-                     'label' => 'Secondary Button Style',
-                     'required' => false,
-                     'choices' => [
-                         'Primary' => 'primary',
-                         'Secondary' => 'secondary',
-                         'Outline' => 'outline',
-                         'Ghost' => 'ghost',
-                     ],
-                     'placeholder' => 'Select style',
-                 ],
-             ],
-             
-
-             'primary_button_text' => [
-                 'type' => TextType::class,
-                 'options' => [
-                     'label' => 'Primary Button Text',
-                     'required' => false,
-                 ],
-             ],
-             'primary_button_url' => [
-                 'type' => TextType::class,
-                 'options' => [
-                     'label' => 'Primary Button URL',
-                     'required' => false,
-                 ],
-             ],
-             'secondary_button_text' => [
-                 'type' => TextType::class,
-                 'options' => [
-                     'label' => 'Secondary Button Text',
-                     'required' => false,
-                 ],
-             ],
-             'secondary_button_url' => [
-                 'type' => TextType::class,
-                 'options' => [
-                     'label' => 'Secondary Button URL',
-                     'required' => false,
-                 ],
-             ],
-        ];
+        return [];
     }
 
     /**

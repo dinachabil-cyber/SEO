@@ -163,6 +163,18 @@
     {%- endif -%}
     
     {%- set is_enabled = field.enabled is not defined or field.enabled -%}
+
+    {%- set raw_options = field.options is defined ? field.options : [] -%}
+    {%- if raw_options is not iterable -%}
+        {%- set raw_options = raw_options|split('\n') -%}
+    {%- endif -%}
+    {%- set options = [] -%}
+    {%- for o in raw_options -%}
+        {%- set o = o|trim -%}
+        {%- if o != '' -%}
+            {%- set options = options|merge([o]) -%}
+        {%- endif -%}
+    {%- endfor -%}
     
     {%- if is_enabled -%}
         <div class="{{ field_class }}{% if field.css_class is defined and field.css_class %} {{ field.css_class }}{% endif %}">
@@ -175,8 +187,8 @@
                     {%- if field.placeholder is defined and field.placeholder -%}
                         <option value="">{{ field.placeholder }}</option>
                     {%- endif -%}
-                    {%- if field.options is defined and field.options -%}
-                        {%- for option in field.options -%}
+                    {%- if options -%}
+                        {%- for option in options -%}
                             <option value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}selected{% endif %}>{{ option }}</option>
                         {%- endfor -%}
                     {%- endif -%}
@@ -187,8 +199,8 @@
                     <label class="form-check-label" for="{{ field.name }}">{{ field.label }}</label>
                 </div>
             {%- elseif field.type == 'radio' -%}
-                {%- if field.options is defined and field.options -%}
-                    {%- for option in field.options -%}
+                {%- if options -%}
+                    {%- for option in options -%}
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="{{ field.name }}" id="{{ field.name }}_{{ loop.index }}" value="{{ option }}" {% if field.default_value is defined and field.default_value == option %}checked{% endif %}>
                             <label class="form-check-label" for="{{ field.name }}_{{ loop.index }}">{{ option }}</label>

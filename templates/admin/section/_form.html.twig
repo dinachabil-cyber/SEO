@@ -57,9 +57,6 @@
                     <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#hero-style" type="button" role="tab" aria-controls="hero-style" aria-selected="false">Style</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#hero-buttons" type="button" role="tab" aria-controls="hero-buttons" aria-selected="false">Buttons</button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="form-fields-tab" data-bs-toggle="tab" data-bs-target="#hero-form-fields" type="button" role="tab" aria-controls="hero-form-fields" aria-selected="false">Form Fields</button>
                 </li>
             </ul>
@@ -77,26 +74,6 @@
                     </div>
                     {{ form_row(dataForm.hero_subtitle) }}
                     {{ form_row(dataForm.description) }}
-                    <hr class="my-4">
-                    <h6 class="text-muted mb-3">Primary Button</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.primary_button_text) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.primary_button_url) }}
-                        </div>
-                    </div>
-                    <hr class="my-4">
-                    <h6 class="text-muted mb-3">Secondary Button</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.secondary_button_text) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.secondary_button_url) }}
-                        </div>
-                    </div>
                 </div>
                 
                 {# Media Tab #}
@@ -113,6 +90,10 @@
                 
                 {# Layout Tab #}
                 <div class="tab-pane fade" id="hero-layout" role="tabpanel" aria-labelledby="layout-tab">
+                    <div class="alert alert-secondary small mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>Layout:</strong> controls where things sit. Use "Layout Type" to put the <u>form on the left/right of the image</u>, center them, or show the form only. The hero title always stays above the image.
+                    </div>
                     {{ form_row(dataForm.layout_type) }}
                     {{ form_row(dataForm.text_alignment) }}
                     <div class="row">
@@ -139,35 +120,14 @@
                 
                 {# Style Tab #}
                 <div class="tab-pane fade" id="hero-style" role="tabpanel" aria-labelledby="style-tab">
-                    {{ form_row(dataForm.background_color) }}
-                    {{ form_row(dataForm.background_gradient) }}
-                    <div class="alert alert-info small">
+                    <div class="alert alert-secondary small mb-3">
                         <i class="bi bi-info-circle me-1"></i>
-                        Enter a CSS gradient like: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+                        <strong>Style:</strong> controls <u>colors and spacing</u> of the hero section (background, title/text colors, padding/margins). This is not the form's submit button.
                     </div>
+                    {{ form_row(dataForm.background_color) }}
                     <div class="row">
                         <div class="col-md-6">
                             {{ form_row(dataForm.hero_text_color) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.title_color) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.subtitle_color) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.description_color) }}
-                        </div>
-                    </div>
-                    {{ form_row(dataForm.card_background_color) }}
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.border_radius) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.box_shadow) }}
                         </div>
                     </div>
                     <hr class="my-4">
@@ -189,53 +149,13 @@
                         </div>
                     </div>
                 </div>
-                
-                {# Buttons Tab #}
-                <div class="tab-pane fade" id="hero-buttons" role="tabpanel" aria-labelledby="buttons-tab">
-                    <h6 class="text-muted mb-3">Primary Button Styling</h6>
-                    <div class="row">
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.primary_button_background_color) }}
-                        </div>
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.primary_button_text_color) }}
-                        </div>
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.primary_button_border_color) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.primary_button_border_radius) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.primary_button_style) }}
-                        </div>
-                    </div>
-                    <hr class="my-4">
-                    <h6 class="text-muted mb-3">Secondary Button Styling</h6>
-                    <div class="row">
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.secondary_button_background_color) }}
-                        </div>
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.secondary_button_text_color) }}
-                        </div>
-                        <div class="col-md-4">
-                            {{ form_row(dataForm.secondary_button_border_color) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.secondary_button_border_radius) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(dataForm.secondary_button_style) }}
-                        </div>
-                    </div>
-                </div>
+
                 {# Form Fields Tab #}
                 <div class="tab-pane fade" id="hero-form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Build the form fields below, then set the form title and submit button styling.
+                    </div>
                     {{ form_row(dataForm.hero_form_fields) }}
                     {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
                         'hero_form_fields_json': dataForm.hero_form_fields.vars.value|default('[]'),
@@ -256,6 +176,40 @@
                             'hidden': 'Hidden Field'
                         }
                     } %}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Form Submit Button ("Send Message")</h6>
+                    <div class="alert alert-secondary small mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        This is the button that <u>sends the form</u>. It is required and is added automatically — you do <u>not</u> add a button from the form fields above. Just type the label you want (e.g. "Send Message", "Get a Quote", "Subscribe") and choose its colors here.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.form_title) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.submit_button_text) }}
+                        </div>
+                    </div>
+                    {{ form_row(dataForm.form_subtitle) }}
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.form_title_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.form_subtitle_color) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(dataForm.submit_button_background_color) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.submit_button_text_color) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.submit_button_border_radius) }}
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -312,6 +266,9 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 {{ form_row(cardForm.linkUrl) }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form_row(cardForm.buttonText) }}
                                             </div>
                                         </div>
                                     </div>
