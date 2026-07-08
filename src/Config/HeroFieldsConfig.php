@@ -87,7 +87,7 @@ class HeroFieldsConfig
     public static function getContentFields(): array
     {
         return [
-            // Legacy fields (kept for backward compatibility)
+// Legacy fields (kept for backward compatibility)
             'hero_title' => [
                 'type' => TextType::class,
                 'options' => [
@@ -120,27 +120,9 @@ class HeroFieldsConfig
                     'attr' => ['rows' => 3],
                 ],
             ],
-            
-// ===== FIELDS REQUESTED BY USER =====
-'top_text' => [
-    'type' => TextType::class,
-    'options' => [
-        'label' => 'Top Text / Badge',
-        'required' => false,
-        'attr' => ['placeholder' => 'e.g., Welcome to our site'],
-    ],
-],
-'phone_number' => [
-    'type' => TextType::class,
-    'options' => [
-        'label' => 'Phone Number',
-        'required' => false,
-        'attr' => ['placeholder' => '+1 234 567 8900'],
-    ],
-],
 
-// Primary button (Content tab for convenience)
-             'primary_button_text' => [
+            // Primary button (Content tab for convenience)
+            'primary_button_text' => [
                  'type' => TextType::class,
                  'options' => [
                      'label' => 'Primary Button Text',
@@ -175,23 +157,13 @@ class HeroFieldsConfig
         ];
     }
 
-    /**
+/**
      * MEDIA TAB FIELDS
      * Image and media related settings
      */
     public static function getMediaFields(): array
     {
         return [
-            // ===== FIELDS REQUESTED BY USER =====
-            'left_image' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Left Image URL',
-                    'required' => false,
-                    'attr' => ['placeholder' => '/images/left-image.jpg'],
-                ],
-            ],
-            
             // Existing media fields
             'hero_image_url' => [
                 'type' => TextType::class,
@@ -528,22 +500,7 @@ class HeroFieldsConfig
                  ],
              ],
              
-             // Form fields (moved from Content tab)
-             'form_title' => [
-                 'type' => TextType::class,
-                 'options' => [
-                     'label' => 'Form Title',
-                     'required' => false,
-                 ],
-             ],
-             'form_subtitle' => [
-                 'type' => TextareaType::class,
-                 'options' => [
-                     'label' => 'Form Subtitle',
-                     'required' => false,
-                     'attr' => ['rows' => 2],
-                 ],
-             ],
+
              'primary_button_text' => [
                  'type' => TextType::class,
                  'options' => [

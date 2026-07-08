@@ -369,16 +369,7 @@ class SectionDataType extends AbstractType
                         'data' => $this->ensureString($this->get($existingData, 'description')),
                         'attr' => ['rows' => 3],
                     ])
-                    ->add('top_text', TextType::class, [
-                        'label' => 'Top Text / Badge',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'top_text')),
-                    ])
-                    ->add('phone_number', TextType::class, [
-                        'label' => 'Phone Number',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'phone_number')),
-                    ])
+                    
                     ->add('primary_button_text', TextType::class, [
                         'label' => 'Primary Button Text',
                         'required' => false,
@@ -398,17 +389,6 @@ class SectionDataType extends AbstractType
                         'label' => 'Secondary Button URL',
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'secondary_button_url')),
-                    ])
-                    ->add('form_title', TextType::class, [
-                        'label' => 'Form Title',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'form_title')),
-                    ])
-                    ->add('form_subtitle', TextareaType::class, [
-                        'label' => 'Form Subtitle',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'form_subtitle')),
-                        'attr' => ['rows' => 2],
                     ]);
 
                 $this->addHiddenLegacyField($builder, 'title', $existingData);
@@ -424,9 +404,13 @@ class SectionDataType extends AbstractType
                 ]);
 
                 $builder->add('show_form', CheckboxType::class, [
-                    'label' => 'Show Contact Form',
+                    'label' => 'Show Lead Form',
                     'required' => false,
-                    'data' => filter_var($this->get($existingData, 'show_form', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+                    'data' => $this->get($existingData, 'show_form', true),
+                ])->add('show_image', CheckboxType::class, [
+                    'label' => 'Show Image',
+                    'required' => false,
+                    'data' => $this->get($existingData, 'show_image', true),
                 ]);
 
                 $builder
@@ -443,17 +427,7 @@ class SectionDataType extends AbstractType
                     ->add('image_alt_text', TextType::class, [
                         'label' => 'Image Alt Text',
                         'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'image_alt_text')),
-                    ])
-                    ->add('show_image', CheckboxType::class, [
-                        'label' => 'Show Image',
-                        'required' => false,
-                        'data' => filter_var($this->get($existingData, 'show_image', true), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
-                    ])
-                    ->add('left_image', TextType::class, [
-                        'label' => 'Left Image URL',
-                        'required' => false,
-                        'data' => $this->ensureString($this->get($existingData, 'left_image')),
+                        'data' => $this->ensureString($this->get($existingData, 'image_alt_text', $this->get($existingData, 'alt'))),
                     ])
                     ->add('layout_type', ChoiceType::class, [
                         'label' => 'Layout Type',

@@ -42,9 +42,7 @@
             <div class="col-lg-6">
                 <div class="hero-content {{ text_align_class }}" {% if text_style %} style="{{ text_style }}"{% endif %}>
                     
-                    {% if data.top_text is defined and data.top_text %}
-                        <span class="badge bg-primary mb-3" style="display: inline-block;">{{ data.top_text }}</span>
-                    {% endif %}
+                    
                     
                     {% if data.hero_title is defined and data.hero_title %}
                         {% set title_color = '' %}
