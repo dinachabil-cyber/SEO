@@ -617,60 +617,61 @@
 </div>
 
 <script>
-// Hero Fields Builder JavaScript
 let heroFieldIndex = 0;
 let symfonyInputId = '{{ symfony_input_id|default('')|e('js') }}';
-// Symfony hidden input id/name can vary depending on how this partial is included.
-// Auto-detect the actual field that will be submitted in the parent PageSectionType form.
+
 function findSymfonyHeroInput() {
     return (
         document.getElementById(symfonyInputId) ||
         document.querySelector('input[name="page_section[data][hero_form_fields]"]') ||
+        document.querySelector('input[id^="page_section_data_"][name*="hero_form_fields"]') ||
         document.getElementById('page_section_data_hero_form_fields') ||
         null
     );
 }
 
-
 function handleAddHeroField() {
     const select = document.getElementById('add-field-type-select');
     const fieldType = select.value;
-    
+
     if (!fieldType) {
         alert('Please select a field type');
         return;
     }
-    
+
     addHeroField(fieldType);
     select.value = '';
 }
 
 function addHeroField(fieldType) {
     const container = document.getElementById('hero-fields-container');
-    const template = document.getElementById('hero-field-template-' + fieldType);
-    
+    let template = document.getElementById('hero-field-template-' + fieldType);
+
     if (!template) {
-        // Use generic template for unknown types
-        const genericTemplate = document.getElementById('hero-field-template-generic');
-        const clone = genericTemplate.cloneNode(true);
-        clone.innerHTML = clone.innerHTML.replace(/__TYPE__/g, fieldType).replace(/__TYPE_LABEL__/g, fieldType.charAt(0).toUpperCase() + fieldType.slice(1));
-        clone.id = '';
-        clone.style.display = 'block';
-        
-        // Update indices
-        clone.innerHTML = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
-        container.appendChild(clone);
+        template = document.getElementById('hero-field-template-generic');
+        if (!template) return;
+
+        let html = template.innerHTML
+            .replace(/__TYPE__/g, fieldType)
+            .replace(/__TYPE_LABEL__/g, fieldType.charAt(0).toUpperCase() + fieldType.slice(1))
+            .replace(/__INDEX__/g, heroFieldIndex);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const card = tempDiv.querySelector('.field-card');
+        if (!card) return;
+        card.dataset.index = heroFieldIndex;
+        card.dataset.fieldType = fieldType;
+        container.appendChild(card);
     } else {
-        const clone = template.cloneNode(true);
-        clone.id = '';
-        clone.style.display = 'block';
-        
-        // Update indices
-        const html = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
-        clone.innerHTML = html;
-        container.appendChild(clone);
+        const html = template.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        const card = tempDiv.querySelector('.field-card');
+        if (!card) return;
+        card.dataset.index = heroFieldIndex;
+        container.appendChild(card);
     }
-    
+
     heroFieldIndex++;
     updateHeroFieldsEmptyState();
     updateHeroFieldsJson();
@@ -678,6 +679,7 @@ function addHeroField(fieldType) {
 
 function removeHeroField(button) {
     const card = button.closest('.field-card');
+    if (!card) return;
     card.remove();
     updateHeroFieldsEmptyState();
     updateHeroFieldsJson();
@@ -685,19 +687,17 @@ function removeHeroField(button) {
 
 function toggleFieldConfig(button) {
     const card = button.closest('.field-card');
+    if (!card) return;
     const config = card.querySelector('.field-config');
-    if (config.style.display === 'none') {
-        config.style.display = 'block';
-    } else {
-        config.style.display = 'none';
-    }
+    if (!config) return;
+    config.style.display = config.style.display === 'none' ? 'block' : 'none';
 }
 
 function updateHeroFieldsEmptyState() {
     const container = document.getElementById('hero-fields-container');
     const emptyState = document.getElementById('hero-fields-empty');
     const fields = container.querySelectorAll('.field-card');
-    
+
     if (fields.length > 0) {
         emptyState.classList.add('d-none');
     } else {
@@ -707,126 +707,163 @@ function updateHeroFieldsEmptyState() {
 
 function updateHeroFieldsJson() {
     const container = document.getElementById('hero-fields-container');
+    const symfonyInput = findSymfonyHeroInput();
+    const fallbackInput = document.getElementById('hero_form_fields_fallback');
     if (!container) return;
 
-    const fields = container.querySelectorAll('.field-card');
+    const cards = container.querySelectorAll('.field-card');
     const fieldsData = [];
 
-    fields.forEach(function(fieldCard) {
-        const getVal = (selector, fallback = '') => {
-            const el = fieldCard.querySelector(selector);
-            if (!el) return fallback;
-        const tag = (el.tagName || '').toUpperCase();
-            if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return el.value ?? fallback;
-            return fallback;
-        };
+    cards.forEach(function(card) {
+        const fieldData = {};
+        const inputs = card.querySelectorAll('.field-field');
 
-        const getChecked = (selector, fallback = false) => {
-            const el = fieldCard.querySelector(selector);
-            return el ? !!el.checked : fallback;
-        };
+        inputs.forEach(function(input) {
+            const match = input.name.match(/\[\d+\]\[(.+?)\]$/);
+            if (match) {
+                const key = match[1];
+                if (input.type === 'checkbox') {
+                    fieldData[key] = input.checked;
+                } else {
+                    fieldData[key] = input.value;
+                }
+            } else if (input.dataset.field) {
+                const key = input.dataset.field;
+                if (input.type === 'checkbox') {
+                    fieldData[key] = input.checked;
+                } else if (input.tagName === 'SELECT') {
+                    fieldData[key] = input.value;
+                } else {
+                    fieldData[key] = input.value;
+                }
+            }
+        });
 
-        const fieldData = {
-            type: getVal('input[type="hidden"][data-field="type"], input[name*="[type]"], input[name*="[type]"]') || (fieldCard.dataset.fieldType || 'text'),
-            label: getVal('.field-field[data-field="label"], input[name*="[label]"], input[name*="[label"]'),
-            name: getVal('.field-field[data-field="name"], input[name*="[name]"], input[name*="[name"]'),
-            default_value: getVal('.field-field[data-field="default_value"], textarea[name*="[default_value]"], input[name*="[default_value]"], textarea[name*="[default_value]"], input[name*="[default_value"]'),
-            category: getVal('select[name*="[category]"], select.field-field[name*="[category]"], .field-field[data-field="category"]', 'content'),
-            placeholder: getVal('.field-field[data-field="placeholder"], input[name*="[placeholder]"], input[name*="[placeholder"]'),
-            help_text: getVal('.field-field[data-field="help_text"], input[name*="[help_text]"], input[name*="[help_text"]'),
-            options: getVal('textarea[name*="[options]"], textarea.field-field[data-field="options"], textarea[data-field="options"]'),
-            enabled: getChecked('input[name*="[enabled]"], input.field-field[name*="[enabled]"], input.field-field[data-field="enabled"]')
-        };
-
-        // Normalize enabled/default_value for different input types
-        if (typeof fieldData.enabled !== 'boolean') fieldData.enabled = !!fieldData.enabled;
-        if (fieldData.type === 'checkbox' && (fieldData.default_value === '1' || fieldData.default_value === 1)) {
-            // keep as-is
+        if (!fieldData.type) {
+            fieldData.type = card.dataset.fieldType || 'text';
         }
 
         fieldsData.push(fieldData);
     });
 
-    const symfonyInput = findSymfonyHeroInput();
-    if (symfonyInput) symfonyInput.value = JSON.stringify(fieldsData);
+    const json = JSON.stringify(fieldsData);
 
-    const fallbackInput = document.getElementById('hero_form_fields_fallback');
-    if (fallbackInput) fallbackInput.value = JSON.stringify(fieldsData);
+    if (symfonyInput) {
+        symfonyInput.value = json;
+    }
+
+    if (fallbackInput) {
+        fallbackInput.value = json;
+    }
 }
 
-// Initialize - load existing fields
-document.addEventListener('DOMContentLoaded', function() {
+function applyFieldValues(card, field) {
+    const inputs = card.querySelectorAll('.field-field');
+    inputs.forEach(function(input) {
+        const match = input.name.match(/\[\d+\]\[(.+?)\]$/);
+        if (match) {
+            const key = match[1];
+            if (!(key in field)) return;
+            if (input.type === 'checkbox') {
+                input.checked = !!field[key];
+            } else if (input.tagName === 'SELECT') {
+                const option = Array.from(input.options).find(function(opt) { return opt.value === field[key]; });
+                if (option) option.selected = true;
+            } else {
+                input.value = field[key] ?? '';
+            }
+        } else if (input.dataset.field) {
+            const key = input.dataset.field;
+            if (!(key in field)) return;
+            if (input.type === 'checkbox') {
+                input.checked = !!field[key];
+            } else if (input.tagName === 'SELECT') {
+                const option = Array.from(input.options).find(function(opt) { return opt.value === field[key]; });
+                if (option) option.selected = true;
+            } else {
+                input.value = field[key] ?? '';
+            }
+        }
+    });
+}
+
+function loadHeroFields() {
     const jsonInput = findSymfonyHeroInput();
-    console.log('Symfony hero_form_fields input element:', jsonInput);
-    console.log('hero_form_fields input value:', jsonInput ? jsonInput.value : 'not found');
-    
     let initialValue = jsonInput && jsonInput.value ? jsonInput.value : null;
 
-    
     const fallbackInput = document.getElementById('hero_form_fields_fallback');
-    console.log('Fallback hero_form_fields input element:', fallbackInput);
-    console.log('Fallback value:', fallbackInput ? fallbackInput.value : 'not found');
-    
     if ((!initialValue || initialValue === '[]') && fallbackInput && fallbackInput.value) {
         initialValue = fallbackInput.value;
     }
-    
-    if (initialValue) {
-        try {
-            const parsed = JSON.parse(initialValue);
-            console.log('Parsed hero fields:', parsed);
-            const fields = Array.isArray(parsed) ? parsed : [];
-            console.log('Loading hero fields, count:', fields.length);
-            const container = document.getElementById('hero-fields-container');
-            
-            fields.forEach(function(field) {
-                const fieldType = field.type || 'text';
-                const template = document.getElementById('hero-field-template-' + fieldType);
-                
-                if (template) {
-                    const clone = template.cloneNode(true);
-                    clone.id = '';
-                    clone.style.display = 'block';
-                    
-                    let html = clone.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
-                    html = html.replace(/name="fields\[__INDEX__\]\[label\]" value="/, 'name="fields[' + heroFieldIndex + '][label]" value="' + (field.label || ''));
-                    html = html.replace(/name="fields\[__INDEX__\]\[name\]" value="/, 'name="fields[' + heroFieldIndex + '][name]" value="' + (field.name || ''));
-                    html = html.replace(/name="fields\[__INDEX__\]\[default_value\]"(?: value="[^"]*")?>/, 'name="fields[' + heroFieldIndex + '][default_value]" value="' + (field.default_value || '') + '">');
-                    html = html.replace(/name="fields\[__INDEX__\]\[placeholder\]" value="/, 'name="fields[' + heroFieldIndex + '][placeholder]" value="' + (field.placeholder || ''));
-                    html = html.replace(/name="fields\[__INDEX__\]\[help_text\]" value="/, 'name="fields[' + heroFieldIndex + '][help_text]" value="' + (field.help_text || ''));
-                    
-                    if (field.category) {
-                        html = html.replace(/value="content">/, 'value="' + field.category + '">');
-                    }
-                    
-                    if (field.enabled === false) {
-                        html = html.replace(/name="fields\[__INDEX__\]\[enabled\]" value="1" checked/, 'name="fields[' + heroFieldIndex + '][enabled]" value="1"');
-                    }
-                    
-                    clone.innerHTML = html;
-                    container.appendChild(clone);
-                    heroFieldIndex++;
-                }
-            });
-            
-            updateHeroFieldsEmptyState();
-        } catch (e) {
-            console.error('Error parsing hero fields JSON:', e);
-        }
+
+    if (!initialValue) return;
+
+    try {
+        const parsed = JSON.parse(initialValue);
+        const fields = Array.isArray(parsed) ? parsed : [];
+        const container = document.getElementById('hero-fields-container');
+
+        fields.forEach(function(field) {
+            const fieldType = field.type || 'text';
+            let template = document.getElementById('hero-field-template-' + fieldType);
+
+            if (!template) {
+                template = document.getElementById('hero-field-template-generic');
+                if (!template) return;
+
+                let html = template.innerHTML
+                    .replace(/__TYPE__/g, fieldType)
+                    .replace(/__TYPE_LABEL__/g, fieldType.charAt(0).toUpperCase() + fieldType.slice(1))
+                    .replace(/__INDEX__/g, heroFieldIndex);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const card = tempDiv.querySelector('.field-card');
+                if (!card) return;
+                card.dataset.index = heroFieldIndex;
+                card.dataset.fieldType = fieldType;
+
+                applyFieldValues(card, field);
+                container.appendChild(card);
+            } else {
+                const html = template.innerHTML.replace(/__INDEX__/g, heroFieldIndex);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const card = tempDiv.querySelector('.field-card');
+                if (!card) return;
+                card.dataset.index = heroFieldIndex;
+
+                applyFieldValues(card, field);
+                container.appendChild(card);
+            }
+
+            heroFieldIndex++;
+        });
+
+        updateHeroFieldsEmptyState();
+    } catch (e) {
+        console.error('Error parsing hero fields JSON:', e);
     }
-    
+}
 
-    document.addEventListener('input', function(e) {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadHeroFields);
+} else {
+    loadHeroFields();
+}
 
-        if (e.target.classList.contains('field-field')) {
-            updateHeroFieldsJson();
-        }
-    });
-    
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('field-field')) {
-            updateHeroFieldsJson();
-        }
-    });
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('field-field')) {
+        updateHeroFieldsJson();
+    }
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('field-field')) {
+        updateHeroFieldsJson();
+    }
+});
+
+document.addEventListener('submit', function() {
+    updateHeroFieldsJson();
 });
 </script>

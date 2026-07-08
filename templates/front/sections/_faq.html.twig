@@ -1,23 +1,45 @@
-<section class="section faq-section">
+{% import 'front/sections/_macros.html.twig' as macros %}
+{% set style_parts = [] %}
+{% if data.backgroundColor is defined and data.backgroundColor %}{% set style_parts = style_parts|merge(['background-color: ' ~ data.backgroundColor]) %}{% endif %}
+{% if data.textColor is defined and data.textColor %}{% set style_parts = style_parts|merge(['color: ' ~ data.textColor]) %}{% endif %}
+{% if data.paddingTop is defined and data.paddingTop %}{% set style_parts = style_parts|merge(['padding-top: ' ~ data.paddingTop ~ 'px']) %}{% endif %}
+{% if data.paddingBottom is defined and data.paddingBottom %}{% set style_parts = style_parts|merge(['padding-bottom: ' ~ data.paddingBottom ~ 'px']) %}{% endif %}
+{% if data.marginTop is defined and data.marginTop %}{% set style_parts = style_parts|merge(['margin-top: ' ~ data.marginTop ~ 'px']) %}{% endif %}
+{% if data.marginBottom is defined and data.marginBottom %}{% set style_parts = style_parts|merge(['margin-bottom: ' ~ data.marginBottom ~ 'px']) %}{% endif %}
+{% if data.itemBackgroundColor is defined and data.itemBackgroundColor %}{% set style_parts = style_parts|merge(['--faq-item-bg: ' ~ data.itemBackgroundColor]) %}{% endif %}
+{% if data.itemBorderColor is defined and data.itemBorderColor %}{% set style_parts = style_parts|merge(['--faq-item-border: ' ~ data.itemBorderColor]) %}{% endif %}
+{% if data.activeColor is defined and data.activeColor %}{% set style_parts = style_parts|merge(['--faq-active: ' ~ data.activeColor]) %}{% endif %}
+
+{% set title_color = '' %}
+{% if data.titleColor is defined and data.titleColor %}{% set title_color = data.titleColor %}{% endif %}
+
+<section class="{{ macros.section_class('section faq-section', data) }}" {% if style_parts|length %}style="{{ style_parts|join('; ') }}"{% endif %}>
     <div class="container">
         {% if data.sectionTitle is defined and data.sectionTitle %}
-            <div class="text-center mb-5">
-                <h2>{{ data.sectionTitle }}</h2>
+            <div class="text-center mb-2 {{ macros.text_align_class(data) }}">
+                <h2 class="faq-title" {% if title_color %}style="color: {{ title_color }}"{% endif %}>{{ data.sectionTitle }}</h2>
             </div>
         {% endif %}
-        
+
+        {% if data.sectionSubtitle is defined and data.sectionSubtitle %}
+            <p class="text-center text-muted mb-5 {{ macros.text_align_class(data) }}">{{ data.sectionSubtitle }}</p>
+        {% else %}
+            <div class="mb-5"></div>
+        {% endif %}
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="accordion" id="faqAccordion">
                     {% for item in data.items ?? [] %}
-                        <div class="faq-item">
+                        <div class="accordion-item faq-item">
                             <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="faqCollapse{{ loop.index }}">
-                                    {{ item.question|default('') }}
+                                <button class="accordion-button faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="faqCollapse{{ loop.index }}">
+                                    <span class="faq-question-text">{{ item.question|default('') }}</span>
+                                    <span class="faq-icon" aria-hidden="true"></span>
                                 </button>
                             </h2>
                             <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="faqHeading{{ loop.index }}" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
+                                <div class="accordion-body faq-answer">
                                     {{ item.answer|default('')|raw }}
                                 </div>
                             </div>

@@ -121,79 +121,57 @@ class HeroFieldsConfig
                 ],
             ],
             
-            // ===== FIELDS REQUESTED BY USER =====
-            'top_text' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Top Text / Badge',
-                    'required' => false,
-                    'attr' => ['placeholder' => 'e.g., Welcome to our site'],
-                ],
-            ],
-            'phone_number' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Phone Number',
-                    'required' => false,
-                    'attr' => ['placeholder' => '+1 234 567 8900'],
-                ],
-            ],
-            'show_form' => [
-                'type' => CheckboxType::class,
-                'options' => [
-                    'label' => 'Show Contact Form',
-                    'required' => false,
-                ],
-            ],
-            'form_title' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Form Title',
-                    'required' => false,
-                ],
-            ],
-            'form_subtitle' => [
-                'type' => TextareaType::class,
-                'options' => [
-                    'label' => 'Form Subtitle',
-                    'required' => false,
-                    'attr' => ['rows' => 2],
-                ],
-            ],
-            
-            // Primary button (Content tab for convenience)
-            'primary_button_text' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Primary Button Text',
-                    'required' => false,
-                ],
-                'legacy_key' => 'ctaText',
-            ],
-            'primary_button_url' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Primary Button URL',
-                    'required' => false,
-                ],
-                'legacy_key' => 'ctaUrl',
-            ],
-            
-            // Secondary button (Content tab for convenience)
-            'secondary_button_text' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Secondary Button Text',
-                    'required' => false,
-                ],
-            ],
-            'secondary_button_url' => [
-                'type' => TextType::class,
-                'options' => [
-                    'label' => 'Secondary Button URL',
-                    'required' => false,
-                ],
-            ],
+// ===== FIELDS REQUESTED BY USER =====
+'top_text' => [
+    'type' => TextType::class,
+    'options' => [
+        'label' => 'Top Text / Badge',
+        'required' => false,
+        'attr' => ['placeholder' => 'e.g., Welcome to our site'],
+    ],
+],
+'phone_number' => [
+    'type' => TextType::class,
+    'options' => [
+        'label' => 'Phone Number',
+        'required' => false,
+        'attr' => ['placeholder' => '+1 234 567 8900'],
+    ],
+],
+
+// Primary button (Content tab for convenience)
+             'primary_button_text' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Primary Button Text',
+                     'required' => false,
+                 ],
+                 'legacy_key' => 'ctaText',
+             ],
+             'primary_button_url' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Primary Button URL',
+                     'required' => false,
+                 ],
+                 'legacy_key' => 'ctaUrl',
+             ],
+             
+             // Secondary button (Content tab for convenience)
+             'secondary_button_text' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Secondary Button Text',
+                     'required' => false,
+                 ],
+             ],
+             'secondary_button_url' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Secondary Button URL',
+                     'required' => false,
+                 ],
+             ],
         ];
     }
 
@@ -535,20 +513,65 @@ class HeroFieldsConfig
                     'required' => false,
                 ],
             ],
-            'secondary_button_style' => [
-                'type' => ChoiceType::class,
-                'options' => [
-                    'label' => 'Secondary Button Style',
-                    'required' => false,
-                    'choices' => [
-                        'Primary' => 'primary',
-                        'Secondary' => 'secondary',
-                        'Outline' => 'outline',
-                        'Ghost' => 'ghost',
-                    ],
-                    'placeholder' => 'Select style',
-                ],
-            ],
+'secondary_button_style' => [
+                 'type' => ChoiceType::class,
+                 'options' => [
+                     'label' => 'Secondary Button Style',
+                     'required' => false,
+                     'choices' => [
+                         'Primary' => 'primary',
+                         'Secondary' => 'secondary',
+                         'Outline' => 'outline',
+                         'Ghost' => 'ghost',
+                     ],
+                     'placeholder' => 'Select style',
+                 ],
+             ],
+             
+             // Form fields (moved from Content tab)
+             'form_title' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Form Title',
+                     'required' => false,
+                 ],
+             ],
+             'form_subtitle' => [
+                 'type' => TextareaType::class,
+                 'options' => [
+                     'label' => 'Form Subtitle',
+                     'required' => false,
+                     'attr' => ['rows' => 2],
+                 ],
+             ],
+             'primary_button_text' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Primary Button Text',
+                     'required' => false,
+                 ],
+             ],
+             'primary_button_url' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Primary Button URL',
+                     'required' => false,
+                 ],
+             ],
+             'secondary_button_text' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Secondary Button Text',
+                     'required' => false,
+                 ],
+             ],
+             'secondary_button_url' => [
+                 'type' => TextType::class,
+                 'options' => [
+                     'label' => 'Secondary Button URL',
+                     'required' => false,
+                 ],
+             ],
         ];
     }
 

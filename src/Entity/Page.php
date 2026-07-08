@@ -14,8 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(
     fields: ['site', 'slug'],
     message: 'This slug is already used for this site.',
-    errorPath: 'slug',
-    ignore: ['id']
+    errorPath: 'slug'
 )]
 class Page
 {

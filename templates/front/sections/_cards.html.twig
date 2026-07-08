@@ -17,12 +17,7 @@
                 {% endif %}
             {% endfor %}
 
-            {# Filter out completely empty cards to avoid ghost/duplicate empty cards #}
             {% for card in cardsToRender %}
-                {% if (card.title is not defined or not card.title) and (card.description is not defined or not card.description) and (card.linkUrl is not defined or not card.linkUrl) and (card.imageUrl is not defined or not card.imageUrl) %}
-                    {% continue %}
-                {% endif %}
-
                 <div class="col">
                     {% set card_style = '' %}
                     {% if data.cardBackgroundColor is defined or data.style is defined and data.style.cardBackgroundColor is defined %}

@@ -51,8 +51,50 @@ class PageSectionType extends AbstractType
             }
         });
 
-        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+        // When creating a NEW section, the type is submitted via the request but the
+        // entity has no type yet, so PRE_SET_DATA never adds the dynamic fields.
+        // Add them here based on the submitted type so the content (form_fields,
+        // FAQ items, etc.) is not discarded.
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            if ($form->has('data')) {
+                return;
+            }
+
+            $data = $event->getData();
+            $type = is_array($data) ? ($data['type'] ?? null) : null;
+            if (!$type) {
+                return;
+            }
+
+            $existingData = (is_array($data) && isset($data['data']) && is_array($data['data']))
+                ? $data['data']
+                : [];
+            if (!is_array($existingData)) {
+                $existingData = [];
+            }
+
+            $this->addDynamicFields($form, $type, $existingData);
         });
+
+$builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+    $data = $event->getData();
+    if (!is_array($data)) {
+        return;
+    }
+
+    if (isset($data['data']['hero_form_fields']) && is_string($data['data']['hero_form_fields'])) {
+        $decoded = json_decode($data['data']['hero_form_fields'], true);
+        $data['data']['hero_form_fields'] = is_array($decoded) ? $decoded : [];
+        $event->setData($data);
+    }
+
+    if (isset($data['data']['form_fields']) && is_string($data['data']['form_fields'])) {
+        $decoded = json_decode($data['data']['form_fields'], true);
+        $data['data']['form_fields'] = is_array($decoded) ? $decoded : [];
+        $event->setData($data);
+    }
+});
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -183,6 +225,7 @@ class SectionDataType extends AbstractType
             'choices' => self::BUTTON_STYLES,
             'data' => $existingData[$name] ?? $default,
             'placeholder' => 'Select style',
+            'help' => 'Button appearance. "primary"/"success" etc. are solid filled colors; "outline-*" are bordered; the style should match your theme.',
         ]);
     }
 
@@ -217,6 +260,7 @@ class SectionDataType extends AbstractType
             ],
             'data' => $existingData[$name] ?? $default,
             'placeholder' => 'Select alignment',
+            'help' => 'Align the text inside this section: Left, Center, or Right.',
         ]);
     }
 
@@ -325,6 +369,16 @@ class SectionDataType extends AbstractType
                         'data' => $this->ensureString($this->get($existingData, 'description')),
                         'attr' => ['rows' => 3],
                     ])
+                    ->add('top_text', TextType::class, [
+                        'label' => 'Top Text / Badge',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'top_text')),
+                    ])
+                    ->add('phone_number', TextType::class, [
+                        'label' => 'Phone Number',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'phone_number')),
+                    ])
                     ->add('primary_button_text', TextType::class, [
                         'label' => 'Primary Button Text',
                         'required' => false,
@@ -344,6 +398,17 @@ class SectionDataType extends AbstractType
                         'label' => 'Secondary Button URL',
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'secondary_button_url')),
+                    ])
+                    ->add('form_title', TextType::class, [
+                        'label' => 'Form Title',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_title')),
+                    ])
+                    ->add('form_subtitle', TextareaType::class, [
+                        'label' => 'Form Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'form_subtitle')),
+                        'attr' => ['rows' => 2],
                     ]);
 
                 $this->addHiddenLegacyField($builder, 'title', $existingData);
@@ -358,10 +423,10 @@ class SectionDataType extends AbstractType
                     'data' => is_array($hero_fields_data) ? json_encode($hero_fields_data) : (string) $hero_fields_data,
                 ]);
 
-                $builder->add('showForm', HiddenType::class, [
+                $builder->add('show_form', CheckboxType::class, [
+                    'label' => 'Show Contact Form',
                     'required' => false,
-                    'mapped' => false,
-                    'data' => $this->get($existingData, 'showForm', false),
+                    'data' => filter_var($this->get($existingData, 'show_form', false), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
                 ]);
 
                 $builder
@@ -385,6 +450,11 @@ class SectionDataType extends AbstractType
                         'required' => false,
                         'data' => filter_var($this->get($existingData, 'show_image', true), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
                     ])
+                    ->add('left_image', TextType::class, [
+                        'label' => 'Left Image URL',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'left_image')),
+                    ])
                     ->add('layout_type', ChoiceType::class, [
                         'label' => 'Layout Type',
                         'required' => false,
@@ -397,6 +467,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'layout_type', 'centered'),
                         'placeholder' => 'Select layout',
+                        'help' => 'How the hero content and media are arranged. "Form Only" shows just a lead form with no image.',
                     ])
                     ->add('text_alignment', ChoiceType::class, [
                         'label' => 'Text Alignment',
@@ -408,6 +479,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'text_alignment', 'center'),
                         'placeholder' => 'Select alignment',
+                        'help' => 'Align the hero text (Left, Center, or Right) inside its column.',
                     ])
                     ->add('content_width', ChoiceType::class, [
                         'label' => 'Content Width',
@@ -420,6 +492,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'content_width', 'medium'),
                         'placeholder' => 'Select width',
+                        'help' => 'Maximum width of the hero text column. "Full Width" spans the whole container.',
                     ])
                     ->add('section_height', ChoiceType::class, [
                         'label' => 'Section Height',
@@ -433,6 +506,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'section_height', 'medium'),
                         'placeholder' => 'Select height',
+                        'help' => 'Vertical space of the hero. "Auto" sizes to content; larger values add more breathing room.',
                     ])
                     ->add('vertical_alignment', ChoiceType::class, [
                         'label' => 'Vertical Alignment',
@@ -444,6 +518,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'vertical_alignment', 'center'),
                         'placeholder' => 'Select alignment',
+                        'help' => 'Vertically position the content (Top, Center, Bottom) when the section is taller than its content.',
                     ])
                     ->add('column_gap', TextType::class, [
                         'label' => 'Column Gap (px)',
@@ -566,6 +641,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'cardLayout', 'grid-3'),
                         'placeholder' => 'Select layout',
+                        'help' => 'How cards are arranged: the number of columns (grid-2/3/4), stacked (vertical), side-by-side (horizontal), or centered single column.',
                     ])
                     ->add('cardStyle', ChoiceType::class, [
                         'label' => 'Card Style',
@@ -580,6 +656,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'cardStyle', 'standard'),
                         'placeholder' => 'Select style',
+                        'help' => 'Card visual style: shape (rounded / square / oval) and treatment (bordered outline or shadowed lifted card).',
                     ]);
 
                 $builder
@@ -646,6 +723,11 @@ class SectionDataType extends AbstractType
                         'required' => false,
                         'data' => $this->ensureString($this->get($existingData, 'sectionTitle')),
                     ])
+                    ->add('sectionSubtitle', TextareaType::class, [
+                        'label' => 'Section Subtitle',
+                        'required' => false,
+                        'data' => $this->ensureString($this->get($existingData, 'sectionSubtitle')),
+                    ])
                     ->add('items', CollectionType::class, [
                         'entry_type' => FaqItemType::class,
                         'entry_options' => ['label' => false],
@@ -655,6 +737,15 @@ class SectionDataType extends AbstractType
                         'data' => $this->get($existingData, 'items', []),
                         'label' => 'FAQ Items',
                     ]);
+
+                $this->addColorField($builder, 'backgroundColor', 'Background Color', $existingData);
+                $this->addColorField($builder, 'textColor', 'Text Color', $existingData);
+                $this->addColorField($builder, 'titleColor', 'Title Color', $existingData);
+                $this->addColorField($builder, 'itemBackgroundColor', 'Item Background Color', $existingData);
+                $this->addColorField($builder, 'itemBorderColor', 'Item Border Color', $existingData);
+                $this->addColorField($builder, 'activeColor', 'Active/Open Item Color', $existingData);
+                $this->addTextAlignmentChoice($builder, 'textAlignment', 'Text Alignment', $existingData, 'center');
+                $this->addSpacingFields($builder, $existingData);
                 break;
 
             case 'form':
@@ -713,6 +804,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'form_type', 'contact'),
                         'placeholder' => 'Select form type',
+                        'help' => 'The form\'s purpose, used for labelling/analytics. It does not change the fields shown — use "Field Visibility" for that.',
                     ])
                     ->add('form_key', TextType::class, [
                         'label' => 'Form Key / ID',
@@ -772,6 +864,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'form_layout', 'centered'),
                         'placeholder' => 'Select layout',
+                        'help' => 'Overall arrangement. "Split" places the form beside an image or text column (add the image in the Media tab).',
                     ])
                     ->add('form_width', ChoiceType::class, [
                         'label' => 'Form Width',
@@ -784,6 +877,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'form_width', 'medium'),
                         'placeholder' => 'Select width',
+                        'help' => 'Maximum width of the form card within the section.',
                     ])
                     ->add('form_alignment', ChoiceType::class, [
                         'label' => 'Form Alignment',
@@ -795,6 +889,7 @@ class SectionDataType extends AbstractType
                         ],
                         'data' => $this->get($existingData, 'form_alignment', 'center'),
                         'placeholder' => 'Select alignment',
+                        'help' => 'Horizontal alignment of the form card within the section.',
                     ])
                     ->add('show_icon_above_title', CheckboxType::class, [
                         'label' => 'Show Icon Above Title',
@@ -864,6 +959,7 @@ class SectionDataType extends AbstractType
                             'Small (720px)' => '720px',
                         ],
                         'data' => $this->get($existingData, 'container_width', '1140px'),
+                        'help' => 'Maximum width of the content container. Wider shows more columns; narrower keeps content centered and focused.',
                     ])
                     ->add('layout_type', ChoiceType::class, [
                         'label' => 'Layout Type',
@@ -875,6 +971,7 @@ class SectionDataType extends AbstractType
                             'Minimal (1 column)' => 'minimal',
                         ],
                         'data' => $this->get($existingData, 'layout_type', 'classic'),
+                        'help' => 'Footer column arrangement: Classic (3), Modern (4), Simple (2), or Minimal (1) column.',
                     ])
                     ->add('stack_on_mobile', ChoiceType::class, [
                         'label' => 'Stack on Mobile',
@@ -884,6 +981,7 @@ class SectionDataType extends AbstractType
                             'No - Keep inline' => false,
                         ],
                         'data' => isset($existingData['stack_on_mobile']) ? (bool) $existingData['stack_on_mobile'] : true,
+                        'help' => 'On small screens, stack the columns vertically (Yes) instead of keeping them side-by-side.',
                     ])
                     ->add('show_divider', ChoiceType::class, [
                         'label' => 'Show Divider',
@@ -893,6 +991,7 @@ class SectionDataType extends AbstractType
                             'No' => false,
                         ],
                         'data' => isset($existingData['show_divider']) ? (bool) $existingData['show_divider'] : true,
+                        'help' => 'Show a thin top border line above the footer to separate it from the section above.',
                     ]);
                 break;
 
@@ -1072,6 +1171,7 @@ class SectionDataType extends AbstractType
                             'Right' => 'right',
                         ],
                         'data' => $this->get($existingData, 'text_alignment', 'left'),
+                        'help' => 'Align the footer text (Left, Center, or Right) within its columns.',
                     ])
                     ->add('column_gap', TextType::class, [
                         'label' => 'Column Gap (px)',
@@ -1087,6 +1187,7 @@ class SectionDataType extends AbstractType
                             '4 Columns' => 4,
                         ],
                         'data' => isset($existingData['columns_count']) ? (int) $existingData['columns_count'] : 3,
+                        'help' => 'Number of columns in the footer grid (applies when "Layout Type" is not Minimal).',
                     ])
                     ->add('border_radius', TextType::class, [
                         'label' => 'Border Radius (px)',
@@ -1103,6 +1204,7 @@ class SectionDataType extends AbstractType
                             'Large' => '0 8px 16px rgba(0,0,0,0.2)',
                         ],
                         'data' => $this->get($existingData, 'box_shadow', 'none'),
+                        'help' => 'Drop shadow applied to the footer block. Choose "None" for a flat look.',
                     ]);
 
                 $builder
@@ -1116,6 +1218,7 @@ class SectionDataType extends AbstractType
                             'Small (720px)' => '720px',
                         ],
                         'data' => $this->get($existingData, 'container_width', '1140px'),
+                        'help' => 'Maximum width of the footer content container.',
                     ])
                     ->add('layout_type', ChoiceType::class, [
                         'label' => 'Layout Type',
@@ -1127,6 +1230,7 @@ class SectionDataType extends AbstractType
                             'Minimal (1 column)' => 'minimal',
                         ],
                         'data' => $this->get($existingData, 'layout_type', 'classic'),
+                        'help' => 'Footer column arrangement: Classic (3), Modern (4), Simple (2), or Minimal (1) column.',
                     ])
                     ->add('stack_on_mobile', ChoiceType::class, [
                         'label' => 'Stack on Mobile',
@@ -1136,6 +1240,7 @@ class SectionDataType extends AbstractType
                             'No - Keep inline' => false,
                         ],
                         'data' => isset($existingData['stack_on_mobile']) ? (bool) $existingData['stack_on_mobile'] : true,
+                        'help' => 'On small screens, stack the columns vertically (Yes) instead of keeping them side-by-side.',
                     ])
                     ->add('show_divider', ChoiceType::class, [
                         'label' => 'Show Divider',
@@ -1145,6 +1250,7 @@ class SectionDataType extends AbstractType
                             'No' => false,
                         ],
                         'data' => isset($existingData['show_divider']) ? (bool) $existingData['show_divider'] : true,
+                        'help' => 'Show a thin top border line above the footer to separate it from the section above.',
                     ]);
                 break;
         }
@@ -1154,6 +1260,8 @@ class SectionDataType extends AbstractType
             if (!is_array($data)) {
                 return;
             }
+
+            $data = self::stripPrototypeKeys($data);
 
             if ($type === 'form' && isset($data['form_fields']) && is_string($data['form_fields'])) {
                 $decoded = json_decode($data['form_fields'], true);
@@ -1167,6 +1275,19 @@ class SectionDataType extends AbstractType
                 $event->setData($data);
             }
         });
+    }
+
+    private static function stripPrototypeKeys(array $data): array
+    {
+        $clean = [];
+        foreach ($data as $key => $value) {
+            if ($key === '__name__') {
+                continue;
+            }
+            $clean[$key] = is_array($value) ? self::stripPrototypeKeys($value) : $value;
+        }
+
+        return $clean;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

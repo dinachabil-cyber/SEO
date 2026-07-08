@@ -286,6 +286,14 @@ admin_event_delete:
     requirements:
         id: '\d+'
 
+# Preview Routes
+app_preview_page:
+    path: /admin/preview/page/{id}
+    controller: 'App\Controller\PreviewController::page'
+    methods: ['GET']
+    requirements:
+        id: '\d+'
+
 # Reference Section Routes
 app_reference_index:
     path: /admin/reference

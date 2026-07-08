@@ -42,7 +42,7 @@ function beforeSubmitSectionForm() {
                         <a href="{{ path('app_page_builder', {siteId: site.id, pageId: page.id}) }}" class="btn btn-outline-secondary">
                             Cancel
                         </a>
-                        <a href="{{ path('app_front_page', {slug: page.slug}) }}" class="btn btn-outline-info">
+                        <a href="{{ path('app_preview_page', {'id': page.id}) }}" class="btn btn-outline-info">
                             <i class="bi bi-eye me-1"></i> Preview
                         </a>
                         <button type="submit" class="btn btn-primary">

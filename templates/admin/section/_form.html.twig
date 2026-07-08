@@ -237,7 +237,6 @@
                 {# Form Fields Tab #}
                 <div class="tab-pane fade" id="hero-form-fields" role="tabpanel" aria-labelledby="form-fields-tab">
                     {{ form_row(dataForm.hero_form_fields) }}
-                    <input type="hidden" id="hero_form_fields_fallback" data-hero-form-fields-json value="{{ dataForm.hero_form_fields.vars.value|default('[]') }}">
                     {% include 'admin/section/partials/_hero_fields_builder.html.twig' with {
                         'hero_form_fields_json': dataForm.hero_form_fields.vars.value|default('[]'),
                         'symfony_input_id': dataForm.hero_form_fields.vars.id,
@@ -376,14 +375,31 @@
                                     }
                                 });
 
-                                const removeBtn = source.querySelector('.remove-card');
-                                if (removeBtn) {
-                                    removeBtn.addEventListener('click', function() {
-                                        if (confirm('Remove this card?')) {
-                                            source.remove();
-                                        }
-                                    });
+                                source.classList.add('collection-item', 'mb-3');
+                                source.setAttribute('data-card-index', nextIndex.toString());
+
+                                const header = document.createElement('div');
+                                header.className = 'collection-item-header d-flex justify-content-between align-items-center';
+                                header.innerHTML = '<strong>Card ' + (nextIndex + 1) + '</strong>';
+
+                                const removeBtn = document.createElement('button');
+                                removeBtn.type = 'button';
+                                removeBtn.className = 'btn btn-sm btn-outline-danger remove-card';
+                                removeBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
+                                removeBtn.addEventListener('click', function() {
+                                    if (confirm('Remove this card?')) {
+                                        source.remove();
+                                    }
+                                });
+                                header.appendChild(removeBtn);
+
+                                const body = document.createElement('div');
+                                body.className = 'collection-item-body';
+                                while (source.firstChild) {
+                                    body.appendChild(source.firstChild);
                                 }
+                                source.insertBefore(header, body);
+                                source.appendChild(body);
 
                                 container.appendChild(source);
                                 nextIndex = nextIndex + 1;
@@ -442,9 +458,190 @@
 
             
         {% elseif form.vars.value.type == 'faq' %}
-            {{ form_row(dataForm.sectionTitle) }}
-            {{ form_row(dataForm.items) }}
-            
+            <ul class="nav nav-tabs" id="faqSectionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="faq-content-tab" data-bs-toggle="tab" data-bs-target="#faq-content" type="button" role="tab" aria-controls="faq-content" aria-selected="true">Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="faq-style-tab" data-bs-toggle="tab" data-bs-target="#faq-style" type="button" role="tab" aria-controls="faq-style" aria-selected="false">Style</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="faq-layout-tab" data-bs-toggle="tab" data-bs-target="#faq-layout" type="button" role="tab" aria-controls="faq-layout" aria-selected="false">Layout</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0" id="faqSectionTabsContent">
+                <div class="tab-pane fade show active" id="faq-content" role="tabpanel" aria-labelledby="faq-content-tab">
+                    {{ form_row(dataForm.sectionTitle) }}
+                    {{ form_row(dataForm.sectionSubtitle) }}
+
+                    <div class="faq-items-collection" id="faq-items-collection" data-index="{{ dataForm.items|length }}">
+                        {% if dataForm.items is defined and dataForm.items|length > 0 %}
+                            {% for itemForm in dataForm.items %}
+                                <div class="collection-item mb-3 card" data-faq-item-index="{{ loop.index0 }}">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <strong>FAQ Item {{ loop.index }}</strong>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-faq-item" data-target="#faq-item-{{ loop.index0 }}">
+                                            <i class="bi bi-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form_row(itemForm.question) }}
+                                        {{ form_row(itemForm.answer) }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted small">No FAQ items yet. Click the button below to add your first question.</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-primary mt-2" id="add-faq-item-btn">
+                        <i class="bi bi-plus-circle me-1"></i> Add FAQ Item
+                    </button>
+
+                    <div id="faq-item-prototype-source" style="display: none;">
+                        {{ form_widget(dataForm.items.vars.prototype) }}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="faq-style" role="tabpanel" aria-labelledby="faq-style-tab">
+                    <h6 class="text-muted mb-3">Colors</h6>
+                    {{ form_row(dataForm.backgroundColor) }}
+                    {{ form_row(dataForm.textColor) }}
+                    {{ form_row(dataForm.titleColor) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">FAQ Items</h6>
+                    {{ form_row(dataForm.itemBackgroundColor) }}
+                    {{ form_row(dataForm.itemBorderColor) }}
+                    {{ form_row(dataForm.activeColor) }}
+                </div>
+
+                <div class="tab-pane fade" id="faq-layout" role="tabpanel" aria-labelledby="faq-layout-tab">
+                    {{ form_row(dataForm.textAlignment) }}
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Spacing</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.paddingTop) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.paddingBottom) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.marginTop) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(dataForm.marginBottom) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                (function() {
+                    const container = document.getElementById('faq-items-collection');
+                    const addBtn = document.getElementById('add-faq-item-btn');
+                    const prototypeSource = document.getElementById('faq-item-prototype-source');
+                    if (!container || !addBtn || !prototypeSource) {
+                        return;
+                    }
+
+                    if (container.dataset.faqJsBound === '1') {
+                        return;
+                    }
+                    container.dataset.faqJsBound = '1';
+
+                    let nextIndex = container.dataset.index ? parseInt(container.dataset.index, 10) : 0;
+
+                    function updateNames(containerItem, index) {
+                        const inputs = containerItem.querySelectorAll('input, textarea, select');
+                        inputs.forEach(function(input) {
+                            const name = input.getAttribute('name') || '';
+                            const updatedName = name.replace(/__name__/g, index.toString());
+                            input.setAttribute('name', updatedName);
+
+                            const id = input.getAttribute('id');
+                            if (id) {
+                                input.setAttribute('id', id.replace(/__name__/g, index.toString()));
+                            }
+                        });
+                    }
+
+                    function reindexLabels() {
+                        container.querySelectorAll('.collection-item').forEach(function(item, i) {
+                            const label = item.querySelector('strong');
+                            if (label) {
+                                label.textContent = 'FAQ Item ' + (i + 1);
+                            }
+                        });
+                    }
+
+                    addBtn.addEventListener('click', function() {
+                        const source = prototypeSource.firstElementChild.cloneNode(true);
+                        updateNames(source, nextIndex);
+
+                        source.classList.add('collection-item', 'mb-3', 'card');
+                        source.setAttribute('data-faq-item-index', nextIndex.toString());
+
+                        source.querySelectorAll('input, textarea').forEach(function(input) {
+                            if (input.type !== 'hidden') {
+                                input.value = '';
+                                if (input.hasAttribute('required')) {
+                                    input.removeAttribute('required');
+                                }
+                            }
+                        });
+
+                        const header = document.createElement('div');
+                        header.className = 'card-header d-flex justify-content-between align-items-center';
+                        header.innerHTML = '<strong>FAQ Item X</strong>';
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-sm btn-outline-danger remove-faq-item';
+                        removeBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
+                        removeBtn.addEventListener('click', function() {
+                            if (confirm('Remove this FAQ item?')) {
+                                source.remove();
+                                reindexLabels();
+                            }
+                        });
+                        header.appendChild(removeBtn);
+
+                        const body = document.createElement('div');
+                        body.className = 'card-body';
+                        while (source.firstChild) {
+                            body.appendChild(source.firstChild);
+                        }
+                        source.appendChild(header);
+                        source.appendChild(body);
+
+                        container.appendChild(source);
+                        nextIndex = nextIndex + 1;
+                        container.dataset.index = nextIndex.toString();
+                        reindexLabels();
+
+                        const prototypeInputs = prototypeSource.querySelectorAll('input, textarea, select');
+                        prototypeInputs.forEach(function(input) { input.value = ''; });
+                    });
+
+                    container.querySelectorAll('.collection-item').forEach(function(item) {
+                        const removeBtn = item.querySelector('.remove-faq-item');
+                        if (removeBtn && !removeBtn._faqJsBound) {
+                            removeBtn._faqJsBound = true;
+                            removeBtn.addEventListener('click', function() {
+                                if (confirm('Remove this FAQ item?')) {
+                                    item.remove();
+                                    reindexLabels();
+                                }
+                            });
+                        }
+                    });
+                })();
+            </script>
+
         {% elseif form.vars.value.type == 'form' %}
             <ul class="nav nav-tabs" id="formSectionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -674,62 +871,7 @@
                     {{ form_row(dataForm.buttonStyle) }}
                 </div>
             </div>
-            
-        {% elseif form.vars.value.type == 'footer' %}
-            <ul class="nav nav-tabs" id="footerSectionTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-content" type="button" role="tab" aria-controls="heroSplit-content" aria-selected="true">Content</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-style" type="button" role="tab" aria-controls="heroSplit-style" aria-selected="false">Style</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="buttons-tab" data-bs-toggle="tab" data-bs-target="#heroSplit-buttons" type="button" role="tab" aria-controls="heroSplit-buttons" aria-selected="false">Buttons</button>
-                </li>
-            </ul>
-            <div class="tab-content p-3 border border-top-0" id="heroSplitTabsContent">
-              
-                
-            </div>
-        
-        {% elseif form.vars.value.type == 'footer' %}
-            <ul class="nav nav-tabs" id="heroQuoteTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-content" type="button" role="tab" aria-controls="heroQuote-content" aria-selected="true">Content</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-form" type="button" role="tab" aria-controls="heroQuote-form" aria-selected="false">Form</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="style-tab" data-bs-toggle="tab" data-bs-target="#heroQuote-style" type="button" role="tab" aria-controls="heroQuote-style" aria-selected="false">Style</button>
-                </li>
-            </ul>
-            <div class="tab-content p-3 border border-top-0" id="heroQuoteTabsContent">
-                <div class="tab-pane fade show active" id="heroQuote-content" role="tabpanel" aria-labelledby="content-tab">
-                    {{ form_row(dataForm.top_text) }}
-                    {{ form_row(dataForm.hero_title) }}
-                    {{ form_row(dataForm.hero_subtitle) }}
-                    {{ form_row(dataForm.phone_number) }}
-                    {{ form_row(dataForm.left_image) }}
-                </div>
-                <div class="tab-pane fade" id="heroQuote-form" role="tabpanel" aria-labelledby="form-tab">
-                    {{ form_row(dataForm.form_title) }}
-                    {{ form_row(dataForm.form_description) }}
-                    {{ form_row(dataForm.button_text) }}
-                </div>
-                <div class="tab-pane fade" id="heroQuote-style" role="tabpanel" aria-labelledby="style-tab">
-                    {{ form_row(dataForm.background_color) }}
-                    {{ form_row(dataForm.text_color) }}
-                    {{ form_row(dataForm.title_color) }}
-                    {{ form_row(dataForm.form_card_background) }}
-                    {{ form_row(dataForm.button_background_color) }}
-                    {{ form_row(dataForm.button_text_color) }}
-                    <hr>
-                    {{ form_row(dataForm.padding_top) }}
-                    {{ form_row(dataForm.padding_bottom) }}
-                </div>
-            </div>
-            
+
         {% elseif form.vars.value.type == 'footer' %}
             <ul class="nav nav-tabs" id="footerSectionTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -819,18 +961,18 @@
                     <h6 class="text-muted mb-3">Spacing</h6>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_top) }}
+                            {{ form_row(dataForm.paddingTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.padding_bottom) }}
+                            {{ form_row(dataForm.paddingBottom) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_top) }}
+                            {{ form_row(dataForm.marginTop) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_row(dataForm.margin_bottom) }}
+                            {{ form_row(dataForm.marginBottom) }}
                         </div>
                     </div>
                     

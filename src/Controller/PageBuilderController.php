@@ -56,6 +56,17 @@ class PageBuilderController extends AbstractController
         $form = $this->createForm(PageSectionType::class, $section);
         $form->handleRequest($request);
 
+        // When the type is changed in the "Add Section" form, only re-render with the
+        // type-specific fields. Do not persist a (possibly empty) section yet.
+        if ($form->isSubmitted() && $request->request->has('_rerender')) {
+            return $this->render('admin/section/new.html.twig', [
+                'section' => $section,
+                'page' => $page,
+                'site' => $page->getSite(),
+                'form' => $form,
+            ]);
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($section);
             $entityManager->flush();
